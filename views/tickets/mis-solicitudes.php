@@ -1,0 +1,125 @@
+<!-- Header -->
+<div class="flex items-center justify-between mb-6">
+    <div>
+        <h2 class="text-xl font-semibold text-gray-900">Mis Solicitudes</h2>
+        <p class="text-sm text-gray-500">Tickets de cancelación que has creado</p>
+    </div>
+    
+    <?php if (\App\Helpers\PermissionHelper::hasPermission('tickets.create')): ?>
+    <a href="<?= BASE_URL ?>tickets/crear" class="btn btn-primary">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nuevo Ticket
+    </a>
+    <?php endif; ?>
+</div>
+
+<!-- Tabla de tickets -->
+<div class="card">
+    <?php if (empty($tickets)): ?>
+    <div class="p-12 text-center">
+        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No tienes solicitudes</h3>
+        <p class="text-gray-500 mb-4">Crea tu primer ticket de cancelación</p>
+        
+        <?php if (\App\Helpers\PermissionHelper::hasPermission('tickets.create')): ?>
+        <a href="<?= BASE_URL ?>tickets/crear" class="btn btn-primary">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Crear Ticket
+        </a>
+        <?php endif; ?>
+    </div>
+    <?php else: ?>
+    
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php foreach ($tickets as $ticket): ?>
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-sm font-medium text-gray-900">#<?= $ticket['id'] ?></span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-medium text-gray-900">
+                            <?= htmlspecialchars($ticket['nombre_cliente']) ?>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            RFC: <?= htmlspecialchars($ticket['rfc_receptor']) ?>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-900">
+                            <?= htmlspecialchars($ticket['serie']) ?>-<?= htmlspecialchars($ticket['folio']) ?>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-sm font-medium text-gray-900">
+                            $<?= number_format($ticket['total_factura'], 2) ?>
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <?php $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'color' => 'gray']; ?>
+                        <span class="badge badge-<?= $estadoInfo['color'] ?>">
+                            <?= $estadoInfo['label'] ?>
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <?= date('d/m/Y', strtotime($ticket['fecha_creacion'])) ?>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <a href="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>" 
+                           class="text-primary-600 hover:text-primary-700 font-medium text-sm">
+                            Ver detalle →
+                        </a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Paginación -->
+    <?php if ($pagination['pages'] > 1): ?>
+    <div class="card-body border-t border-gray-200">
+        <div class="flex items-center justify-between">
+            <div class="text-sm text-gray-500">
+                Mostrando <?= (($pagination['page'] - 1) * $pagination['limit']) + 1 ?> 
+                a <?= min($pagination['page'] * $pagination['limit'], $pagination['total']) ?> 
+                de <?= $pagination['total'] ?>
+            </div>
+            
+            <nav class="flex space-x-2">
+                <?php if ($pagination['page'] > 1): ?>
+                <a href="?page=<?= $pagination['page'] - 1 ?>" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Anterior
+                </a>
+                <?php endif; ?>
+                
+                <?php if ($pagination['page'] < $pagination['pages']): ?>
+                <a href="?page=<?= $pagination['page'] + 1 ?>" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                    Siguiente
+                </a>
+                <?php endif; ?>
+            </nav>
+        </div>
+    </div>
+    <?php endif; ?>
+    
+    <?php endif; ?>
+</div>

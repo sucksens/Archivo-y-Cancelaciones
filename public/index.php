@@ -1,0 +1,75 @@
+<?php
+define('BASE_PATH', dirname(__DIR__));
+define('APP_PATH', BASE_PATH . '/app');
+define('PUBLIC_PATH', __DIR__);
+define('VIEWS_PATH', BASE_PATH . '/views');
+define('UPLOADS_PATH', PUBLIC_PATH . '/assets/uploads');
+
+require_once APP_PATH . '/config/constants.php';
+
+spl_autoload_register(function ($class) {
+    $prefix = 'App\\';
+    $baseDir = APP_PATH . '/';
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) return;
+    $relativeClass = substr($class, $len);
+    $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
+    $file = str_replace(['/Core/', '/Controllers/', '/Models/', '/Helpers/'], ['/core/', '/controllers/', '/models/', '/helpers/'], $file);
+    if (file_exists($file)) require $file;
+});
+
+use App\Core\Router;
+use App\Helpers\SessionHelper;
+use App\Helpers\AuthHelper;
+
+$session = new SessionHelper();
+$router = new Router();
+
+$authMiddleware = function() {
+    if (!AuthHelper::isAuthenticated()) {
+        Router::redirect('/login');
+        return false;
+    }
+    return true;
+};
+
+$router->get('/login', 'AuthController@showLogin');
+$router->post('/login', 'AuthController@login');
+$router->get('/registro', 'AuthController@showRegister');
+$router->post('/registro', 'AuthController@register');
+$router->post('/logout', 'AuthController@logout', [$authMiddleware]);
+
+$router->get('/', 'DashboardController@index', [$authMiddleware]);
+$router->get('/dashboard', 'DashboardController@index', [$authMiddleware]);
+$router->get('/api/dashboard/stats', 'DashboardController@getStats', [$authMiddleware]);
+
+$router->get('/tickets', 'TicketController@index', [$authMiddleware]);
+$router->get('/tickets/crear', 'TicketController@create', [$authMiddleware]);
+$router->post('/tickets', 'TicketController@store', [$authMiddleware]);
+$router->get('/tickets/{id}', 'TicketController@show', [$authMiddleware]);
+$router->post('/tickets/{id}/estado', 'TicketController@updateStatus', [$authMiddleware]);
+$router->post('/tickets/{id}/eliminar', 'TicketController@destroy', [$authMiddleware]);
+$router->get('/tickets/{id}/archivo', 'TicketController@downloadFile', [$authMiddleware]);
+
+$router->get('/mis-solicitudes', 'TicketController@misSolicitudes', [$authMiddleware]);
+
+$router->get('/perfil', 'AuthController@profile', [$authMiddleware]);
+$router->post('/perfil', 'AuthController@updateProfile', [$authMiddleware]);
+
+$router->get('/usuarios', 'UserController@index', [$authMiddleware]);
+$router->get('/usuarios/crear', 'UserController@create', [$authMiddleware]);
+$router->post('/usuarios', 'UserController@store', [$authMiddleware]);
+$router->get('/usuarios/{id}/editar', 'UserController@edit', [$authMiddleware]);
+$router->post('/usuarios/{id}', 'UserController@update', [$authMiddleware]);
+$router->post('/usuarios/{id}/eliminar', 'UserController@destroy', [$authMiddleware]);
+$router->post('/usuarios/{id}/toggle', 'UserController@toggleStatus', [$authMiddleware]);
+
+$router->get('/admin/roles', 'RoleController@index', [$authMiddleware]);
+$router->post('/admin/roles', 'RoleController@store', [$authMiddleware]);
+$router->get('/admin/roles/{id}', 'RoleController@show', [$authMiddleware]);
+$router->post('/admin/roles/{id}', 'RoleController@update', [$authMiddleware]);
+$router->post('/admin/roles/{id}/eliminar', 'RoleController@destroy', [$authMiddleware]);
+$router->get('/admin/roles/{id}/permisos', 'RoleController@getRolePermissions', [$authMiddleware]);
+$router->get('/admin/permisos', 'RoleController@getAllPermissions', [$authMiddleware]);
+
+$router->dispatch();
