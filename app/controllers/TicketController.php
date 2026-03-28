@@ -132,17 +132,14 @@ class TicketController extends BaseController
             }
 
             // Validar y subir archivo
-            if (empty($_FILES['archivo_autorizacion']['tmp_name'])) {
-                $this->session->flash('error', 'El archivo de autorización es requerido');
-                $this->session->set('old_input', $_POST);
-                $this->redirect('/tickets/crear');
-            }
-
             $uploader = new FileUploadHelper();
-            $filePath = $uploader->upload($_FILES['archivo_autorizacion']);
+            $fileData = $_FILES['archivo_autorizacion'] ?? [];
+            
+            $filePath = $uploader->upload($fileData);
 
             if (!$filePath) {
-                $this->session->flash('error', $uploader->getFirstError());
+                $errorMsg = $uploader->getFirstError() ?: 'Error al subir el archivo de autorización';
+                $this->session->flash('error', $errorMsg);
                 $this->session->set('old_input', $_POST);
                 $this->redirect('/tickets/crear');
             }
