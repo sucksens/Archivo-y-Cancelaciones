@@ -238,6 +238,7 @@ $session->remove('old_input');
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    /*
     const container = document.getElementById('operacionesContainer');
     const noOperaciones = document.getElementById('noOperaciones');
     const template = document.getElementById('operacionTemplate');
@@ -264,6 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    */
     // RFC to uppercase
     document.getElementById('rfc_receptor').addEventListener('input', function(e) {
         e.target.value = e.target.value.toUpperCase();
