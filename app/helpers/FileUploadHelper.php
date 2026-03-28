@@ -26,15 +26,21 @@ class FileUploadHelper
         $this->errors = [];
         $this->uploadedPath = null;
 
-        // Validar que hay archivo
-        if (!isset($file['tmp_name']) || empty($file['tmp_name'])) {
-            $this->errors[] = 'No se seleccionó ningún archivo';
+        // Validar que el array de archivo existe
+        if (!isset($file['error'])) {
+            $this->errors[] = 'No se recibió información del archivo';
             return null;
         }
 
-        // Validar errores de upload
+        // Validar errores de upload (PHP reporta errores aquí antes de llenar tmp_name si falló por tamaño, etc)
         if ($file['error'] !== UPLOAD_ERR_OK) {
             $this->errors[] = $this->getUploadErrorMessage($file['error']);
+            return null;
+        }
+
+        // Validar que hay un archivo temporal
+        if (empty($file['tmp_name'])) {
+            $this->errors[] = 'No se seleccionó ningún archivo';
             return null;
         }
 

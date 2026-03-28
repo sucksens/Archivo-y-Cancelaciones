@@ -135,6 +135,13 @@ class TicketController extends BaseController
             $uploader = new FileUploadHelper();
             $fileData = $_FILES['archivo_autorizacion'] ?? [];
             
+            // DIAGNÓSTICO TEMPORAL: 
+            if (empty($_FILES)) {
+                die("ERROR CRÍTICO: El servidor no recibió ningún archivo (FILES está vacío). " . 
+                    "POST tiene: " . count($_POST) . " campos. " . 
+                    "Límite máximo de POST (post_max_size): " . ini_get('post_max_size'));
+            }
+            
             $filePath = $uploader->upload($fileData);
 
             if (!$filePath) {
