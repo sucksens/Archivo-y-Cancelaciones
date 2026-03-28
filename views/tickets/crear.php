@@ -145,7 +145,7 @@ $session->remove('old_input');
                 </div>
             </div>
             
-            <!-- Operaciones Relacionadas -->
+            <!-- Operaciones Relacionadas 
             <div>
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -161,7 +161,7 @@ $session->remove('old_input');
                 </div>
                 
                 <div id="operacionesContainer" class="space-y-4">
-                    <!-- Las operaciones se agregan dinámicamente -->
+                     Las operaciones se agregan dinámicamente 
                 </div>
                 
                 <div id="noOperaciones" class="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
@@ -172,7 +172,7 @@ $session->remove('old_input');
                     <p class="text-xs">Click en "Agregar" para añadir una operación</p>
                 </div>
             </div>
-            
+            --> 
             <!-- Botones -->
             <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
                 <a href="<?= BASE_URL ?>dashboard" class="btn btn-secondary">
