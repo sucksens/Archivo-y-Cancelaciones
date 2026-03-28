@@ -189,7 +189,7 @@ $session->remove('old_input');
     </div>
 </div>
 
-<!-- Template para operaciones -->
+<!-- Template para operaciones 
 <template id="operacionTemplate">
     <div class="operacion-item bg-gray-50 rounded-lg p-4 relative">
         <button type="button" class="remove-operacion absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500 transition-colors">
@@ -234,6 +234,7 @@ $session->remove('old_input');
         </div>
     </div>
 </template>
+-->
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
