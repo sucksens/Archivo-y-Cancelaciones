@@ -13,12 +13,12 @@
     </div>
 
     <!-- Main JavaScript -->
-    <script src="<?= BASE_URL ?>assets/js/main.js"></script>
+    <script src="<?= BASE_URL_JS ?>assets/js/main.js"></script>
     
     <!-- Page specific scripts -->
     <?php if (isset($scripts)): ?>
         <?php foreach ($scripts as $script): ?>
-        <script src="<?= BASE_URL ?>assets/js/<?= $script ?>"></script>
+        <script src="<?= BASE_URL_JS ?>assets/js/<?= $script ?>"></script>
         <?php endforeach; ?>
     <?php endif; ?>
     

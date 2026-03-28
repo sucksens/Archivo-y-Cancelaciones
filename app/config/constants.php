@@ -24,6 +24,7 @@ define('UPLOADS_PATH', PUBLIC_PATH . '/assets/uploads');
 
 // URL base (ajustar según configuración del servidor)
 define('BASE_URL', '/index.php/');
+define('BASE_URL_JS', '/');
 
 // Configuración de sesiones
 define('SESSION_NAME', 'cancelaciones_session');
