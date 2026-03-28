@@ -9,7 +9,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
     <div class="lg:col-span-2 space-y-6">
         
         <!-- Datos del Ticket -->
-        <div class="card">
+        <div class="card card-accent-top card-accent-blue">
             <div class="card-header flex items-center justify-between">
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900">Ticket #<?= $ticket['id'] ?></h3>
@@ -74,7 +74,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                     <label class="text-sm font-medium text-gray-500">Archivo de Autorización</label>
                     <a href="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/archivo" 
                        class="mt-2 flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <svg class="w-10 h-10 text-red-500 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-10 h-10 text-danger-500 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
                         <div>
@@ -159,7 +159,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                         <?php endforeach; ?>
                     </select>
                     
-                    <button type="submit" class="btn btn-primary w-full">
+                    <button type="submit" class="btn btn-update w-full">
                         Actualizar Estado
                     </button>
                 </form>

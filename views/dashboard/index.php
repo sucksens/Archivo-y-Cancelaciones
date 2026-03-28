@@ -8,8 +8,8 @@ use App\Helpers\PermissionHelper;
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
-                <div class="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                 </div>
@@ -25,14 +25,14 @@ use App\Helpers\PermissionHelper;
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
-                <div class="flex-shrink-0 w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex-shrink-0 w-12 h-12 bg-gold-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Pendientes</p>
-                    <p class="text-2xl font-bold text-yellow-600"><?= $stats['pendientes'] ?? 0 ?></p>
+                    <p class="text-2xl font-bold text-gold-600"><?= $stats['pendientes'] ?? 0 ?></p>
                 </div>
             </div>
         </div>
@@ -42,14 +42,14 @@ use App\Helpers\PermissionHelper;
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
-                <div class="flex-shrink-0 w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex-shrink-0 w-12 h-12 bg-warning-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">En Proceso</p>
-                    <p class="text-2xl font-bold text-orange-600"><?= ($stats['en_revision'] ?? 0) + ($stats['en_proceso'] ?? 0) ?></p>
+                    <p class="text-2xl font-bold text-warning-600"><?= ($stats['en_revision'] ?? 0) + ($stats['en_proceso'] ?? 0) ?></p>
                 </div>
             </div>
         </div>
@@ -59,14 +59,14 @@ use App\Helpers\PermissionHelper;
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
-                <div class="flex-shrink-0 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex-shrink-0 w-12 h-12 bg-success-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Completados</p>
-                    <p class="text-2xl font-bold text-green-600"><?= ($stats['completados'] ?? 0) + ($stats['cancelados'] ?? 0) ?></p>
+                    <p class="text-2xl font-bold text-success-600"><?= ($stats['completados'] ?? 0) + ($stats['cancelados'] ?? 0) ?></p>
                 </div>
             </div>
         </div>
@@ -202,11 +202,11 @@ use App\Helpers\PermissionHelper;
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                                 </svg>
                                 <?php elseif ($log['tipo_log'] === 'error'): ?>
-                                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-danger-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                                 </svg>
                                 <?php else: ?>
-                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 <?php endif; ?>

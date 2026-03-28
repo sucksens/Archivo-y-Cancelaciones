@@ -4,7 +4,7 @@ $session->remove('old_input');
 ?>
 
 <div class="max-w-4xl mx-auto">
-    <div class="card">
+    <div class="card card-accent-top card-accent-blue">
         <div class="card-header">
             <h2 class="text-xl font-semibold text-gray-900">Nuevo Ticket de Cancelación</h2>
             <p class="text-sm text-gray-500 mt-1">Complete todos los campos requeridos para crear el ticket</p>
@@ -145,40 +145,12 @@ $session->remove('old_input');
                 </div>
             </div>
             
-            <!-- Operaciones Relacionadas 
-            <div>
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-900">Operaciones Relacionadas</h3>
-                        <p class="text-sm text-gray-500">Agregue complementos de pago, notas, anticipos u otros documentos relacionados</p>
-                    </div>
-                    <button type="button" id="addOperacion" class="btn btn-secondary">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                        Agregar
-                    </button>
-                </div>
-                
-                <div id="operacionesContainer" class="space-y-4">
-                     Las operaciones se agregan dinámicamente 
-                </div>
-                
-                <div id="noOperaciones" class="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
-                    <svg class="w-12 h-12 mx-auto text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                    <p>No hay operaciones relacionadas</p>
-                    <p class="text-xs">Click en "Agregar" para añadir una operación</p>
-                </div>
-            </div>
-            --> 
             <!-- Botones -->
             <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
                 <a href="<?= BASE_URL ?>dashboard" class="btn btn-secondary">
                     Cancelar
                 </a>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-update">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                     </svg>
@@ -189,83 +161,9 @@ $session->remove('old_input');
     </div>
 </div>
 
-<!-- Template para operaciones 
-<template id="operacionTemplate">
-    <div class="operacion-item bg-gray-50 rounded-lg p-4 relative">
-        <button type="button" class="remove-operacion absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-        </button>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-                <label class="form-label text-sm">Tipo de Operación</label>
-                <select name="operaciones[INDEX][tipo_operacion]" class="form-select text-sm">
-                    <?php foreach ($tipos_operacion as $key => $label): ?>
-                    <option value="<?= $key ?>"><?= htmlspecialchars($label) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            
-            <div>
-                <label class="form-label text-sm">UUID de Operación</label>
-                <input type="text" name="operaciones[INDEX][uuid_operacion]" class="form-input text-sm"
-                       pattern="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
-                       placeholder="UUID">
-            </div>
-            
-            <div>
-                <label class="form-label text-sm">Monto</label>
-                <input type="number" name="operaciones[INDEX][monto]" class="form-input text-sm" step="0.01" placeholder="0.00">
-            </div>
-            
-            <div class="md:col-span-2">
-                <label class="form-label text-sm">Descripción</label>
-                <input type="text" name="operaciones[INDEX][descripcion]" class="form-input text-sm" placeholder="Descripción opcional">
-            </div>
-            
-            <div class="flex items-end">
-                <label class="flex items-center cursor-pointer">
-                    <input type="checkbox" name="operaciones[INDEX][requiere_cancelacion]" value="1" class="w-4 h-4 text-primary-600 rounded focus:ring-primary-500">
-                    <span class="ml-2 text-sm text-gray-700">Requiere cancelación</span>
-                </label>
-            </div>
-        </div>
-    </div>
-</template>
--->
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    /*
-    const container = document.getElementById('operacionesContainer');
-    const noOperaciones = document.getElementById('noOperaciones');
-    const template = document.getElementById('operacionTemplate');
-    const addBtn = document.getElementById('addOperacion');
-    let operacionIndex = 0;
-    
-    function updateVisibility() {
-        const items = container.querySelectorAll('.operacion-item');
-        noOperaciones.style.display = items.length === 0 ? 'block' : 'none';
-    }
-    
-    addBtn.addEventListener('click', function() {
-        const clone = template.content.cloneNode(true);
-        const html = clone.querySelector('.operacion-item').outerHTML.replace(/INDEX/g, operacionIndex);
-        container.insertAdjacentHTML('beforeend', html);
-        operacionIndex++;
-        updateVisibility();
-        
-        // Attach remove event
-        const newItem = container.lastElementChild;
-        newItem.querySelector('.remove-operacion').addEventListener('click', function() {
-            newItem.remove();
-            updateVisibility();
-        });
-    });
-    
-    */
     // RFC to uppercase
     document.getElementById('rfc_receptor').addEventListener('input', function(e) {
         e.target.value = e.target.value.toUpperCase();

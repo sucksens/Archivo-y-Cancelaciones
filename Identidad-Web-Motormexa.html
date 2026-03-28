@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motormexa UI Kit - Sistema Completo v5.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ===== VARIABLES CSS COMPLETAS ===== */
+        :root {
+            /* ===== PALETA ORIGINAL COMPLETA ===== */
+            --primary-red: #dd1815;
+            --primary-blue: #224580;
+            --accent-gold: #f5ac3d;
+            --dark-primary: #202022;
+            --white: #ffffff;
+            --black: #000000;
+            /* Variaciones originales */
+            --red-hover: #c41411;
+            --red-light: #f8e6e5;
+            --red-dark: #a11310;
+            --blue-hover: #1a3564;
+            --blue-light: #e8eef7;
+            --blue-dark: #162745;
+            --gold-hover: #e69b35;
+            --gold-light: #fdf6e8;
+            --gold-dark: #d4932a;
+            /* ===== NUEVOS COLORES DEL AVANCE ===== */
+            --edit-blue: #3b82f6;
+            --edit-blue-hover: #2563eb;
+            --edit-blue-light: #dbeafe;
+            --edit-blue-dark: #1d4ed8;
+            --update-green: #10b981;
+            --update-green-hover: #059669;
+            --update-green-light: #ecfdf5;
+            --update-green-dark: #047857;
+            /* ===== PALETA EXPANDIDA ===== */
+            /* Colores de estado adicionales */
+            --success: #22c55e;
+            --success-hover: #16a34a;
+            --success-light: #dcfce7;
+            --success-dark: #15803d;
+            --warning: #f59e0b;
+            --warning-hover: #d97706;
+            --warning-light: #fef3c7;
+            --warning-dark: #b45309;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --danger-light: #fecaca;
+            --danger-dark: #b91c1c;
+            --info: #06b6d4;
+            --info-hover: #0891b2;
+            --info-light: #cffafe;
+            --info-dark: #0e7490;
+            /* Colores neutrales expandidos */
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            /* Colores de fondo y superficie */
+            --surface-50: #fafafa;
+            --surface-100: #f4f4f5;
+            --surface-200: #e4e4e7;
+            --surface-300: #d4d4d8;
+            --surface-400: #a1a1aa;
+            --surface-500: #71717a;
+            --surface-600: #52525b;
+            --surface-700: #3f3f46;
+            --surface-800: #27272a;
+            --surface-900: #18181b;
+            /* Colores de marca extendidos */
+            --brand-orange: #ff6b35;
+            --brand-orange-hover: #ea580c;
+            --brand-orange-light: #fed7aa;
+            --brand-orange-dark: #c2410c;
+            --brand-purple: #8b5cf6;
+            --brand-purple-hover: #7c3aed;
+            --brand-purple-light: #ddd6fe;
+            --brand-purple-dark: #6d28d9;
+            --brand-teal: #14b8a6;
+            --brand-teal-hover: #0f766e;
+            --brand-teal-light: #ccfbf1;
+            --brand-teal-dark: #0d9488;
+            /* Gradientes */
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--blue-dark) 100%);
+            --gradient-red: linear-gradient(135deg, var(--primary-red) 0%, var(--red-dark) 100%);
+            --gradient-gold: linear-gradient(135deg, var(--accent-gold) 0%, var(--gold-dark) 100%);
+            --gradient-success: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+            --gradient-warning: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%);
+            --gradient-danger: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
+            /* Sombras mejoradas */
+            --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            /* Espaciados */
+            --space-xs: 0.5rem;
+            --space-sm: 0.75rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            /* Radios */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-full: 9999px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--gray-50); color: var(--gray-900); line-height: 1.6; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-lg); }
+        header { background: var(--gradient-primary); color: white; padding: var(--space-3xl) 0; text-align: center; margin-bottom: var(--space-2xl); }
+        h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: var(--space-sm); }
+        .subtitle { font-size: 1.125rem; opacity: 0.9; }
+        /* ===== GRID SYSTEM ===== */
+        .grid { display: grid; gap: var(--space-lg); }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid-5 { grid-template-columns: repeat(5, 1fr); }
+        .grid-6 { grid-template-columns: repeat(6, 1fr); }
+        @media (max-width: 768px) {
+            .grid-2, .grid-3, .grid-4, .grid-5, .grid-6 { grid-template-columns: 1fr; }
+        }
+        /* ===== BUTTONS SYSTEM ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-sm) var(--space-lg);
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            justify-content: center;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        /* Botones principales con todos los colores */
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--blue-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+        .btn-edit { background: var(--edit-blue); color: white; }
+        .btn-edit:hover:not(:disabled) { background: var(--edit-blue-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+        .btn-update { background: var(--update-green); color: white; }
+        .btn-update:hover:not(:disabled) { background: var(--update-green-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover:not(:disabled) { background: var(--success-hover); }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning:hover:not(:disabled) { background: var(--warning-hover); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
+        .btn-secondary { background: var(--gray-200); color: var(--gray-700); border-color: var(--gray-300); }
+        .btn-secondary:hover:not(:disabled) { background: var(--gray-300); }
+        /* Tamaños de botones */
+        .btn-sm { padding: var(--space-xs) var(--space-sm); font-size: 0.75rem; }
+        .btn-lg { padding: var(--space-md) var(--space-xl); font-size: 1rem; }
+        /* Botones outline */
+        .btn-outline-primary { color: var(--primary-blue); border-color: var(--primary-blue); background: transparent; }
+        .btn-outline-primary:hover { background: var(--primary-blue); color: white; }
+        .btn-outline-edit { color: var(--edit-blue); border-color: var(--edit-blue); background: transparent; }
+        .btn-outline-edit:hover { background: var(--edit-blue); color: white; }
+        /* ===== CARDS CON ACCENTOS ===== */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        /* Acentos en todas las posiciones */
+        .card-accent-top { border-top: 4px solid var(--accent-gold); }
+        .card-accent-right { border-right: 4px solid var(--accent-gold); }
+        .card-accent-bottom { border-bottom: 4px solid var(--accent-gold); }
+        .card-accent-left { border-left: 4px solid var(--accent-gold); }
+        /* Variantes de color de acento */
+        .card-accent-blue { --accent-gold: var(--primary-blue); }
+        .card-accent-green { --accent-gold: var(--update-green); }
+        .card-accent-red { --accent-gold: var(--primary-red); }
+        .card-accent-purple { --accent-gold: var(--brand-purple); }
+        .card-header { padding: var(--space-lg); border-bottom: 1px solid var(--gray-200); }
+        .card-title { font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-xs); }
+        .card-subtitle { color: var(--gray-600); font-size: 0.875rem; }
+        .card-content { padding: var(--space-lg); }
+        .card-footer { padding: var(--space-lg); background: var(--gray-50); border-top: 1px solid var(--gray-200); }
+        /* ===== FORMS ===== */
+        .form-group { margin-bottom: var(--space-lg); }
+        .form-label { display: block; margin-bottom: var(--space-sm); font-weight: 500; color: var(--gray-700); }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: var(--white);
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px var(--blue-light);
+        }
+        .form-textarea { resize: vertical; min-height: 100px; }
+        .form-actions { display: flex; gap: var(--space-md); margin-top: var(--space-xl); justify-content: flex-end; }
+        /* ===== FILTERS ===== */
+        .filter-section {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            align-items: end;
+        }
+        /* ===== VEHICLE CARD EXAMPLE ===== */
+        .vehicle-card {
+            position: relative;
+        }
+        .vehicle-image {
+            height: 200px;
+            background: var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+        }
+        .vehicle-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin: var(--space-sm) 0;
+        }
+        .badge {
+            display: inline-flex;
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .badge-new { background: var(--update-green-light); color: var(--update-green); }
+        .badge-used { background: var(--gray-200); color: var(--gray-700); }
+        .badge-offer { background: var(--accent-gold); color: var(--white); }
+        /* ===== SECTIONS ===== */
+        .section {
+            margin: var(--space-2xl) 0;
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+        .section-header {
+            background: var(--gray-100);
+            padding: var(--space-xl);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        .section-content {
+            padding: var(--space-xl);
+        }
+
+        /* Color Card Component */
+        .color-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .color-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+        .color-sample {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            position: relative;
+            cursor: pointer;
+        }
+        .color-sample::after {
+            content: attr(data-color);
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+        }
+        .color-info {
+            padding: var(--space-md);
+        }
+        .color-name {
+            font-weight: 600;
+            margin-bottom: var(--space-xs);
+            color: var(--gray-900);
+        }
+        .color-value {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        .color-usage {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: var(--space-xs);
+            font-style: italic;
+        }
+        .color-group {
+            margin-bottom: var(--space-2xl);
+        }
+        .color-group h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--gray-800);
+            border-bottom: 2px solid var(--gray-200);
+            padding-bottom: var(--space-sm);
+        }
+        .demo-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: var(--space-lg);
+            color: var(--gray-700);
+        }
+        .copy-notification {
+            position: fixed;
+            top: var(--space-lg);
+            right: var(--space-lg);
+            background: var(--success);
+            color: white;
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        .copy-notification.show {
+            transform: translateX(0);
+        }
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .container { padding: 0 var(--space-md); }
+            .form-actions { flex-direction: column; }
+            .btn { width: 100%; }
+            .filter-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Motormexa UI Kit v5.0</h1>
+            <p class="subtitle">Sistema Completo con Paleta Expandida y Acentos Flexibles</p>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Paleta Original Completa -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🎯 Paleta Original Completa</h2>
+            </div>
+            <div class="section-content">
+                <div class="color-group">
+                    <h3>Colores Primarios Originales</h3>
+                    <div class="grid grid-5">
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--primary-red);" data-color="#dd1815"></div>
+                            <div class="color-info">
+                                <div class="color-name">Rojo Principal</div>
+                                <div class="color-value">#dd1815</div>
+                                <div class="color-usage">Color institucional</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--primary-blue);" data-color="#224580"></div>
+                            <div class="color-info">
+                                <div class="color-name">Azul Principal</div>
+                                <div class="color-value">#224580</div>
+                                <div class="color-usage">Color corporativo</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--accent-gold);" data-color="#f5ac3d"></div>
+                            <div class="color-info">
+                                <div class="color-name">Oro Acento</div>
+                                <div class="color-value">#f5ac3d</div>
+                                <div class="color-usage">Elementos premium</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--dark-primary);" data-color="#202022"></div>
+                            <div class="color-info">
+                                <div class="color-name">Negro Principal</div>
+                                <div class="color-value">#202022</div>
+                                <div class="color-usage">Textos principales</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--white); color: var(--gray-700); border: 1px solid var(--gray-300);" data-color="#ffffff"></div>
+                            <div class="color-info">
+                                <div class="color-name">Blanco</div>
+                                <div class="color-value">#ffffff</div>
+                                <div class="color-usage">Fondos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-group">
+                    <h3>Variaciones Originales</h3>
+                    <div class="grid grid-6">
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--red-light); color: var(--red-dark);" data-color="#f8e6e5"></div>
+                            <div class="color-info">
+                                <div class="color-name">Rojo Claro</div>
+                                <div class="color-value">#f8e6e5</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--red-hover);" data-color="#c41411"></div>
+                            <div class="color-info">
+                                <div class="color-name">Rojo Hover</div>
+                                <div class="color-value">#c41411</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--blue-light); color: var(--blue-dark);" data-color="#e8eef7"></div>
+                            <div class="color-info">
+                                <div class="color-name">Azul Claro</div>
+                                <div class="color-value">#e8eef7</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--blue-hover);" data-color="#1a3564"></div>
+                            <div class="color-info">
+                                <div class="color-name">Azul Hover</div>
+                                <div class="color-value">#1a3564</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gold-light); color: var(--gold-dark);" data-color="#fdf6e8"></div>
+                            <div class="color-info">
+                                <div class="color-name">Oro Claro</div>
+                                <div class="color-value">#fdf6e8</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gold-hover);" data-color="#e69b35"></div>
+                            <div class="color-info">
+                                <div class="color-name">Oro Hover</div>
+                                <div class="color-value">#e69b35</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Nuevos Colores del Avance -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🚀 Colores del Avance</h2>
+            </div>
+            <div class="section-content">
+                <div class="color-group">
+                    <h3>Editar / Actualizar</h3>
+                    <div class="grid grid-4">
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--edit-blue);" data-color="#3b82f6"></div>
+                            <div class="color-info">
+                                <div class="color-name">Edit Blue</div>
+                                <div class="color-value">#3b82f6</div>
+                                <div class="color-usage">Botón editar</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--edit-blue-hover);" data-color="#2563eb"></div>
+                            <div class="color-info">
+                                <div class="color-name">Edit Blue Hover</div>
+                                <div class="color-value">#2563eb</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--update-green);" data-color="#10b981"></div>
+                            <div class="color-info">
+                                <div class="color-name">Update Green</div>
+                                <div class="color-value">#10b981</div>
+                                <div class="color-usage">Botón actualizar</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--update-green-hover);" data-color="#059669"></div>
+                            <div class="color-info">
+                                <div class="color-name">Update Green Hover</div>
+                                <div class="color-value">#059669</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Paleta Expandida Completa -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🎨 Paleta Expandida Completa</h2>
+            </div>
+            <div class="section-content">
+                <div class="color-group">
+                    <h3>Colores de Estado</h3>
+                    <div class="grid grid-6">
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--success);" data-color="#22c55e"></div>
+                            <div class="color-info">
+                                <div class="color-name">Success</div>
+                                <div class="color-value">#22c55e</div>
+                                <div class="color-usage">Éxito, confirmación</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--warning);" data-color="#f59e0b"></div>
+                            <div class="color-info">
+                                <div class="color-name">Warning</div>
+                                <div class="color-value">#f59e0b</div>
+                                <div class="color-usage">Advertencia</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--danger);" data-color="#ef4444"></div>
+                            <div class="color-info">
+                                <div class="color-name">Danger</div>
+                                <div class="color-value">#ef4444</div>
+                                <div class="color-usage">Error, eliminar</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--info);" data-color="#06b6d4"></div>
+                            <div class="color-info">
+                                <div class="color-name">Info</div>
+                                <div class="color-value">#06b6d4</div>
+                                <div class="color-usage">Información</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-group">
+                    <h3>Escala Completa de Grises</h3>
+                    <div class="grid grid-6">
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gray-50); color: var(--gray-700); border: 1px solid var(--gray-200);" data-color="#f9fafb"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 50</div>
+                                <div class="color-value">#f9fafb</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gray-100); color: var(--gray-700);" data-color="#f3f4f6"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 100</div>
+                                <div class="color-value">#f3f4f6</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gray-300); color: var(--gray-700);" data-color="#d1d5db"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 300</div>
+                                <div class="color-value">#d1d5db</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gray-500);" data-color="#6b7280"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 500</div>
+                                <div class="color-value">#6b7280</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gray-700);" data-color="#374151"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 700</div>
+                                <div class="color-value">#374151</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gray-900);" data-color="#111827"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gray 900</div>
+                                <div class="color-value">#111827</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-group">
+                    <h3>Colores de Marca Extendidos</h3>
+                    <div class="grid grid-6">
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--brand-orange);" data-color="#ff6b35"></div>
+                            <div class="color-info">
+                                <div class="color-name">Brand Orange</div>
+                                <div class="color-value">#ff6b35</div>
+                                <div class="color-usage">Promociones</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--brand-purple);" data-color="#8b5cf6"></div>
+                            <div class="color-info">
+                                <div class="color-name">Brand Purple</div>
+                                <div class="color-value">#8b5cf6</div>
+                                <div class="color-usage">Premium Plus</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--brand-teal);" data-color="#14b8a6"></div>
+                            <div class="color-info">
+                                <div class="color-name">Brand Teal</div>
+                                <div class="color-value">#14b8a6</div>
+                                <div class="color-usage">Ecológico</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Gradientes y Sombras -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🌈 Gradientes y Sombras</h2>
+            </div>
+            <div class="section-content">
+                <div class="color-group">
+                    <h3>Gradientes</h3>
+                    <div class="grid grid-3">
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gradient-primary);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Primary Gradient</div>
+                                <div class="color-value">Blue → Dark Blue</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gradient-red);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Red Gradient</div>
+                                <div class="color-value">Red → Dark Red</div>
+                            </div>
+                        </div>
+                        <div class="color-card">
+                            <div class="color-sample" style="background: var(--gradient-gold);"></div>
+                            <div class="color-info">
+                                <div class="color-name">Gold Gradient</div>
+                                <div class="color-value">Gold → Dark Gold</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Guía de Uso -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">📋 Guía de Uso de la Paleta Completa</h2>
+            </div>
+            <div class="section-content">
+                <div class="grid grid-2">
+                    <div>
+                        <h3 class="demo-title">Jerarquía de Colores</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: var(--space-md);">
+                                <span style="display: inline-block; width: 20px; height: 20px; background: var(--primary-blue); border-radius: var(--radius-sm); margin-right: var(--space-sm);"></span>
+                                <strong>Principal:</strong> Botones, navegación, CTAs principales
+                            </li>
+                            <li style="margin-bottom: var(--space-md);">
+                                <span style="display: inline-block; width: 20px; height: 20px; background: var(--edit-blue); border-radius: var(--radius-sm); margin-right: var(--space-sm);"></span>
+                                <strong>Editar:</strong> Acciones de edición, modificación
+                            </li>
+                            <li style="margin-bottom: var(--space-md);">
+                                <span style="display: inline-block; width: 20px; height: 20px; background: var(--update-green); border-radius: var(--radius-sm); margin-right: var(--space-sm);"></span>
+                                <strong>Actualizar:</strong> Guardar cambios, confirmar
+                            </li>
+                            <li style="margin-bottom: var(--space-md);">
+                                <span style="display: inline-block; width: 20px; height: 20px; background: var(--primary-red); border-radius: var(--radius-sm); margin-right: var(--space-sm);"></span>
+                                <strong>Alertas:</strong> Advertencias, errores importantes
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="demo-title">Aplicaciones por Contexto</h3>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: var(--space-md);">
+                                <strong>UI Elements:</strong> Primary Blue, Edit Blue, Update Green
+                            </li>
+                            <li style="margin-bottom: var(--space-md);">
+                                <strong>Estados:</strong> Success, Warning, Danger (rojo), Info
+                            </li>
+                            <li style="margin-bottom: var(--space-md);">
+                                <strong>Fondos:</strong> Grises 50-100-200
+                            </li>
+                            <li style="margin-bottom: var(--space-md);">
+                                <strong>Textos:</strong> Grises 700-800-900
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sistema de Botones Completo -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🎯 Sistema de Botones Completo</h2>
+            </div>
+            <div class="section-content">
+                <h3>Todos los colores disponibles</h3>
+                <div class="grid grid-4">
+                    <div>
+                        <h4>Estilo Lleno</h4>
+                        <button class="btn btn-primary">Comprar</button>
+                        <button class="btn btn-edit">Editar</button>
+                        <button class="btn btn-update">Actualizar</button>
+                        <button class="btn btn-success">Éxito</button>
+                        <button class="btn btn-warning">Advertencia</button>
+                        <button class="btn btn-danger">Eliminar</button>
+                        <button class="btn btn-secondary">Secundario</button>
+                    </div>
+                    <div>
+                        <h4>Estilo Outline</h4>
+                        <button class="btn btn-outline-primary">Comprar</button>
+                        <button class="btn btn-outline-edit">Editar</button>
+                        <button class="btn btn-secondary">Cancelar</button>
+                    </div>
+                    <div>
+                        <h4>Tamaños</h4>
+                        <button class="btn btn-sm btn-primary">Pequeño</button>
+                        <button class="btn btn-primary">Mediano</button>
+                        <button class="btn btn-lg btn-primary">Grande</button>
+                    </div>
+                    <div>
+                        <h4>Estados</h4>
+                        <button class="btn btn-primary">Normal</button>
+                        <button class="btn btn-primary" disabled>Deshabilitado</button>
+                        <button class="btn btn-edit" style="transform: scale(0.95);">Activo</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Cards con Acentos en Todas las Posiciones -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🎨 Cards con Acentos Flexibles</h2>
+            </div>
+            <div class="section-content">
+                <h3>Demostración de acentos en todas las posiciones</h3>
+                <div class="grid grid-2">
+                    <!-- Acento Arriba -->
+                    <div class="card card-accent-top card-accent-blue">
+                        <div class="card-header">
+                            <h3 class="card-title">Chrysler Pacifica 2024</h3>
+                            <span class="badge badge-new">Nuevo</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="vehicle-image">Imagen del vehículo</div>
+                            <p class="vehicle-price">$45,999 USD</p>
+                            <p>Minivan familiar con tecnología avanzada y espacio para toda la familia.</p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary">Ver Detalles</button>
+                            <button class="btn btn-edit">Editar</button>
+                            <button class="btn btn-update">Actualizar Stock</button>
+                        </div>
+                    </div>
+                    <!-- Acento Derecha -->
+                    <div class="card card-accent-right card-accent-green">
+                        <div class="card-header">
+                            <h3 class="card-title">Jeep Wrangler Sport</h3>
+                            <span class="badge badge-used">Seminuevo</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="vehicle-image">Imagen del vehículo</div>
+                            <p class="vehicle-price">$38,500 USD</p>
+                            <p>SUV todoterreno con 15,000 km. Perfecto para aventuras off-road.</p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary">Ver Detalles</button>
+                            <button class="btn btn-edit">Editar</button>
+                            <button class="btn btn-update">Actualizar Precio</button>
+                        </div>
+                    </div>
+                    <!-- Acento Abajo -->
+                    <div class="card card-accent-bottom card-accent-purple">
+                        <div class="card-header">
+                            <h3 class="card-title">Dodge Challenger R/T</h3>
+                            <span class="badge badge-offer">Oferta Especial</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="vehicle-image">Imagen del vehículo</div>
+                            <p class="vehicle-price">$42,999 USD</p>
+                            <p>Muscle car potente con motor V8 HEMI. Experiencia de conducción pura.</p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-lg btn-primary">Comprar Ahora</button>
+                        </div>
+                    </div>
+                    <!-- Acento Izquierda -->
+                    <div class="card card-accent-left card-accent-red">
+                        <div class="card-header">
+                            <h3 class="card-title">Ram 1500 Laramie</h3>
+                            <span class="badge badge-new">Nuevo</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="vehicle-image">Imagen del vehículo</div>
+                            <p class="vehicle-price">$58,750 USD</p>
+                            <p>Pickup full-size con lujo y potencia. Ideal para trabajo y familia.</p>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary">Ver Detalles</button>
+                            <button class="btn btn-sm btn-edit">✏️</button>
+                            <button class="btn btn-sm btn-update">↻</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Formularios Completos -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">📝 Formularios Completos con Todos los Elementos</h2>
+            </div>
+            <div class="section-content">
+                <h3>Formulario de Registro de Vehículo</h3>
+                <form>
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Marca</label>
+                            <select class="form-select">
+                                <option>Seleccione marca</option>
+                                <option>Chrysler</option>
+                                <option>Dodge</option>
+                                <option>Jeep</option>
+                                <option>Ram</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Modelo</label>
+                            <input type="text" class="form-input" placeholder="Ej: Pacifica">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Año</label>
+                            <select class="form-select">
+                                <option>2024</option>
+                                <option>2023</option>
+                                <option>2022</option>
+                                <option>2021</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Precio (USD)</label>
+                            <input type="number" class="form-input" placeholder="45,999">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Kilometraje</label>
+                            <input type="number" class="form-input" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Transmisión</label>
+                            <div style="display: flex; gap: var(--space-lg);">
+                                <label><input type="radio" name="transmission"> Automática</label>
+                                <label><input type="radio" name="transmission"> Manual</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-textarea" placeholder="Descripción detallada del vehículo..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Características</label>
+                        <div class="grid grid-4">
+                            <label><input type="checkbox"> Aire acondicionado</label>
+                            <label><input type="checkbox"> Cámara de retroceso</label>
+                            <label><input type="checkbox"> Pantalla táctil</label>
+                            <label><input type="checkbox"> Asientos de cuero</label>
+                            <label><input type="checkbox"> Bluetooth</label>
+                            <label><input type="checkbox"> GPS</label>
+                            <label><input type="checkbox"> Llantas de aleación</label>
+                            <label><input type="checkbox"> Control de crucero</label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary">Cancelar</button>
+                        <button type="button" class="btn btn-edit">Guardar Borrador</button>
+                        <button type="submit" class="btn btn-update">Publicar Vehículo</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+        <!-- Filtros y Búsqueda -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">🔍 Sistema de Filtros Completo</h2>
+            </div>
+            <div class="section-content">
+                <div class="filter-section">
+                    <h3>Buscar y Filtrar Vehículos</h3>
+                    <div class="filter-grid">
+                        <div class="form-group">
+                            <label class="form-label">Buscar</label>
+                            <input type="text" class="form-input" placeholder="Buscar vehículo...">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Marca</label>
+                            <select class="form-select">
+                                <option>Todas las marcas</option>
+                                <option>Chrysler</option>
+                                <option>Dodge</option>
+                                <option>Jeep</option>
+                                <option>Ram</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Precio Máximo</label>
+                            <input type="range" class="form-input" min="0" max="100000" step="1000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Año</label>
+                            <select class="form-select">
+                                <option>Todos los años</option>
+                                <option>2024</option>
+                                <option>2023</option>
+                                <option>2022</option>
+                                <option>2021</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Estado</label>
+                            <select class="form-select">
+                                <option>Todos</option>
+                                <option>Nuevo</option>
+                                <option>Seminuevo</option>
+                                <option>Usado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary w-full">Aplicar Filtros</button>
+                            <button class="btn btn-secondary w-full">Limpiar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Mini Formularios de Edición Rápida -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">⚡ Mini Formularios de Edición Rápida</h2>
+            </div>
+            <div class="section-content">
+                <div class="grid grid-3">
+                    <div class="card card-accent-top card-accent-blue">
+                        <div class="card-header">
+                            <h3 class="card-title">Actualizar Precio</h3>
+                        </div>
+                        <div class="card-content">
+                            <form>
+                                <div class="form-group">
+                                    <label class="form-label">Nuevo precio</label>
+                                    <input type="number" class="form-input" placeholder="0.00">
+                                </div>
+                                <button type="submit" class="btn btn-update w-full">Actualizar precio</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card card-accent-right card-accent-green">
+                        <div class="card-header">
+                            <h3 class="card-title">Cambiar Estado</h3>
+                        </div>
+                        <div class="card-content">
+                            <form>
+                                <div class="form-group">
+                                    <select class="form-select">
+                                        <option>Disponible</option>
+                                        <option>Vendido</option>
+                                        <option>Reservado</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-update w-full">Guardar estado</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card card-accent-bottom card-accent-purple">
+                        <div class="card-header">
+                            <h3 class="card-title">Subir Imagen</h3>
+                        </div>
+                        <div class="card-content">
+                            <form>
+                                <div class="form-group">
+                                    <input type="file" class="form-input">
+                                </div>
+                                <button type="submit" class="btn btn-edit w-full">Subir imagen</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Tabla con Acciones -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">📊 Tabla de Gestión con Acciones</h2>
+            </div>
+            <div class="section-content">
+                <div class="card">
+                    <div class="card-content">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid var(--gray-200);">
+                                    <th style="text-align: left; padding: var(--space-md);">Vehículo</th>
+                                    <th style="text-align: left; padding: var(--space-md);">Precio</th>
+                                    <th style="text-align: left; padding: var(--space-md);">Stock</th>
+                                    <th style="text-align: left; padding: var(--space-md);">Estado</th>
+                                    <th style="text-align: left; padding: var(--space-md);">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--gray-200);">
+                                    <td style="padding: var(--space-md);">Chrysler Pacifica</td>
+                                    <td style="padding: var(--space-md);">$45,999</td>
+                                    <td style="padding: var(--space-md);">5</td>
+                                    <td style="padding: var(--space-md);"><span class="badge badge-new">Disponible</span></td>
+                                    <td style="padding: var(--space-md);">
+                                        <button class="btn btn-sm btn-primary">Ver</button>
+                                        <button class="btn btn-sm btn-edit">Editar</button>
+                                        <button class="btn btn-sm btn-update">Actualizar</button>
+                                        <button class="btn btn-sm btn-danger">Eliminar</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: var(--space-md);">Jeep Wrangler</td>
+                                    <td style="padding: var(--space-md);">$38,500</td>
+                                    <td style="padding: var(--space-md);">2</td>
+                                    <td style="padding: var(--space-md);"><span class="badge badge-used">Reservado</span></td>
+                                    <td style="padding: var(--space-md);">
+                                        <button class="btn btn-sm btn-primary">Ver</button>
+                                        <button class="btn btn-sm btn-edit">Editar</button>
+                                        <button class="btn btn-sm btn-update">Actualizar</button>
+                                        <button class="btn btn-sm btn-danger">Eliminar</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <div class="copy-notification" id="copyNotification">
+        ¡Color copiado al portapapeles!
+    </div>
+    <script>
+        // Copiar color al portapapeles
+        document.querySelectorAll('.color-sample').forEach(sample => {
+            sample.addEventListener('click', () => {
+                const color = sample.getAttribute('data-color');
+                if (color) {
+                    navigator.clipboard.writeText(color).then(() => {
+                        const notification = document.getElementById('copyNotification');
+                        notification.classList.add('show');
+                        setTimeout(() => {
+                            notification.classList.remove('show');
+                        }, 2000);
+                    });
+                }
+            });
+        });
+        // Añadir tooltip
+        document.querySelectorAll('.color-sample').forEach(sample => {
+            sample.title = 'Click para copiar';
+        });
+    </script>
+</body>
+</html>
