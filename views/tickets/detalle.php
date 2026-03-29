@@ -87,11 +87,14 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
         </div>
         
         <!-- Operaciones Relacionadas -->
-        <?php if (!empty($ticket['operaciones'])): ?>
         <div class="card">
-            <div class="card-header">
-                <h3 class="text-lg font-semibold text-gray-900">Operaciones Relacionadas</h3>
+            <div class="card-header grid grid-2">
+                <h3 class="text-lg font-semibold text-gray-900 grid-span-1">Operaciones Relacionadas</h3>
+                <button type="submit" class="btn btn-update grid-span-1">
+                    Buscar Operaciones
+                </button>
             </div>
+            <?php if (!empty($ticket['operaciones'])): ?>
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b border-gray-200">
