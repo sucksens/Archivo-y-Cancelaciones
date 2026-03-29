@@ -160,7 +160,7 @@
     <!-- Heroicons -->
     
     <!-- Estilos personalizados -->
-    <style>
+    <style type="text/tailwindcss">
         [x-cloak] { display: none !important; }
         
         .sidebar-link {
