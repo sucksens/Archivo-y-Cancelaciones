@@ -177,7 +177,7 @@ class TicketController extends BaseController
             }
             //llamada a un helper de bbj
             $facturaBridge = new FacturasBridge($DbName);
-            $factura = $facturaBridge->getFactura(ValidationHelper::clearUuid($_POST['uuid_factura']));
+            $factura = $facturaBridge->getFactura(ValidationHelper::cleanUuid($_POST['uuid_factura']));
 
             //estos son los datos para ya actualizar la factura de bbj
             $actualizado = $this->ticketModel->update($ticketId, [
