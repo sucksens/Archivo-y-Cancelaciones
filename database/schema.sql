@@ -113,6 +113,10 @@ CREATE TABLE IF NOT EXISTS tickets_cancelacion (
     serie VARCHAR(20) NOT NULL,
     folio VARCHAR(20) NOT NULL,
     inventario VARCHAR(50) NULL,
+    fecfac DATE NULL,
+    id_pedido VARCHAR(20) NULL,
+    id_vendedor VARCHAR(10) NULL,
+    id_suc VARCHAR(10) NULL,
     nombre_cliente VARCHAR(200) NOT NULL,
     total_factura DECIMAL(15,2) NOT NULL,
     rfc_receptor VARCHAR(13) NOT NULL,
@@ -130,6 +134,9 @@ CREATE TABLE IF NOT EXISTS tickets_cancelacion (
     INDEX idx_empresa (empresa_solicitante),
     INDEX idx_fecha_creacion (fecha_creacion),
     INDEX idx_uuid_factura (uuid_factura),
+    INDEX idx_id_pedido (id_pedido),
+    INDEX idx_id_vendedor (id_vendedor),
+    INDEX idx_id_suc (id_suc),
     CONSTRAINT fk_tc_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE RESTRICT,
     CONSTRAINT fk_tc_completador FOREIGN KEY (completado_por) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

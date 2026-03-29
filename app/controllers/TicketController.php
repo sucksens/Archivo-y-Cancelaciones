@@ -168,6 +168,17 @@ class TicketController extends BaseController
             ]);
 
             // Guardar operaciones relacionadas
+            //rehacer con la logica de buscar los datos de la factura en bbj 
+            //llamada a un helper de bbj
+            /* estos son los datos para ya actualizar la factura de bbj
+            $actualizado = $this->ticketModel->update($ticketId, [
+                'fecfac' => $_POST['FECFAC'],
+                'id_pedido' => $_POST['ID_PEDIDO'],
+                'id_vendedor' => $_POST['ID_VENDEDOR'],
+                'id_suc' => $_POST['ID_SUC']
+            ]);
+            */
+            // rehacer con la logica de buscar las operaciones 
             if (!empty($_POST['operaciones']) && is_array($_POST['operaciones'])) {
                 foreach ($_POST['operaciones'] as $op) {
                     if (!empty($op['uuid_operacion'])) {
