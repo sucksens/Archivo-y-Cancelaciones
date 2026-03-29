@@ -152,45 +152,6 @@
                 }
             }
         }
-        /* ===== BUTTONS SYSTEM ===== */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-xs);
-            padding: var(--space-sm) var(--space-lg);
-            border: 1px solid transparent;
-            border-radius: var(--radius-md);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            justify-content: center;
-        }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        /* Botones principales con todos los colores */
-        .btn-primary { background: var(--primary-blue); color: white; }
-        .btn-primary:hover:not(:disabled) { background: var(--blue-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
-        .btn-edit { background: var(--edit-blue); color: white; }
-        .btn-edit:hover:not(:disabled) { background: var(--edit-blue-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
-        .btn-update { background: var(--update-green); color: white; }
-        .btn-update:hover:not(:disabled) { background: var(--update-green-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-success:hover:not(:disabled) { background: var(--success-hover); }
-        .btn-warning { background: var(--warning); color: white; }
-        .btn-warning:hover:not(:disabled) { background: var(--warning-hover); }
-        .btn-danger { background: var(--danger); color: white; }
-        .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
-        .btn-secondary { background: var(--gray-200); color: var(--gray-700); border-color: var(--gray-300); }
-        .btn-secondary:hover:not(:disabled) { background: var(--gray-300); }
-        /* Tamaños de botones */
-        .btn-sm { padding: var(--space-xs) var(--space-sm); font-size: 0.75rem; }
-        .btn-lg { padding: var(--space-md) var(--space-xl); font-size: 1rem; }
-        /* Botones outline */
-        .btn-outline-primary { color: var(--primary-blue); border-color: var(--primary-blue); background: transparent; }
-        .btn-outline-primary:hover { background: var(--primary-blue); color: white; }
-        .btn-outline-edit { color: var(--edit-blue); border-color: var(--edit-blue); background: transparent; }
-        .btn-outline-edit:hover { background: var(--edit-blue); color: white; }
     </script>
     
     <!-- Favicon -->
