@@ -70,8 +70,8 @@
                             800: '#1e40af',
                             900: '#1e3a8a',
                         },
-                        /* Update Green / Success */
-                        success: {
+                        /* Update Green (Operations) */
+                        update: {
                             50: '#ecfdf5',
                             100: '#d1fae5',
                             200: '#a7f3d0',
@@ -82,6 +82,19 @@
                             700: '#047857',
                             800: '#065f46',
                             900: '#064e3b',
+                        },
+                        /* Success (Messages/States) */
+                        success: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',  /* success standard */
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
                         },
                         /* Warning (usando gold) */
                         warning: {
@@ -138,116 +151,6 @@
                     }
                 }
             }
-        }
-                :root {
-            /* ===== PALETA ORIGINAL COMPLETA ===== */
-            --primary-red: #dd1815;
-            --primary-blue: #224580;
-            --accent-gold: #f5ac3d;
-            --dark-primary: #202022;
-            --white: #ffffff;
-            --black: #000000;
-            /* Variaciones originales */
-            --red-hover: #c41411;
-            --red-light: #f8e6e5;
-            --red-dark: #a11310;
-            --blue-hover: #1a3564;
-            --blue-light: #e8eef7;
-            --blue-dark: #162745;
-            --gold-hover: #e69b35;
-            --gold-light: #fdf6e8;
-            --gold-dark: #d4932a;
-            /* ===== NUEVOS COLORES DEL AVANCE ===== */
-            --edit-blue: #3b82f6;
-            --edit-blue-hover: #2563eb;
-            --edit-blue-light: #dbeafe;
-            --edit-blue-dark: #1d4ed8;
-            --update-green: #10b981;
-            --update-green-hover: #059669;
-            --update-green-light: #ecfdf5;
-            --update-green-dark: #047857;
-            /* ===== PALETA EXPANDIDA ===== */
-            /* Colores de estado adicionales */
-            --success: #22c55e;
-            --success-hover: #16a34a;
-            --success-light: #dcfce7;
-            --success-dark: #15803d;
-            --warning: #f59e0b;
-            --warning-hover: #d97706;
-            --warning-light: #fef3c7;
-            --warning-dark: #b45309;
-            --danger: #ef4444;
-            --danger-hover: #dc2626;
-            --danger-light: #fecaca;
-            --danger-dark: #b91c1c;
-            --info: #06b6d4;
-            --info-hover: #0891b2;
-            --info-light: #cffafe;
-            --info-dark: #0e7490;
-            /* Colores neutrales expandidos */
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-            /* Colores de fondo y superficie */
-            --surface-50: #fafafa;
-            --surface-100: #f4f4f5;
-            --surface-200: #e4e4e7;
-            --surface-300: #d4d4d8;
-            --surface-400: #a1a1aa;
-            --surface-500: #71717a;
-            --surface-600: #52525b;
-            --surface-700: #3f3f46;
-            --surface-800: #27272a;
-            --surface-900: #18181b;
-            /* Colores de marca extendidos */
-            --brand-orange: #ff6b35;
-            --brand-orange-hover: #ea580c;
-            --brand-orange-light: #fed7aa;
-            --brand-orange-dark: #c2410c;
-            --brand-purple: #8b5cf6;
-            --brand-purple-hover: #7c3aed;
-            --brand-purple-light: #ddd6fe;
-            --brand-purple-dark: #6d28d9;
-            --brand-teal: #14b8a6;
-            --brand-teal-hover: #0f766e;
-            --brand-teal-light: #ccfbf1;
-            --brand-teal-dark: #0d9488;
-            /* Gradientes */
-            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--blue-dark) 100%);
-            --gradient-red: linear-gradient(135deg, var(--primary-red) 0%, var(--red-dark) 100%);
-            --gradient-gold: linear-gradient(135deg, var(--accent-gold) 0%, var(--gold-dark) 100%);
-            --gradient-success: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
-            --gradient-warning: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%);
-            --gradient-danger: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
-            /* Sombras mejoradas */
-            --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-            /* Espaciados */
-            --space-xs: 0.5rem;
-            --space-sm: 0.75rem;
-            --space-md: 1rem;
-            --space-lg: 1.5rem;
-            --space-xl: 2rem;
-            --space-2xl: 3rem;
-            --space-3xl: 4rem;
-            /* Radios */
-            --radius-sm: 0.375rem;
-            --radius-md: 0.5rem;
-            --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --radius-2xl: 1.5rem;
-            --radius-full: 9999px;
         }
         /* ===== BUTTONS SYSTEM ===== */
         .btn {
@@ -322,7 +225,7 @@
         .card-accent-bottom { @apply border-b-4 border-gold-500; }
         
         .card-accent-blue { @apply border-primary-500; }
-        .card-accent-green { @apply border-success-500; }
+        .card-accent-green { @apply border-update-500; }
         .card-accent-red { @apply border-danger-500; }
         .card-accent-purple { @apply border-brand-purple; }
 
@@ -352,7 +255,7 @@
         }
         
         .btn-update {
-            @apply bg-success-500 text-white hover:bg-success-600 focus:ring-success-500;
+            @apply bg-update-500 text-white hover:bg-update-600 focus:ring-update-500;
         }
         
         .btn-warning {
@@ -428,7 +331,7 @@
         .badge-red { @apply bg-red-100 text-red-500; }
         .badge-gray { @apply bg-gray-100 text-gray-700; }
         .badge-green { @apply bg-success-50 text-success-600; }
-        .badge-new { @apply bg-success-50 text-success-600; }
+        .badge-new { @apply bg-update-50 text-update-600; }
         .badge-used { @apply bg-gray-200 text-gray-700; }
         .badge-offer { @apply bg-gold-500 text-white; }
         
@@ -457,31 +360,31 @@
         <div class="flex-1 flex flex-col overflow-hidden">
             
             <!-- Top Navbar -->
-            <header class="bg-white border-b border-gray-200 sticky top-0 z-30">
+            <header class="bg-gradient-to-r from-primary-500 to-primary-700 shadow-md border-b border-primary-600 sticky top-0 z-30">
                 <div class="flex items-center justify-between px-6 py-4">
                     <div class="flex items-center space-x-4">
                         <!-- Mobile menu button -->
-                        <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg hover:bg-gray-100">
+                        <button id="sidebarToggle" class="lg:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                             </svg>
                         </button>
-                        <h1 class="text-xl font-semibold text-gray-800"><?= htmlspecialchars($title ?? 'Dashboard') ?></h1>
+                        <h1 class="text-xl font-semibold text-white"><?= htmlspecialchars($title ?? 'Dashboard') ?></h1>
                     </div>
                     
                     <div class="flex items-center space-x-4">
                         <!-- User dropdown -->
                         <div class="relative" id="userDropdown">
-                            <button class="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                                <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                                    <span class="text-primary-700 font-medium text-sm">
+                            <button class="flex items-center space-x-3 p-2 rounded-lg hover:bg-white/10 transition-colors">
+                                <div class="w-8 h-8 bg-white text-primary-600 rounded-full flex items-center justify-center shadow-sm">
+                                    <span class="font-bold text-sm">
                                         <?= strtoupper(substr($user['nombre_completo'] ?? 'U', 0, 1)) ?>
                                     </span>
                                 </div>
-                                <span class="hidden md:block text-sm font-medium text-gray-700">
+                                <span class="hidden md:block text-sm font-medium text-white">
                                     <?= htmlspecialchars($user['nombre_completo'] ?? 'Usuario') ?>
                                 </span>
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-primary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
