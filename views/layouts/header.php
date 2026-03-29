@@ -139,6 +139,155 @@
                 }
             }
         }
+                :root {
+            /* ===== PALETA ORIGINAL COMPLETA ===== */
+            --primary-red: #dd1815;
+            --primary-blue: #224580;
+            --accent-gold: #f5ac3d;
+            --dark-primary: #202022;
+            --white: #ffffff;
+            --black: #000000;
+            /* Variaciones originales */
+            --red-hover: #c41411;
+            --red-light: #f8e6e5;
+            --red-dark: #a11310;
+            --blue-hover: #1a3564;
+            --blue-light: #e8eef7;
+            --blue-dark: #162745;
+            --gold-hover: #e69b35;
+            --gold-light: #fdf6e8;
+            --gold-dark: #d4932a;
+            /* ===== NUEVOS COLORES DEL AVANCE ===== */
+            --edit-blue: #3b82f6;
+            --edit-blue-hover: #2563eb;
+            --edit-blue-light: #dbeafe;
+            --edit-blue-dark: #1d4ed8;
+            --update-green: #10b981;
+            --update-green-hover: #059669;
+            --update-green-light: #ecfdf5;
+            --update-green-dark: #047857;
+            /* ===== PALETA EXPANDIDA ===== */
+            /* Colores de estado adicionales */
+            --success: #22c55e;
+            --success-hover: #16a34a;
+            --success-light: #dcfce7;
+            --success-dark: #15803d;
+            --warning: #f59e0b;
+            --warning-hover: #d97706;
+            --warning-light: #fef3c7;
+            --warning-dark: #b45309;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --danger-light: #fecaca;
+            --danger-dark: #b91c1c;
+            --info: #06b6d4;
+            --info-hover: #0891b2;
+            --info-light: #cffafe;
+            --info-dark: #0e7490;
+            /* Colores neutrales expandidos */
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            /* Colores de fondo y superficie */
+            --surface-50: #fafafa;
+            --surface-100: #f4f4f5;
+            --surface-200: #e4e4e7;
+            --surface-300: #d4d4d8;
+            --surface-400: #a1a1aa;
+            --surface-500: #71717a;
+            --surface-600: #52525b;
+            --surface-700: #3f3f46;
+            --surface-800: #27272a;
+            --surface-900: #18181b;
+            /* Colores de marca extendidos */
+            --brand-orange: #ff6b35;
+            --brand-orange-hover: #ea580c;
+            --brand-orange-light: #fed7aa;
+            --brand-orange-dark: #c2410c;
+            --brand-purple: #8b5cf6;
+            --brand-purple-hover: #7c3aed;
+            --brand-purple-light: #ddd6fe;
+            --brand-purple-dark: #6d28d9;
+            --brand-teal: #14b8a6;
+            --brand-teal-hover: #0f766e;
+            --brand-teal-light: #ccfbf1;
+            --brand-teal-dark: #0d9488;
+            /* Gradientes */
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--blue-dark) 100%);
+            --gradient-red: linear-gradient(135deg, var(--primary-red) 0%, var(--red-dark) 100%);
+            --gradient-gold: linear-gradient(135deg, var(--accent-gold) 0%, var(--gold-dark) 100%);
+            --gradient-success: linear-gradient(135deg, var(--success) 0%, var(--success-dark) 100%);
+            --gradient-warning: linear-gradient(135deg, var(--warning) 0%, var(--warning-dark) 100%);
+            --gradient-danger: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
+            /* Sombras mejoradas */
+            --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            /* Espaciados */
+            --space-xs: 0.5rem;
+            --space-sm: 0.75rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            /* Radios */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-full: 9999px;
+        }
+        /* ===== BUTTONS SYSTEM ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-sm) var(--space-lg);
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            justify-content: center;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        /* Botones principales con todos los colores */
+        .btn-primary { background: var(--primary-blue); color: white; }
+        .btn-primary:hover:not(:disabled) { background: var(--blue-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+        .btn-edit { background: var(--edit-blue); color: white; }
+        .btn-edit:hover:not(:disabled) { background: var(--edit-blue-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+        .btn-update { background: var(--update-green); color: white; }
+        .btn-update:hover:not(:disabled) { background: var(--update-green-hover); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover:not(:disabled) { background: var(--success-hover); }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-warning:hover:not(:disabled) { background: var(--warning-hover); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
+        .btn-secondary { background: var(--gray-200); color: var(--gray-700); border-color: var(--gray-300); }
+        .btn-secondary:hover:not(:disabled) { background: var(--gray-300); }
+        /* Tamaños de botones */
+        .btn-sm { padding: var(--space-xs) var(--space-sm); font-size: 0.75rem; }
+        .btn-lg { padding: var(--space-md) var(--space-xl); font-size: 1rem; }
+        /* Botones outline */
+        .btn-outline-primary { color: var(--primary-blue); border-color: var(--primary-blue); background: transparent; }
+        .btn-outline-primary:hover { background: var(--primary-blue); color: white; }
+        .btn-outline-edit { color: var(--edit-blue); border-color: var(--edit-blue); background: transparent; }
+        .btn-outline-edit:hover { background: var(--edit-blue); color: white; }
     </script>
     
     <!-- Favicon -->
