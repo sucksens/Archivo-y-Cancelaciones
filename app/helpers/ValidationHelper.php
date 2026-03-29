@@ -356,4 +356,26 @@ class ValidationHelper
     {
         return strtolower(trim($uuid));
     }
+   
+    /**
+     * Convertir las fechas de bbj  a el formato de mysql
+     * 
+     * @param string $date DATE
+     * @return string
+     */
+    public static function BbjDateToMysqlDate(string $date): string 
+    {
+        // Verifica que la longitud de la fecha sea correcta
+        if (strlen($date) !== 8) {
+            throw new InvalidArgumentException('La fecha debe estar en formato YYYYMMDD.');
+        }
+        
+        // Extrae el año, mes y día
+        $year = substr($date, 0, 4);
+        $month = substr($date, 4, 2);
+        $day = substr($date, 6, 2);
+        
+        // Forma la nueva fecha en formato YYYY-MM-DD
+        return "$year-$month-$day";
+    }
 }

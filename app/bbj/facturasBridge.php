@@ -9,8 +9,20 @@
 
 namespace App\BBj;
 
+use App\Core\DatabaseBBj;
+
 class FacturasBridge{
 
-    private string $Database;
-   // por generar 
+    private string $DatabaseName;
+    private DatabaseBBj $db;
+
+    public function __construct(string $DatabaseName){
+        $this->DatabaseName = $DatabaseName;
+        $this->db = DatabaseBBj::getInstance($this->DatabaseName);
+   }
+
+   public function getFactura(string $uuid){
+        $sql = "SELECT * FROM FACTURAS WHERE FOLIOFISCAL = ?";
+        return $this->db->fetchOne($sql, [$uuid]);
+   }
 }

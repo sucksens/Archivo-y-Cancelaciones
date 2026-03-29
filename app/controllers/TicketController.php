@@ -15,6 +15,7 @@ use App\Models\FacturaOperacion;
 use App\Helpers\ValidationHelper;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\PermissionHelper;
+use App\BBj\FacturasBridge;
 
 class TicketController extends BaseController
 {
@@ -169,15 +170,23 @@ class TicketController extends BaseController
 
             // Guardar operaciones relacionadas
             //rehacer con la logica de buscar los datos de la factura en bbj 
+            if($_POST['empresa_solicitante'] == 'grupo_motormexa'){
+                $DbName  = "01AN_AUTOSNUEVOS";
+            }elseif ($_POST['empresa_solicitante'] == 'automotriz_motormexa') {
+                $DbName  = "02AN_AUTOSNUEVOS";
+            }
             //llamada a un helper de bbj
-            /* estos son los datos para ya actualizar la factura de bbj
+            $facturaBridge = new FacturasBridge($DbName);
+            $factura = $facturaBridge->getFactura(ValidationHelper::clearUuid($_POST['uuid_factura']));
+
+            //estos son los datos para ya actualizar la factura de bbj
             $actualizado = $this->ticketModel->update($ticketId, [
-                'fecfac' => $_POST['FECFAC'],
-                'id_pedido' => $_POST['ID_PEDIDO'],
-                'id_vendedor' => $_POST['ID_VENDEDOR'],
-                'id_suc' => $_POST['ID_SUC']
+                'fecfac' => ValidationHelper::BbjDateToMysqlDate($factura['FECFAC']),
+                'id_pedido' => $factura['ID_PEDIDO'],
+                'id_vendedor' => $factura['ID_VENDEDOR'],
+                'id_suc' => $factura['ID_SUC']
             ]);
-            */
+
             // rehacer con la logica de buscar las operaciones 
             if (!empty($_POST['operaciones']) && is_array($_POST['operaciones'])) {
                 foreach ($_POST['operaciones'] as $op) {
