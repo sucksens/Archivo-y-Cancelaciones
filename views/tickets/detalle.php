@@ -110,7 +110,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                         <?php foreach ($ticket['operaciones'] as $op): ?>
                         <tr>
                             <td class="px-6 py-4 text-sm text-gray-900">
-                                <?= $tipos_operacion[$op['serie']] ?? $op['serie'] .'-'. $tipos_operacion[$op['id_compago']] ?? $op['id_compago'] ?>
+                                <?= $op['serie'] .'-'. $op['id_compago'] ?>
                             </td>
                             <td class="px-6 py-4 text-xs font-mono text-gray-500">
                                 <?= htmlspecialchars(substr($op['uuid_operacion'], 0, 18)) ?>...
