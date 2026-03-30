@@ -99,9 +99,9 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Factura</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">UUID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descripción</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Monto</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Cancelación</th>
                         </tr>
@@ -110,13 +110,13 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                         <?php foreach ($ticket['operaciones'] as $op): ?>
                         <tr>
                             <td class="px-6 py-4 text-sm text-gray-900">
-                                <?= $tipos_operacion[$op['tipo_operacion']] ?? $op['tipo_operacion'] ?>
+                                <?= $tipos_operacion[$op['serie']] ?? $op['serie'] .'-'. $tipos_operacion[$op['id_compago']] ?? $op['id_compago'] ?>
                             </td>
                             <td class="px-6 py-4 text-xs font-mono text-gray-500">
                                 <?= htmlspecialchars(substr($op['uuid_operacion'], 0, 18)) ?>...
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-700">
-                                <?= htmlspecialchars($op['descripcion'] ?: '-') ?>
+                                <?= htmlspecialchars($tipos_operacion[$op['tipo_operacion']] ?? $op['tipo_operacion']) ?>
                             </td>
                             <td class="px-6 py-4 text-sm text-right font-medium text-gray-900">
                                 <?= $op['monto'] ? '$' . number_format($op['monto'], 2) : '-' ?>

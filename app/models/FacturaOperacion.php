@@ -42,13 +42,15 @@ class FacturaOperacion
     public function create(array $data): ?int
     {
         $sql = "INSERT INTO {$this->table} 
-                (ticket_id, tipo_operacion, uuid_operacion, descripcion, monto, 
+                (ticket_id, tipo_operacion,serie,id_compago, uuid_operacion, descripcion, monto, 
                  fecha_operacion, requiere_cancelacion, observaciones)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         $this->db->query($sql, [
             $data['ticket_id'],
             $data['tipo_operacion'],
+            $data['serie'] ?? null,
+            $data['id_compago'] ?? null,
             $data['uuid_operacion'],
             $data['descripcion'] ?? null,
             $data['monto'] ?? null,

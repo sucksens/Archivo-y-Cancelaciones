@@ -195,6 +195,8 @@ class TicketController extends BaseController
                     $this->operacionModel->create([
                         'ticket_id' => $ticketId,
                         'tipo_operacion' => $operacion['ID_CONCEPTO'],
+                        'serie' => $operacion['SERIE'],
+                        'id_compago' => $operacion['ID_COMPAGO'],
                         'uuid_operacion' => $operacion['FOLIOFISCAL'],
                         'monto' => $operacion['IMPORTE'],
                         'requiere_cancelacion' => 1,
