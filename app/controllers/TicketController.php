@@ -229,7 +229,45 @@ class TicketController extends BaseController
             $this->redirect('/tickets/' . $ticketId);
 
         } catch (\Exception $e) {
-            $this->log('Error al crear ticket: ' . $e->getMessage(), 'tickets');
+                $errorDetails = [
+                'mensaje' => $e->getMessage(),
+                'codigo' => $e->getCode(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine(),
+                'clase' => get_class($e),
+                'trace' => $e->getTraceAsString(),
+                'trace_completo' => $e->getTrace(),
+                'request_data' => [
+                    'post' => $_POST,
+                    'files' => isset($_FILES) ? array_map(fn($f) => [
+                        'name' => $f['name'] ?? null,
+                        'type' => $f['type'] ?? null,
+                        'size' => $f['size'] ?? null,
+                        'error' => $f['error'] ?? null,
+                    ], $_FILES) : [],
+                    'server' => [
+                        'request_uri' => $_SERVER['REQUEST_URI'] ?? null,
+                        'request_method' => $_SERVER['REQUEST_METHOD'] ?? null,
+                        'http_user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null,
+                        'remote_addr' => $_SERVER['REMOTE_ADDR'] ?? null,
+                    ],
+                ],
+                'datos_ticket' => [
+                    'empresa_solicitante' => $_POST['empresa_solicitante'] ?? null,
+                    'uuid_factura' => $_POST['uuid_factura'] ?? null,
+                    'serie' => $_POST['serie'] ?? null,
+                    'folio' => $_POST['folio'] ?? null,
+                    'nombre_cliente' => $_POST['nombre_cliente'] ?? null,
+                    'total_factura' => $_POST['total_factura'] ?? null,
+                    'rfc_receptor' => $_POST['rfc_receptor'] ?? null,
+                    'tipo_cancelacion' => $_POST['tipo_cancelacion'] ?? null,
+                    'motivo' => $_POST['motivo'] ?? null,
+                ],
+                'timestamp' => date('Y-m-d H:i:s'),
+                'user_id' => $this->userId(),
+            ];
+
+            $this->log('Error al crear ticket: ' . $e->getMessage(), 'tickets', json_encode($errorDetails,JSON_PRETTTY_PRINT|JSON_UNSCAPED_UNICODE));
             $this->session->flash('error', 'Error al crear el ticket');
             $this->redirect('/tickets/crear');
         }
