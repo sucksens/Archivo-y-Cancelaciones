@@ -194,21 +194,14 @@ class TicketController extends BaseController
                 //operaciones de recibos de caja
                 $operaciones = $facturaBridge->getRecibosCaja($factura['ID_VENDEDOR'], $factura['ID_PEDIDO']);
                 foreach ($operaciones as $operacion) {
-                    // valida si es un anticipó, y si es, se marca como no cancelable
-                    $cancelacion = 1;
-                    $serie = $operacion['SERIE'];
-                    if ($serie && $serie[0] === 'F') {
-                        // El código a ejecutar si 'SERIE' tiene 'F' al inicio
-                        $cancelacion = 0;
-                    }
                     $this->operacionModel->create([
                         'ticket_id' => $ticketId,
                         'tipo_operacion' => $operacion['ID_CONCEPTO'],
-                        'serie' => $serie,
+                        'serie' => $operacion['SERIE'],
                         'id_compago' => $operacion['ID_COMPAGO'],
                         'uuid_operacion' => $operacion['FOLIOFISCAL'],
                         'monto' => $operacion['IMPORTE'],
-                        'requiere_cancelacion' => $cancelacion,
+                        'requiere_cancelacion' => 1,
                     ]);
                 }
 
@@ -217,11 +210,11 @@ class TicketController extends BaseController
                 foreach ($operaciones as $operacion) {
                     $this->operacionModel->create([
                         'ticket_id' => $ticketId,
-                        'tipo_operacion' => $operacion['ID_CONCEPTO'],
-                        'serie' => $operacion['SERIE'],
-                        'id_compago' => $operacion['ID_COMPAGO'],
-                        'uuid_operacion' => $operacion['FOLIOFISCAL'],
-                        'monto' => $operacion['IMPORTE'],
+                        'tipo_operacion' => 'NAA',
+                        'serie' => $operacion['SERIENC'],
+                        'id_compago' => $operacion['ID_NOTA'],
+                        'uuid_operacion' => $operacion['UUID'],
+                        'monto' => $operacion['TOTAL'],
                         'requiere_cancelacion' => 1,
                     ]);
                 }

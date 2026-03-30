@@ -161,6 +161,22 @@ CREATE TABLE IF NOT EXISTS factura_operaciones (
     CONSTRAINT fk_fo_ticket FOREIGN KEY (ticket_id) REFERENCES tickets_cancelacion(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+DELIMITER //
+
+CREATE TRIGGER trg_actualizar_requiere_cancelacion AFTER INSERT
+ON factura_operaciones
+FOR EACH ROW
+BEGIN
+    -- Verificamos si el primer carácter de la serie es 'F'
+    IF LEFT(NEW.serie, 1) = 'F' THEN
+        UPDATE factura_operaciones 
+        SET requiere_cancelacion = 0 
+        WHERE id = NEW.id;
+    END IF;
+END;
+//
+
+DELIMITER ;
 -- ============================================
 -- TABLA: logs_sistema
 -- ============================================
