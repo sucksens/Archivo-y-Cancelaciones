@@ -16,18 +16,49 @@ class FacturasBridge{
     private string $DatabaseName;
     private DatabaseBBj $db;
 
+    /**
+     * Constructor de la clase
+     * 
+     * @param string $DatabaseName
+     * se pasa el nombre de la base de datos de bbj en la cual se buscaran operaciones de la factura
+     */
     public function __construct(string $DatabaseName){
-        $this->DatabaseName = $DatabaseName;
-        $this->db = DatabaseBBj::getInstance($this->DatabaseName);
-   }
+          $this->DatabaseName = $DatabaseName;
+          $this->db = DatabaseBBj::getInstance($this->DatabaseName);
+    }
 
-   public function getFactura(string $uuid){
-        $sql = "SELECT * FROM FACTURAS WHERE FOLIOFISCAL = ?";
-        return $this->db->fetchOne($sql, [$uuid]);
-   }
+    /**
+     * Obtiene la factura de bbj
+     * 
+     * @param string $uuid
+     * @return array
+     */
+     public function getFactura(string $uuid){
+               $sql = "SELECT * FROM FACTURAS WHERE FOLIOFISCAL = ?";
+               return $this->db->fetchOne($sql, [$uuid]);
+     }
 
-   public function getDoctosRelacionados(string $vendedor, string $pedido){
-        $sql = "SELECT * FROM PEDCOMPAGOS WHERE ID_VENDEDOR = ? AND ID_PEDIDO = ?";
-        return $this->db->fetchAll($sql, [$vendedor, $pedido]);
-   }
+     /**
+      * Obtiene los recibos de caja de la factura
+      * 
+      * @param string $vendedor
+      * @param string $pedido
+      * @return array
+      */
+     public function getRecibosCaja(string $vendedor, string $pedido){
+               $sql = "SELECT * FROM PEDCOMPAGOS WHERE ID_VENDEDOR = ? AND ID_PEDIDO = ?";
+               return $this->db->fetchAll($sql, [$vendedor, $pedido]);
+     }
+
+     /**
+      * Obtiene los documentos relacionados de la factura
+      * 
+      * @param string $vendedor
+      * @param string $pedido
+      * @return array
+      */
+     public function getDoctosRelacionados(string $vendedor, string $pedido){
+               $sql = "SELECT * FROM NCANTICIPOS WHERE ID_VENDEDOR = ? AND ID_PEDIDO = ?";
+               return $this->db->fetchAll($sql, [$vendedor, $pedido]);
+     }
 }

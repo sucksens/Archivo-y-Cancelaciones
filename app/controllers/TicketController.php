@@ -169,7 +169,7 @@ class TicketController extends BaseController
             ]);
 
             // Guardar operaciones relacionadas
-            //rehacer con la logica de buscar los datos de la factura en bbj 
+            // La logica de buscar los datos de la factura en bbj 
             if($_POST['empresa_solicitante'] == 'grupo_motormexa'){
                 $DbName  = "01AN_AUTOSNUEVOS";
             }elseif ($_POST['empresa_solicitante'] == 'automotriz_motormexa') {
@@ -188,8 +188,31 @@ class TicketController extends BaseController
                 'inventario' => $factura['INVENTARIO']
             ]);
 
-            // rehacer con la logica de buscar las operaciones 
+            // La logica de buscar las operaciones 
             if (!empty($factura['ID_VENDEDOR']) && !empty($factura['ID_PEDIDO'])) {
+                
+                //operaciones de recibos de caja
+                $operaciones = $facturaBridge->getRecibosCaja($factura['ID_VENDEDOR'], $factura['ID_PEDIDO']);
+                foreach ($operaciones as $operacion) {
+                    // valida si es un anticipó, y si es, se marca como no cancelable
+                    $cancelacion = 1;
+                    $serie = $operacion['SERIE'];
+                    if ($serie && $serie[0] === 'F') {
+                        // El código a ejecutar si 'SERIE' tiene 'F' al inicio
+                        $cancelacion = 0;
+                    }
+                    $this->operacionModel->create([
+                        'ticket_id' => $ticketId,
+                        'tipo_operacion' => $operacion['ID_CONCEPTO'],
+                        'serie' => $serie,
+                        'id_compago' => $operacion['ID_COMPAGO'],
+                        'uuid_operacion' => $operacion['FOLIOFISCAL'],
+                        'monto' => $operacion['IMPORTE'],
+                        'requiere_cancelacion' => $cancelacion,
+                    ]);
+                }
+
+                //operaciones de doctos relacionados
                 $operaciones = $facturaBridge->getDoctosRelacionados($factura['ID_VENDEDOR'], $factura['ID_PEDIDO']);
                 foreach ($operaciones as $operacion) {
                     $this->operacionModel->create([
