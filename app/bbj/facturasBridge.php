@@ -25,4 +25,9 @@ class FacturasBridge{
         $sql = "SELECT * FROM FACTURAS WHERE FOLIOFISCAL = ?";
         return $this->db->fetchOne($sql, [$uuid]);
    }
+
+   public function getDoctosRelacionados(string $vendedor, string $pedido){
+        $sql = "SELECT * FROM PEDCOMPAGOS WHERE ID_VENDEDOR = ? AND ID_PEDIDO = ?";
+        return $this->db->fetchAll($sql, [$vendedor, $pedido]);
+   }
 }

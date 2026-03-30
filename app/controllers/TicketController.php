@@ -189,20 +189,16 @@ class TicketController extends BaseController
             ]);
 
             // rehacer con la logica de buscar las operaciones 
-            if (!empty($_POST['operaciones']) && is_array($_POST['operaciones'])) {
-                foreach ($_POST['operaciones'] as $op) {
-                    if (!empty($op['uuid_operacion'])) {
-                        $this->operacionModel->create([
-                            'ticket_id' => $ticketId,
-                            'tipo_operacion' => $op['tipo_operacion'] ?? 'documento_relacionado',
-                            'uuid_operacion' => ValidationHelper::cleanUuid($op['uuid_operacion']),
-                            'descripcion' => ValidationHelper::sanitize($op['descripcion'] ?? ''),
-                            'monto' => !empty($op['monto']) ? floatval($op['monto']) : null,
-                            'fecha_operacion' => !empty($op['fecha_operacion']) ? $op['fecha_operacion'] : null,
-                            'requiere_cancelacion' => isset($op['requiere_cancelacion']) ? 1 : 0,
-                            'observaciones' => ValidationHelper::sanitize($op['observaciones'] ?? '')
-                        ]);
-                    }
+            if (!empty($factura['ID_VENDEDOR']) && !empty($factura['ID_PEDIDO'])) {
+                $operaciones = $facturaBridge->getDoctosRelacionados($factura['ID_VENDEDOR'], $factura['ID_PEDIDO']);
+                foreach ($operaciones as $operacion) {
+                    $this->operacionModel->create([
+                        'ticket_id' => $ticketId,
+                        'tipo_operacion' => $operacion['ID_CONCEPTO'],
+                        'uuid_operacion' => $operacion['FOLIOFISCAL'],
+                        'monto' => $operacion['IMPORTE'],
+                        'requiere_cancelacion' => 1,
+                    ]);
                 }
             }
 
