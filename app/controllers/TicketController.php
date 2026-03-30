@@ -184,7 +184,8 @@ class TicketController extends BaseController
                 'fecfac' => ValidationHelper::BbjDateToMysqlDate($factura['FECFAC']),
                 'id_pedido' => $factura['ID_PEDIDO'],
                 'id_vendedor' => $factura['ID_VENDEDOR'],
-                'id_suc' => $factura['ID_SUC']
+                'id_suc' => $factura['ID_SUC'],
+                'inventario' => $factura['INVENTARIO']
             ]);
 
             // rehacer con la logica de buscar las operaciones 
