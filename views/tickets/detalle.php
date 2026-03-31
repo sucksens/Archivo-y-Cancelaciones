@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     body: new URLSearchParams({
                         'flag': flag,
-                        'csrf_token': '<?= \App\Helpers\AuthHelper::generateCsrfToken() ?>'
+                        '_csrf_token': '<?= \App\Helpers\AuthHelper::generateCsrfToken() ?>'
                     })
                 });
                 
