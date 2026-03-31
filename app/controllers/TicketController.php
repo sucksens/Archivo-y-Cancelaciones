@@ -267,8 +267,9 @@ class TicketController extends BaseController
                 'user_id' => $this->userId(),
             ];
 
-            $this->log('Error al crear ticket: ' . $e->getMessage(), 'tickets', json_encode($errorDetails,JSON_PRETTTY_PRINT|JSON_UNSCAPED_UNICODE));
-            $this->session->flash('error', 'Error al crear el ticket');
+            $this->log('Error al crear ticket: ' . $e->getMessage(), 'tickets', json_encode($errorDetails,JSON_PRETTY_PRINT | JSON_UNSCAPED_UNICODE));
+            $this->session->flash('error', json_encode($errorDetails,JSON_PRETTY_PRINT | JSON_UNSCAPED_UNICODE));
+            //$this->session->flash('error', 'Error al crear el ticket');
             $this->redirect('/tickets/crear');
         }
     }
