@@ -262,6 +262,7 @@ class TicketController extends BaseController
                     'rfc_receptor' => $_POST['rfc_receptor'] ?? null,
                     'tipo_cancelacion' => $_POST['tipo_cancelacion'] ?? null,
                     'motivo' => $_POST['motivo'] ?? null,
+                    'ticket_id' => $ticketId,
                 ],
                 'timestamp' => date('Y-m-d H:i:s'),
                 'user_id' => $this->userId(),
