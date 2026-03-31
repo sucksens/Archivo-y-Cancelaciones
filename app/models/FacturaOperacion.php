@@ -3,7 +3,7 @@
  * Modelo FacturaOperacion - Operaciones relacionadas a tickets
  * Sistema de Tickets de Cancelación
  * 
- * @author Sistema
+ * @author José Ernesto Ruiz Valdivia
  * @version 1.0
  */
 

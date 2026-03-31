@@ -3,7 +3,7 @@
  * Modelo User - Gestión de usuarios
  * Sistema de Tickets de Cancelación
  * 
- * @author Sistema
+ * @author José Ernesto Ruiz Valdivia
  * @version 1.0
  */
 
