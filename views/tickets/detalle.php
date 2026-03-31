@@ -165,7 +165,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                             class="btn-toggle-flag p-1 text-blue-600 hover:text-blue-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="cancelada"
-                                            title="Alternar Cancelado Completo"
+                                            title=" Cancelado Completo"
                                             <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -175,7 +175,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                             class="btn-toggle-flag p-1 text-green-600 hover:text-green-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="cancelado_sistema"
-                                            title="Alternar Cancelado Sistema"
+                                            title="Cancelar Sistema"
                                             <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -185,7 +185,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                             class="btn-toggle-flag p-1 text-purple-600 hover:text-purple-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="cancelado_sat"
-                                            title="Alternar Cancelado SAT"
+                                            title="Cancelar SAT"
                                             <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
