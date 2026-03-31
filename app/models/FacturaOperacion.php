@@ -90,7 +90,8 @@ class FacturaOperacion
         $allowedFields = [
             'tipo_operacion', 'uuid_operacion', 'descripcion', 'monto',
             'fecha_operacion', 'requiere_cancelacion', 'cancelada',
-            'fecha_cancelacion', 'observaciones'
+            'cancelado_sistema', 'cancelado_sat',
+            'fecha_cancelacion', 'fecha_cancelacion_sat', 'observaciones'
         ];
 
         $fields = [];

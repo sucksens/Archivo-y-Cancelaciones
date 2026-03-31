@@ -148,13 +148,18 @@ CREATE TABLE IF NOT EXISTS factura_operaciones (
     id INT PRIMARY KEY AUTO_INCREMENT,
     ticket_id INT NOT NULL,
     tipo_operacion ENUM('complemento_pago', 'nota_aplicacion', 'anticipo', 'documento_relacionado') NOT NULL,
+    serie VARCHAR(5) NOT NULL,
+    id_compago VARCHAR(10) NOT NULL,
     uuid_operacion CHAR(36) NOT NULL,
     descripcion VARCHAR(255) NULL,
     monto DECIMAL(15,2) NULL,
     fecha_operacion DATE NULL,
     requiere_cancelacion TINYINT(1) DEFAULT 0,
     cancelada TINYINT(1) DEFAULT 0,
+    cancelado_sistema TINYINT(1) DEFAULT 0,
+    cancelado_sat TINYINT(1) DEFAULT 0,
     fecha_cancelacion TIMESTAMP NULL,
+    fecha_cancelacion_sat TIMESTAMP NULL,
     observaciones TEXT NULL,
     INDEX idx_ticket (ticket_id),
     INDEX idx_tipo (tipo_operacion),
@@ -163,20 +168,20 @@ CREATE TABLE IF NOT EXISTS factura_operaciones (
 
 DELIMITER //
 
-CREATE TRIGGER trg_actualizar_requiere_cancelacion AFTER INSERT
-ON factura_operaciones
+CREATE TRIGGER trg_set_requiere_cancelacion
+BEFORE INSERT ON factura_operaciones
 FOR EACH ROW
 BEGIN
     -- Verificamos si el primer carácter de la serie es 'F'
     IF LEFT(NEW.serie, 1) = 'F' THEN
-        UPDATE factura_operaciones 
-        SET requiere_cancelacion = 0 
-        WHERE id = NEW.id;
+        -- SOLUCIÓN: Modificamos directamente el valor en el registro nuevo
+        SET NEW.requiere_cancelacion = 0;
     END IF;
-END;
-//
+END //
 
 DELIMITER ;
+
+
 -- ============================================
 -- TABLA: logs_sistema
 -- ============================================

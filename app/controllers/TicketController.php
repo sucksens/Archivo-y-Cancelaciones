@@ -152,6 +152,7 @@ class TicketController extends BaseController
                 $this->redirect('/tickets/crear');
             }
 
+            // TODO validacion de que la factura sea de la empresa solicitante
             // Crear ticket
             $ticketId = $this->ticketModel->create([
                 'usuario_id' => $this->userId(),
@@ -455,5 +456,72 @@ class TicketController extends BaseController
         
         readfile($filePath);
         exit;
+    }
+
+    /**
+     * Alternar bandera de una operación (AJAX)
+     * 
+     * @param int $id ID de la operación
+     */
+    public function toggleOperacionFlag(int $id): void
+    {
+        $this->requirePermission('tickets.status');
+
+        try {
+            $this->validateCsrf();
+
+            $operacion = $this->operacionModel->find($id);
+            if (!$operacion) {
+                $this->json(['error' => 'Operación no encontrada'], 404);
+            }
+
+            $flag = $this->input('flag');
+            $allowedFlags = ['requiere_cancelacion', 'cancelada', 'cancelado_sistema', 'cancelado_sat'];
+
+            if (!in_array($flag, $allowedFlags)) {
+                $this->json(['error' => 'Bandera no válida'], 400);
+            }
+
+            $nuevoValor = $operacion[$flag] ? 0 : 1;
+            $updateData = [$flag => $nuevoValor];
+
+            // Si se marca como cancelado, guardamos la fecha
+            if ($nuevoValor === 1) {
+                if ($flag === 'cancelada' || $flag === 'cancelado_sistema') {
+                    $updateData['fecha_cancelacion'] = date('Y-m-d H:i:s');
+                } elseif ($flag === 'cancelado_sat') {
+                    $updateData['fecha_cancelacion_sat'] = date('Y-m-d H:i:s');
+                }
+            } else {
+                // Si se desmarca, podríamos limpiar la fecha, pero mejor dejarla como histórico o limpiarla según regla de negocio
+                if ($flag === 'cancelada' || $flag === 'cancelado_sistema') {
+                    $updateData['fecha_cancelacion'] = null;
+                } elseif ($flag === 'cancelado_sat') {
+                    $updateData['fecha_cancelacion_sat'] = null;
+                }
+            }
+
+            $this->operacionModel->update($id, $updateData);
+
+            // Registrar auditoría en el ticket relacionado
+            $this->ticketModel->audit(
+                $operacion['ticket_id'],
+                $this->userId(),
+                "Cambio de bandera '{$flag}' en operación #{$id}",
+                $flag,
+                $operacion[$flag] ? 'Sí' : 'No',
+                $nuevoValor ? 'Sí' : 'No'
+            );
+
+            $this->json([
+                'success' => true,
+                'message' => 'Operación actualizada correctamente',
+                'nuevo_valor' => $nuevoValor,
+                'flag' => $flag
+            ]);
+
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Error: ' . $e->getMessage()], 500);
+        }
     }
 }
