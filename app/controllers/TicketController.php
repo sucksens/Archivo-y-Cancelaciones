@@ -476,7 +476,7 @@ class TicketController extends BaseController
             }
 
             $flag = $this->input('flag');
-            $allowedFlags = ['requiere_cancelacion', 'cancelada', 'cancelado_sistema', 'cancelado_sat'];
+            $allowedFlags = ['cancelada', 'cancelado_sistema', 'cancelado_sat'];
 
             if (!in_array($flag, $allowedFlags)) {
                 $this->json(['error' => 'Bandera no válida'], 400);
