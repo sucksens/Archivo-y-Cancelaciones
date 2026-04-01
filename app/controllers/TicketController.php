@@ -582,4 +582,65 @@ class TicketController extends BaseController
             $this->json(['error' => 'Ocurrió un error inesperado: ' . $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Parsear archivo XML para extraer datos (AJAX)
+     */
+    public function parseXml(): void
+    {
+        $this->requirePermission('tickets.create');
+
+        try {
+            $fileData = $_FILES['xml_file'] ?? null;
+
+            if (!$fileData || $fileData['error'] !== UPLOAD_ERR_OK) {
+                $this->json(['error' => 'No se recibió un archivo válido'], 400);
+            }
+
+            // Validar que sea XML
+            $ext = pathinfo($fileData['name'], PATHINFO_EXTENSION);
+            if (strtolower($ext) !== 'xml') {
+                $this->json(['error' => 'El archivo debe ser un XML'], 400);
+            }
+
+            // Preparar el archivo para enviarlo por cURL
+            $filePath = $fileData['tmp_name'];
+            $mimeType = $fileData['type'] ?: 'text/xml';
+            $cfile = curl_file_create($filePath, $mimeType, $fileData['name']);
+
+            $data = ['file' => $cfile];
+
+            // Realizar petición al API de parseo
+            $apiUrl = 'http://200.1.1.245:5000/parsear_xml/';
+            
+            $ch = curl_init($apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($response === false) {
+                $this->json(['error' => 'Error al conectar con el servidor de parseo: ' . $error], 500);
+            }
+
+            $decodedResponse = json_decode($response, true);
+            
+            if ($httpCode >= 400) {
+                $this->json([
+                    'error' => 'El servidor de parseo respondió con un error',
+                    'detail' => $decodedResponse['error'] ?? $decodedResponse['detail'] ?? $response
+                ], $httpCode);
+            }
+
+            $this->json($decodedResponse);
+
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Ocurrió un error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
 }
