@@ -50,6 +50,7 @@ $router->get('/tickets/{id}', 'TicketController@show', [$authMiddleware]);
 $router->post('/tickets/{id}/estado', 'TicketController@updateStatus', [$authMiddleware]);
 $router->post('/tickets/{id}/eliminar', 'TicketController@destroy', [$authMiddleware]);
 $router->post('/tickets/operacion/{id}/toggle', 'TicketController@toggleOperacionFlag', [$authMiddleware]);
+$router->post('/tickets/{id}/validar-sat', 'TicketController@validateSatStatus', [$authMiddleware]);
 $router->get('/tickets/{id}/archivo', 'TicketController@downloadFile', [$authMiddleware]);
 
 $router->get('/mis-solicitudes', 'TicketController@misSolicitudes', [$authMiddleware]);

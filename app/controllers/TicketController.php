@@ -509,4 +509,77 @@ class TicketController extends BaseController
             $this->json(['error' => 'Error: ' . $e->getMessage()], 500);
         }
     }
+
+    /**
+     * Validar estatus de factura ante el SAT
+     * 
+     * @param int $id ID del ticket
+     */
+    public function validateSatStatus(int $id): void
+    {
+        $ticket = $this->ticketModel->find($id);
+
+        if (!$ticket) {
+            $this->json(['error' => 'Ticket no encontrado'], 404);
+        }
+
+        // Definir RFC Emisor según la empresa
+        $rfcEmisor = '';
+        if ($ticket['empresa_solicitante'] === 'grupo_motormexa') {
+            $rfcEmisor = 'GMG090821RT0';
+        } else if ($ticket['empresa_solicitante'] === 'automotriz_motormexa') {
+            $rfcEmisor = 'AMO021114AG5';
+        }
+
+        if (empty($rfcEmisor)) {
+            $this->json(['error' => 'RFC emisor no configurado para esta empresa'], 400);
+        }
+
+        // Preparar datos para el API
+        $data = [
+            'rfc_emisor' => $rfcEmisor,
+            'rfc_receptor' => $ticket['rfc_receptor'],
+            'total' => (float)$ticket['total_factura'],
+            'uuid' => $ticket['uuid_factura']
+        ];
+
+        // Realizar petición al API SAT externo
+        $apiUrl = 'http://200.1.1.245:5000/validar_factura/';
+        
+        try {
+            $ch = curl_init($apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Accept: application/json'
+            ]);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($response === false) {
+                $this->json(['error' => 'Error al conectar con el servidor de validación: ' . $error], 500);
+            }
+
+            $decodedResponse = json_decode($response, true);
+            
+            if ($httpCode >= 400) {
+                $this->json([
+                    'error' => 'El servidor de validación respondió con un error',
+                    'detail' => $decodedResponse['detail'] ?? $response
+                ], $httpCode);
+            }
+
+            $this->log("Consultó estatus SAT para ticket #{$id}", 'tickets');
+            $this->json($decodedResponse);
+
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Ocurrió un error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
 }
