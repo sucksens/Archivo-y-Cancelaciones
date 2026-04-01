@@ -65,8 +65,9 @@ class Ticket
         $sql = "INSERT INTO {$this->table} 
                 (uuid, usuario_id, empresa_solicitante, uuid_factura, serie, folio, 
                  inventario, nombre_cliente, total_factura, rfc_receptor, 
-                 tipo_cancelacion, motivo, archivo_autorizacion, estado)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente')";
+                 tipo_cancelacion, motivo, archivo_autorizacion, estado,
+                 fecfac, id_pedido, id_vendedor, id_suc)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?, ?, ?, ?)";
         
         $this->db->query($sql, [
             $uuid,
@@ -81,7 +82,11 @@ class Ticket
             $data['rfc_receptor'],
             $data['tipo_cancelacion'],
             $data['motivo'],
-            $data['archivo_autorizacion']
+            $data['archivo_autorizacion'],
+            $data['fecfac'] ?? null,
+            $data['id_pedido'] ?? null,
+            $data['id_vendedor'] ?? null,
+            $data['id_suc'] ?? null
         ]);
 
         return (int) $this->db->lastInsertId();
