@@ -58,7 +58,7 @@ class FacturasBridge{
       * @return array
       */
      public function getDoctosRelacionados(string $vendedor, string $pedido){
-               $sql = "SELECT * FROM NCANTICIPOS WHERE ID_VENDEDOR = ? AND ID_PEDIDO = ?";
+               $sql = "SELECT * FROM NCANTICIPOS WHERE ID_VENDEDOR = ? AND ID_PEDIDO = ? AND STATUS = '0' ";
                return $this->db->fetchAll($sql, [$vendedor, $pedido]);
      }
 }

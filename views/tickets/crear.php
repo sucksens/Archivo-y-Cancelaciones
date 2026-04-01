@@ -13,6 +13,37 @@ $session->remove('old_input');
         <form action="<?= BASE_URL ?>tickets" method="POST" enctype="multipart/form-data" class="card-body space-y-6" id="ticketForm">
             <?= \App\Helpers\AuthHelper::getCsrfField() ?>
             
+            <!-- Carga Automática por XML -->
+            <div class="bg-primary-50 rounded-xl p-6 border border-primary-100 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-semibold text-primary-900">Carga Automática</h3>
+                        <p class="text-sm text-primary-700">Suba el archivo XML de la factura para autocompletar los campos.</p>
+                    </div>
+                    <div class="bg-white p-2 rounded-lg shadow-sm">
+                        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
+                    <div class="w-full">
+                        <label for="xml_upload" class="sr-only">Subir XML</label>
+                        <input type="file" id="xml_upload" accept=".xml" 
+                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 transition-all cursor-pointer">
+                    </div>
+                    <div id="xml_loading" class="hidden flex items-center text-primary-600 font-medium">
+                        <svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Procesando...
+                    </div>
+                </div>
+                <div id="xml_status" class="mt-3 text-sm hidden"></div>
+            </div>
+
             <!-- Información de la Factura -->
             <div class="border-b border-gray-200 pb-6">
                 <h3 class="text-lg font-medium text-gray-900 mb-4">Información de la Factura</h3>
@@ -164,7 +195,109 @@ $session->remove('old_input');
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Campos que requieren eliminar espacios
+    // --- LÓGICA DE CARGA AUTOMÁTICA POR XML ---
+    const xmlUpload = document.getElementById('xml_upload');
+    const xmlLoading = document.getElementById('xml_loading');
+    const xmlStatus = document.getElementById('xml_status');
+
+    if (xmlUpload) {
+        xmlUpload.addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Mostrar estado de carga
+            xmlLoading.classList.remove('hidden');
+            xmlStatus.classList.add('hidden');
+            xmlUpload.disabled = true;
+
+            const formData = new FormData();
+            formData.append('xml_file', file);
+
+            try {
+                const response = await fetch('<?= BASE_URL ?>tickets/parse-xml', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.exito && result.datos) {
+                    fillFormFromXml(result.datos);
+                    showXmlStatus('¡Datos cargados correctamente!', 'text-green-600');
+                } else {
+                    showXmlStatus(result.error || 'Error al procesar el XML', 'text-red-600');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showXmlStatus('Error de conexión con el servidor', 'text-red-600');
+            } finally {
+                xmlLoading.classList.add('hidden');
+                xmlUpload.disabled = false;
+                xmlUpload.value = ''; // Limpiar para permitir volver a subir el mismo si es necesario
+            }
+        });
+    }
+
+    function showXmlStatus(message, colorClass) {
+        xmlStatus.textContent = message;
+        xmlStatus.className = `mt-3 text-sm flex items-center ${colorClass}`;
+        xmlStatus.classList.remove('hidden');
+    }
+
+    function fillFormFromXml(datos) {
+        const cfdi = datos.cfdi40 || datos.cfdi33 || datos.cfdi32;
+        if (!cfdi) return;
+
+        // 1. UUID (está en tfd11 o tfd10)
+        const tfd = datos.tfd11 ? datos.tfd11[0] : (datos.tfd10 ? datos.tfd10[0] : null);
+        if (tfd && tfd.uuid) {
+            const uuidField = document.getElementById('uuid_factura');
+            uuidField.value = tfd.uuid.toLowerCase();
+            uuidField.dispatchEvent(new Event('input'));
+        }
+
+        // 2. Serie y Folio
+        if (cfdi.serie) document.getElementById('serie').value = cfdi.serie;
+        if (cfdi.folio) document.getElementById('folio').value = cfdi.folio;
+
+        // 3. Total
+        if (cfdi.total) {
+            const totalField = document.getElementById('total_factura');
+            totalField.value = cfdi.total;
+            totalField.dispatchEvent(new Event('input'));
+        }
+
+        // 4. Cliente y RFC
+        if (cfdi.receptor) {
+            if (cfdi.receptor.nombre) document.getElementById('nombre_cliente').value = cfdi.receptor.nombre;
+            if (cfdi.receptor.rfc) {
+                const rfcField = document.getElementById('rfc_receptor');
+                rfcField.value = cfdi.receptor.rfc.toUpperCase();
+                rfcField.dispatchEvent(new Event('input'));
+            }
+        }
+
+        // 5. Empresa (Basado en RFC Emisor)
+        if (cfdi.emisor && cfdi.emisor.rfc) {
+            const rfcEmisor = cfdi.emisor.rfc.toUpperCase();
+            const empresaSelect = document.getElementById('empresa_solicitante');
+            
+            // Mapeo manual de RFCs conocidos
+            const rfcToEmpresa = {
+                'GMG090821RT0': 'grupo_motormexa',
+                'AMO021114AG5': 'automotriz_motormexa'
+            };
+
+            if (rfcToEmpresa[rfcEmisor]) {
+                empresaSelect.value = rfcToEmpresa[rfcEmisor];
+            }
+        }
+    }
+
+    // --- LÓGICA EXISTENTE DE LIMPIEZA DE CAMPOS ---
     const cleanFields = [
         'uuid_factura',
         'serie',
