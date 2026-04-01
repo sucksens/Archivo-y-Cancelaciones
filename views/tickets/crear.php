@@ -67,11 +67,11 @@ $session->remove('old_input');
                                value="<?= htmlspecialchars($oldInput['inventario'] ?? '') ?>">
                     </div>
                     
-                    <!-- Total Factura -->
+    <!-- Total Factura -->
                     <div>
                         <label for="total_factura" class="form-label">Total de Factura <span class="text-red-500">*</span></label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">$</span>
+                            <span id="currency-icon" class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 transition-opacity duration-200">$</span>
                             <input type="number" name="total_factura" id="total_factura" class="form-input pl-8" 
                                    step="0.01" min="0.01"
                                    value="<?= htmlspecialchars($oldInput['total_factura'] ?? '') ?>"
@@ -164,14 +164,60 @@ $session->remove('old_input');
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // RFC to uppercase
-    document.getElementById('rfc_receptor').addEventListener('input', function(e) {
-        e.target.value = e.target.value.toUpperCase();
+    // Campos que requieren eliminar espacios
+    const cleanFields = [
+        'uuid_factura',
+        'serie',
+        'folio',
+        'inventario',
+        'rfc_receptor'
+    ];
+
+    cleanFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.addEventListener('input', function(e) {
+                // Eliminar todos los espacios
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const originalValue = this.value;
+                const cleanedValue = originalValue.replace(/\s+/g, '');
+                
+                if (originalValue !== cleanedValue) {
+                    this.value = cleanedValue;
+                    // Mantener posición del cursor si es posible
+                    const shift = originalValue.length - cleanedValue.length;
+                    this.setSelectionRange(start - shift, end - shift);
+                }
+
+                // Transformaciones adicionales
+                if (id === 'rfc_receptor') {
+                    this.value = this.value.toUpperCase();
+                } else if (id === 'uuid_factura') {
+                    this.value = this.value.toLowerCase();
+                }
+            });
+        }
     });
-    
-    // UUID to lowercase
-    document.getElementById('uuid_factura').addEventListener('input', function(e) {
-        e.target.value = e.target.value.toLowerCase();
-    });
+
+    // Control del icono de moneda en Total Factura
+    const totalInput = document.getElementById('total_factura');
+    const currencyIcon = document.getElementById('currency-icon');
+
+    if (totalInput && currencyIcon) {
+        const toggleIcon = () => {
+            if (totalInput.value.length > 0) {
+                currencyIcon.classList.add('opacity-0');
+                totalInput.classList.remove('pl-8');
+            } else {
+                currencyIcon.classList.remove('opacity-0');
+                totalInput.classList.add('pl-8');
+            }
+        };
+
+        totalInput.addEventListener('input', toggleIcon);
+        // Ejecutar al cargar por si hay old_input
+        toggleIcon();
+    }
 });
 </script>
