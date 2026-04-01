@@ -397,15 +397,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json();
 
                 if (response.ok) {
-                    // Mostrar resultado con una alerta o modal (en este caso usaremos un alert detallado para rapidez)
-                    let mensaje = `Estado Validación: ${result.estado_validacion}\n`;
-                    mensaje += `Mensaje: ${result.mensaje}\n`;
+                    // Mostrar resultado con un toast
+                    let mensaje = `<strong>${result.estado_validacion}</strong><br>${result.mensaje}`;
                     if (result.id_operacion) {
-                        mensaje += `ID Operación: ${result.id_operacion}`;
+                        mensaje += `<br><small class="opacity-75">ID: ${result.id_operacion}</small>`;
                     }
-                    alert(mensaje);
+                    
+                    showToast(mensaje, result.procesamiento_exitoso ? 'success' : 'warning');
                 } else {
-                    alert('Error: ' + (result.error || 'No se pudo verificar el estatus.'));
+                    showToast(result.error || 'No se pudo verificar el estatus.', 'error');
                 }
 
                 this.innerHTML = originalContent;
