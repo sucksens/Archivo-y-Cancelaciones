@@ -96,14 +96,20 @@ class TicketController extends BaseController
     /**
      * Guardar nuevo ticket
      */
+    /**
+     * Guardar nuevo ticket
+     */
     public function store(): void
     {
         $this->requirePermission('tickets.create');
 
+        $db = \App\Core\Database::getInstance();
+        $ticketId = null;
+
         try {
             $this->validateCsrf();
 
-            // Validar datos
+            // Validar datos básicos del formulario
             $validator = new ValidationHelper($_POST);
             $validator
                 ->required('empresa_solicitante', 'La empresa es requerida')
@@ -136,11 +142,10 @@ class TicketController extends BaseController
             $uploader = new FileUploadHelper();
             $fileData = $_FILES['archivo_autorizacion'] ?? [];
             
-            // DIAGNÓSTICO TEMPORAL: 
-            if (empty($_FILES)) {
-                die("ERROR CRÍTICO: El servidor no recibió ningún archivo (FILES está vacío). " . 
-                    "POST tiene: " . count($_POST) . " campos. " . 
-                    "Límite máximo de POST (post_max_size): " . ini_get('post_max_size'));
+            if (empty($fileData) || $fileData['error'] === UPLOAD_ERR_NO_FILE) {
+                $this->session->flash('error', 'El archivo de autorización es requerido');
+                $this->session->set('old_input', $_POST);
+                $this->redirect('/tickets/crear');
             }
             
             $filePath = $uploader->upload($fileData);
@@ -152,49 +157,54 @@ class TicketController extends BaseController
                 $this->redirect('/tickets/crear');
             }
 
-            // TODO validacion de que la factura sea de la empresa solicitante
-            // Crear ticket
+            // --- CONSULTA A BBJ PARA VALIDAR FACTURA ---
+            $empresaSolicitante = $_POST['empresa_solicitante'];
+            $DbName = ($empresaSolicitante === 'grupo_motormexa') ? "01AN_AUTOSNUEVOS" : "02AN_AUTOSNUEVOS";
+            
+            $facturaBridge = new FacturasBridge($DbName);
+            $uuidLimpio = ValidationHelper::cleanUuid($_POST['uuid_factura']);
+            $factura = $facturaBridge->getFactura($uuidLimpio);
+
+            if (!$factura) {
+                // Eliminar archivo subido ya que no se creará el ticket
+                $uploader->delete($filePath);
+                $this->session->flash('error', "La factura con UUID {$uuidLimpio} no fue encontrada en el sistema administrativo ({$empresaSolicitante}).");
+                $this->session->set('old_input', $_POST);
+                $this->redirect('/tickets/crear');
+            }
+
+            // TODO: Validar que la factura pertenezca a la empresa si BBj devuelve ID_EMP
+            // if ($factura['ID_EMP'] != $expectedEmp) { ... }
+
+            // --- INICIO DE TRANSACCIÓN ---
+            $db->beginTransaction();
+
+            // Crear ticket con datos del formulario + datos de BBj
             $ticketId = $this->ticketModel->create([
                 'usuario_id' => $this->userId(),
-                'empresa_solicitante' => $_POST['empresa_solicitante'],
-                'uuid_factura' => ValidationHelper::cleanUuid($_POST['uuid_factura']),
+                'empresa_solicitante' => $empresaSolicitante,
+                'uuid_factura' => $uuidLimpio,
                 'serie' => ValidationHelper::sanitize($_POST['serie']),
                 'folio' => ValidationHelper::sanitize($_POST['folio']),
-                'inventario' => ValidationHelper::sanitize($_POST['inventario'] ?? ''),
+                'inventario' => $factura['INVENTARIO'] ?? ValidationHelper::sanitize($_POST['inventario'] ?? ''),
                 'nombre_cliente' => ValidationHelper::sanitize($_POST['nombre_cliente']),
                 'total_factura' => floatval($_POST['total_factura']),
                 'rfc_receptor' => ValidationHelper::cleanRfc($_POST['rfc_receptor']),
                 'tipo_cancelacion' => $_POST['tipo_cancelacion'],
                 'motivo' => ValidationHelper::sanitize($_POST['motivo']),
-                'archivo_autorizacion' => $filePath
+                'archivo_autorizacion' => $filePath,
+                'fecfac' => isset($factura['FECFAC']) ? ValidationHelper::BbjDateToMysqlDate($factura['FECFAC']) : null,
+                'id_pedido' => $factura['ID_PEDIDO'] ?? null,
+                'id_vendedor' => $factura['ID_VENDEDOR'] ?? null,
+                'id_suc' => $factura['ID_SUC'] ?? null
             ]);
 
-            // Guardar operaciones relacionadas
-            // La logica de buscar los datos de la factura en bbj 
-            if($_POST['empresa_solicitante'] == 'grupo_motormexa'){
-                $DbName  = "01AN_AUTOSNUEVOS";
-            }elseif ($_POST['empresa_solicitante'] == 'automotriz_motormexa') {
-                $DbName  = "02AN_AUTOSNUEVOS";
-            }
-            //llamada a un helper de bbj
-            $facturaBridge = new FacturasBridge($DbName);
-            $factura = $facturaBridge->getFactura(ValidationHelper::cleanUuid($_POST['uuid_factura']));
-
-            //estos son los datos para ya actualizar la factura de bbj
-            $actualizado = $this->ticketModel->update($ticketId, [
-                'fecfac' => ValidationHelper::BbjDateToMysqlDate($factura['FECFAC']),
-                'id_pedido' => $factura['ID_PEDIDO'],
-                'id_vendedor' => $factura['ID_VENDEDOR'],
-                'id_suc' => $factura['ID_SUC'],
-                'inventario' => $factura['INVENTARIO']
-            ]);
-
-            // La logica de buscar las operaciones 
+            // Guardar operaciones relacionadas (Recibos y Doctos Relacionados)
             if (!empty($factura['ID_VENDEDOR']) && !empty($factura['ID_PEDIDO'])) {
                 
-                //operaciones de recibos de caja
-                $operaciones = $facturaBridge->getRecibosCaja($factura['ID_VENDEDOR'], $factura['ID_PEDIDO']);
-                foreach ($operaciones as $operacion) {
+                // Operaciones de recibos de caja
+                $recibos = $facturaBridge->getRecibosCaja($factura['ID_VENDEDOR'], $factura['ID_PEDIDO']);
+                foreach ($recibos as $operacion) {
                     $this->operacionModel->create([
                         'ticket_id' => $ticketId,
                         'tipo_operacion' => $operacion['ID_CONCEPTO'],
@@ -206,9 +216,9 @@ class TicketController extends BaseController
                     ]);
                 }
 
-                //operaciones de doctos relacionados
-                $operaciones = $facturaBridge->getDoctosRelacionados($factura['ID_VENDEDOR'], $factura['ID_PEDIDO']);
-                foreach ($operaciones as $operacion) {
+                // Operaciones de doctos relacionados
+                $doctos = $facturaBridge->getDoctosRelacionados($factura['ID_VENDEDOR'], $factura['ID_PEDIDO']);
+                foreach ($doctos as $operacion) {
                     $this->operacionModel->create([
                         'ticket_id' => $ticketId,
                         'tipo_operacion' => 'NAA',
@@ -224,54 +234,29 @@ class TicketController extends BaseController
             // Registrar auditoría
             $this->ticketModel->audit($ticketId, $this->userId(), 'Ticket creado');
 
+            // Confirmar cambios
+            $db->commit();
+
             $this->log('Ticket creado', 'tickets', "ID: {$ticketId}");
             $this->session->remove('old_input');
             $this->session->flash('success', 'Ticket creado correctamente');
             $this->redirect('/tickets/' . $ticketId);
 
         } catch (\Exception $e) {
-                $errorDetails = [
-                'mensaje' => $e->getMessage(),
-                'codigo' => $e->getCode(),
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine(),
-                'clase' => get_class($e),
-                'trace' => $e->getTraceAsString(),
-                'trace_completo' => $e->getTrace(),
-                'request_data' => [
-                    'post' => $_POST,
-                    'files' => isset($_FILES) ? array_map(fn($f) => [
-                        'name' => $f['name'] ?? null,
-                        'type' => $f['type'] ?? null,
-                        'size' => $f['size'] ?? null,
-                        'error' => $f['error'] ?? null,
-                    ], $_FILES) : [],
-                    'server' => [
-                        'request_uri' => $_SERVER['REQUEST_URI'] ?? null,
-                        'request_method' => $_SERVER['REQUEST_METHOD'] ?? null,
-                        'http_user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? null,
-                        'remote_addr' => $_SERVER['REMOTE_ADDR'] ?? null,
-                    ],
-                ],
-                'datos_ticket' => [
-                    'empresa_solicitante' => $_POST['empresa_solicitante'] ?? null,
-                    'uuid_factura' => $_POST['uuid_factura'] ?? null,
-                    'serie' => $_POST['serie'] ?? null,
-                    'folio' => $_POST['folio'] ?? null,
-                    'nombre_cliente' => $_POST['nombre_cliente'] ?? null,
-                    'total_factura' => $_POST['total_factura'] ?? null,
-                    'rfc_receptor' => $_POST['rfc_receptor'] ?? null,
-                    'tipo_cancelacion' => $_POST['tipo_cancelacion'] ?? null,
-                    'motivo' => $_POST['motivo'] ?? null,
-                    'ticket_id' => $ticketId,
-                ],
-                'timestamp' => date('Y-m-d H:i:s'),
-                'user_id' => $this->userId(),
-            ];
+            if ($db->getConnection()->inTransaction()) {
+                $db->rollBack();
+            }
 
-            $this->log('Error al crear ticket: ' . $e->getMessage(), 'tickets', json_encode($errorDetails,JSON_PRETTY_PRINT | JSON_UNSCAPED_UNICODE));
-            $this->session->flash('error', json_encode($errorDetails,JSON_PRETTY_PRINT | JSON_UNSCAPED_UNICODE));
-            //$this->session->flash('error', 'Error al crear el ticket');
+            // Log detallado para administración
+            $errorDetails = [
+                'mensaje' => $e->getMessage(),
+                'clase' => get_class($e),
+                'request' => $_POST,
+                'user_id' => $this->userId()
+            ];
+            $this->log('Error al crear ticket: ' . $e->getMessage(), 'tickets', json_encode($errorDetails));
+
+            $this->session->flash('error', 'Ocurrió un error al procesar la solicitud. Por favor, intente de nuevo o contacte a soporte.');
             $this->redirect('/tickets/crear');
         }
     }
