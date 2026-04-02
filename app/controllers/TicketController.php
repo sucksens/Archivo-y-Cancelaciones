@@ -68,13 +68,23 @@ class TicketController extends BaseController
         $this->requirePermission('tickets.view.own');
 
         $page = (int) ($this->input('page') ?? 1);
-        $result = $this->ticketModel->getByUser($this->userId(), $page);
+        $filters = [
+            'estado' => $this->input('estado'),
+            'tipo_cancelacion' => $this->input('tipo'),
+            'fecha_desde' => $this->input('fecha_desde'),
+            'fecha_hasta' => $this->input('fecha_hasta'),
+            'search' => $this->input('search')
+        ];
+
+        $result = $this->ticketModel->getByUser($this->userId(), $page, ITEMS_PER_PAGE, $filters);
 
         $this->view('tickets/mis-solicitudes', [
             'title' => 'Mis Solicitudes',
             'tickets' => $result['data'],
             'pagination' => $result,
-            'estados' => TICKET_ESTADOS
+            'filters' => $filters,
+            'estados' => TICKET_ESTADOS,
+            'tipos' => TIPOS_CANCELACION
         ]);
     }
 

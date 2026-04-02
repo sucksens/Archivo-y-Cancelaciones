@@ -1,4 +1,4 @@
-<!-- Header -->
+ <!-- Header -->
 <div class="flex items-center justify-between mb-6">
     <div>
         <h2 class="text-xl font-semibold text-gray-900">Mis Solicitudes</h2>
@@ -13,6 +13,60 @@
         Nuevo Ticket
     </a>
     <?php endif; ?>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-6">
+    <form method="GET" action="<?= BASE_URL ?>mis-solicitudes" class="card-body">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+                <input type="text" name="search" value="<?= htmlspecialchars($filters['search'] ?? '') ?>" 
+                       placeholder="Cliente, RFC, UUID, folio..." 
+                       class="form-input">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                <select name="estado" class="form-input">
+                    <option value="">Todos los estados</option>
+                    <?php foreach ($estados as $key => $estado): ?>
+                    <option value="<?= $key ?>" <?= (($filters['estado'] ?? '') === $key) ? 'selected' : '' ?>>
+                        <?= $estado['label'] ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                <select name="tipo" class="form-input">
+                    <option value="">Todos los tipos</option>
+                    <?php foreach ($tipos as $key => $tipo): ?>
+                    <option value="<?= $key ?>" <?= (($filters['tipo_cancelacion'] ?? '') === $key) ? 'selected' : '' ?>>
+                        <?= $tipo ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
+                <input type="date" name="fecha_desde" value="<?= htmlspecialchars($filters['fecha_desde'] ?? '') ?>" 
+                       class="form-input">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
+                <input type="date" name="fecha_hasta" value="<?= htmlspecialchars($filters['fecha_hasta'] ?? '') ?>" 
+                       class="form-input">
+            </div>
+        </div>
+        <div class="flex justify-end mt-4 gap-2">
+            <a href="<?= BASE_URL ?>mis-solicitudes" class="btn btn-secondary">
+                Limpiar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                Filtrar
+            </button>
+        </div>
+    </form>
 </div>
 
 <!-- Tabla de tickets -->
@@ -105,14 +159,24 @@
             </div>
             
             <nav class="flex space-x-2">
+                <?php
+                $queryParams = [];
+                if (!empty($filters['search'])) $queryParams[] = 'search=' . urlencode($filters['search']);
+                if (!empty($filters['estado'])) $queryParams[] = 'estado=' . urlencode($filters['estado']);
+                if (!empty($filters['tipo'])) $queryParams[] = 'tipo=' . urlencode($filters['tipo']);
+                if (!empty($filters['fecha_desde'])) $queryParams[] = 'fecha_desde=' . urlencode($filters['fecha_desde']);
+                if (!empty($filters['fecha_hasta'])) $queryParams[] = 'fecha_hasta=' . urlencode($filters['fecha_hasta']);
+                $queryString = !empty($queryParams) ? '&' . implode('&', $queryParams) : '';
+                ?>
+                
                 <?php if ($pagination['page'] > 1): ?>
-                <a href="?page=<?= $pagination['page'] - 1 ?>" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                <a href="?page=<?= $pagination['page'] - 1 ?><?= $queryString ?>" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                     Anterior
                 </a>
                 <?php endif; ?>
                 
                 <?php if ($pagination['page'] < $pagination['pages']): ?>
-                <a href="?page=<?= $pagination['page'] + 1 ?>" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                <a href="?page=<?= $pagination['page'] + 1 ?><?= $queryString ?>" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                     Siguiente
                 </a>
                 <?php endif; ?>

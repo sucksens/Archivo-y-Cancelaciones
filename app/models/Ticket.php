@@ -251,11 +251,13 @@ class Ticket
      * @param int $userId ID del usuario
      * @param int $page Página
      * @param int $limit Límite
+     * @param array $filters Filtros adicionales
      * @return array
      */
-    public function getByUser(int $userId, int $page = 1, int $limit = ITEMS_PER_PAGE): array
+    public function getByUser(int $userId, int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
     {
-        return $this->getAll(['usuario_id' => $userId], $page, $limit);
+        $filters['usuario_id'] = $userId;
+        return $this->getAll($filters, $page, $limit);
     }
 
     /**
