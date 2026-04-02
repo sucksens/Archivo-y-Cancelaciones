@@ -84,6 +84,10 @@ use App\Helpers\PermissionHelper;
                 <a href="<?= BASE_URL ?>tickets" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
                     Ver todos →
                 </a>
+                <?php elseif (PermissionHelper::isConsulta()): ?>
+                <a href="<?= BASE_URL ?>solicitudes" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
+                    Ver todos →
+                </a>
                 <?php else: ?>
                 <a href="<?= BASE_URL ?>mis-solicitudes" class="text-sm text-primary-600 hover:text-primary-700 font-medium">
                     Ver todos →
@@ -169,12 +173,21 @@ use App\Helpers\PermissionHelper;
                 </a>
                 <?php endif; ?>
                 
+                <?php if (PermissionHelper::isConsulta()): ?>
+                <a href="<?= BASE_URL ?>solicitudes" class="flex items-center p-3 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                    <span class="font-medium">Solicitudes</span>
+                </a>
+                <?php else: ?>
                 <a href="<?= BASE_URL ?>mis-solicitudes" class="flex items-center p-3 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
                     <span class="font-medium">Mis Solicitudes</span>
                 </a>
+                <?php endif; ?>
                 
                 <a href="<?= BASE_URL ?>perfil" class="flex items-center p-3 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
