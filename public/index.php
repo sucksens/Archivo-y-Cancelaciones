@@ -75,4 +75,6 @@ $router->post('/admin/roles/{id}/eliminar', 'RoleController@destroy', [$authMidd
 $router->get('/admin/roles/{id}/permisos', 'RoleController@getRolePermissions', [$authMiddleware]);
 $router->get('/admin/permisos', 'RoleController@getAllPermissions', [$authMiddleware]);
 
+$router->get('/admin/logs', 'LogController@index', [$authMiddleware]);
+
 $router->dispatch();
