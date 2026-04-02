@@ -1,5 +1,6 @@
 <?php
 use App\Helpers\FileUploadHelper;
+use App\Helpers\PermissionHelper;
 $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'color' => 'gray'];
 ?>
 
@@ -312,9 +313,19 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                 Verificar Status SAT
             </button>
 
+            <?php if (PermissionHelper::isConsulta()): ?>
+            <a href="<?= BASE_URL ?>solicitudes" class="btn btn-secondary w-full">
+                ← Volver al listado
+            </a>
+            <?php elseif (PermissionHelper::hasPermission('tickets.view.all')): ?>
             <a href="<?= BASE_URL ?>tickets" class="btn btn-secondary w-full">
                 ← Volver al listado
             </a>
+            <?php else: ?>
+            <a href="<?= BASE_URL ?>mis-solicitudes" class="btn btn-secondary w-full">
+                ← Volver al listado
+            </a>
+            <?php endif; ?>
         </div>
     </div>
 </div>
