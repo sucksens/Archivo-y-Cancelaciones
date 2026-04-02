@@ -11,7 +11,7 @@
         <form method="GET" action="<?= BASE_URL ?>admin/logs" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Log</label>
-                <select name="tipo_log" class="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                <select name="tipo_log" class="form-select">
                     <option value="">Todos</option>
                     <option value="accion" <?= ($filters['tipo_log'] ?? '') === 'accion' ? 'selected' : '' ?>>Acción</option>
                     <option value="login" <?= ($filters['tipo_log'] ?? '') === 'login' ? 'selected' : '' ?>>Login</option>
@@ -20,7 +20,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Módulo</label>
-                <select name="modulo" class="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                <select name="modulo" class="form-select">
                     <option value="">Todos</option>
                     <?php foreach ($modules as $module): ?>
                         <option value="<?= $module ?>" <?= ($filters['modulo'] ?? '') === $module ? 'selected' : '' ?>><?= ucfirst($module) ?></option>
@@ -29,7 +29,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Usuario</label>
-                <select name="usuario_id" class="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                <select name="usuario_id" class="form-select">
                     <option value="">Todos</option>
                     <?php foreach ($users as $u): ?>
                         <option value="<?= $u['id'] ?>" <?= ($filters['usuario_id'] ?? '') == $u['id'] ? 'selected' : '' ?>>
@@ -40,11 +40,11 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
-                <input type="date" name="fecha_desde" value="<?= $filters['fecha_desde'] ?? '' ?>" class="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                <input type="date" name="fecha_desde" value="<?= $filters['fecha_desde'] ?? '' ?>" class="form-input">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
-                <input type="date" name="fecha_hasta" value="<?= $filters['fecha_hasta'] ?? '' ?>" class="w-full rounded-lg border-gray-300 focus:border-primary-500 focus:ring-primary-500">
+                <input type="date" name="fecha_hasta" value="<?= $filters['fecha_hasta'] ?? '' ?>" class="form-input">
             </div>
             <div class="flex items-end">
                 <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150 flex items-center justify-center">
