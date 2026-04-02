@@ -325,7 +325,9 @@ class TicketController extends BaseController
 
         // Verificar permisos
         $canView = $this->hasPermission('tickets.view.all') 
-                || ($this->hasPermission('tickets.view.own') && $ticket['usuario_id'] === $this->userId());
+                || ($this->hasPermission('tickets.view.own') && $ticket['usuario_id'] === $this->userId())
+                || ($this->hasPermission('tickets.view.empresa') && $ticket['empresa_solicitante'] === PermissionHelper::getUserCompany());
+
 
         if (!$canView) {
             http_response_code(403);
