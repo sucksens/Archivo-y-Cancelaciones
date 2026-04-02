@@ -290,11 +290,13 @@ INSERT INTO permisos (nombre, codigo, descripcion, modulo) VALUES
 INSERT INTO permisos (nombre, codigo, descripcion, modulo) VALUES
 ('Crear Tickets', 'tickets.create', 'Crear nuevos tickets de cancelación', 'tickets'),
 ('Ver Tickets Propios', 'tickets.view.own', 'Ver tickets creados por el usuario', 'tickets'),
+('Ver Tickets de Empresa', 'tickets.view.empresa', 'Ver tickets de la empresa del usuario', 'tickets'),
 ('Ver Todos los Tickets', 'tickets.view.all', 'Ver todos los tickets del sistema', 'tickets'),
 ('Editar Tickets', 'tickets.edit', 'Editar tickets de cancelación', 'tickets'),
 ('Cambiar Estado', 'tickets.status', 'Cambiar el estado de los tickets', 'tickets'),
 ('Eliminar Tickets', 'tickets.delete', 'Eliminar tickets de cancelación', 'tickets'),
-('Procesar Cancelación', 'tickets.process', 'Procesar la cancelación ante el SAT', 'tickets');
+('Procesar Cancelación', 'tickets.process', 'Procesar la cancelación ante el SAT', 'tickets'),
+('Verificar Status SAT', 'tickets.verify_sat', 'Verificar el estatus de factura ante el SAT', 'tickets');
 
 -- Permisos de reportes
 INSERT INTO permisos (nombre, codigo, descripcion, modulo) VALUES
@@ -318,9 +320,9 @@ SELECT 2, id FROM permisos WHERE modulo IN ('tickets', 'reports');
 INSERT INTO rol_permiso (rol_id, permiso_id)
 SELECT 3, id FROM permisos WHERE codigo IN ('tickets.create', 'tickets.view.own', 'reports.dashboard');
 
--- Consulta: solo ver
+-- Consulta: solo ver y verificar SAT
 INSERT INTO rol_permiso (rol_id, permiso_id)
-SELECT 4, id FROM permisos WHERE codigo IN ('tickets.view.own', 'reports.dashboard');
+SELECT 4, id FROM permisos WHERE codigo IN ('tickets.view.own', 'tickets.view.empresa', 'tickets.verify_sat', 'reports.dashboard');
 
 -- ============================================
 -- USUARIO ADMINISTRADOR POR DEFECTO

@@ -261,6 +261,35 @@ class Ticket
     }
 
     /**
+     * Obtener tickets por empresa (para rol Consulta)
+     * 
+     * @param string $empresa Empresa del usuario
+     * @param int $page Página
+     * @param int $limit Límite
+     * @param array $filters Filtros adicionales
+     * @return array
+     */
+    public function getByEmpresa(string $empresa, int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
+    {
+        $filters['empresa'] = $empresa;
+        return $this->getAll($filters, $page, $limit);
+    }
+
+    /**
+     * Verificar si un ticket puede verificar status SAT
+     * Solo puede verificar si está en estado pendiente o en_revision
+     * 
+     * @param int $ticketId ID del ticket
+     * @return bool
+     */
+    public function canVerifySat(int $ticketId): bool
+    {
+        $sql = "SELECT estado FROM {$this->table} WHERE id = ?";
+        $estado = $this->db->fetchColumn($sql, [$ticketId]);
+        return in_array($estado, ['pendiente', 'en_revision']);
+    }
+
+    /**
      * Obtener ticket con operaciones
      * 
      * @param int $id ID del ticket

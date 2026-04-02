@@ -89,6 +89,44 @@ class TicketController extends BaseController
     }
 
     /**
+     * Solicitudes (tickets de la empresa - solo rol Consulta)
+     */
+    public function solicitudes(): void
+    {
+        $this->requirePermission('tickets.view.empresa');
+
+        $empresa = PermissionHelper::getUserCompany();
+        
+        if (!$empresa) {
+            $this->session->flash('error', 'No tienes una empresa asignada');
+            $this->redirect('/dashboard');
+        }
+
+        $page = (int) ($this->input('page') ?? 1);
+        $filters = [
+            'estado' => $this->input('estado'),
+            'tipo_cancelacion' => $this->input('tipo'),
+            'fecha_desde' => $this->input('fecha_desde'),
+            'fecha_hasta' => $this->input('fecha_hasta'),
+            'search' => $this->input('search')
+        ];
+
+        $result = $this->ticketModel->getByEmpresa($empresa, $page, ITEMS_PER_PAGE, $filters);
+
+        $canVerifySat = PermissionHelper::hasPermission('tickets.verify_sat');
+
+        $this->view('tickets/solicitudes', [
+            'title' => 'Solicitudes',
+            'tickets' => $result['data'],
+            'pagination' => $result,
+            'filters' => $filters,
+            'estados' => TICKET_ESTADOS,
+            'tipos' => TIPOS_CANCELACION,
+            'canVerifySat' => $canVerifySat
+        ]);
+    }
+
+    /**
      * Mostrar formulario de creación
      */
     public function create(): void

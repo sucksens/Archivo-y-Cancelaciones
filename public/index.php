@@ -55,6 +55,7 @@ $router->post('/tickets/parse-xml', 'TicketController@parseXml', [$authMiddlewar
 $router->get('/tickets/{id}/archivo', 'TicketController@downloadFile', [$authMiddleware]);
 
 $router->get('/mis-solicitudes', 'TicketController@misSolicitudes', [$authMiddleware]);
+$router->get('/solicitudes', 'TicketController@solicitudes', [$authMiddleware]);
 
 $router->get('/perfil', 'AuthController@profile', [$authMiddleware]);
 $router->post('/perfil', 'AuthController@updateProfile', [$authMiddleware]);

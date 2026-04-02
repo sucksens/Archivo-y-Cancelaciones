@@ -189,6 +189,37 @@ class PermissionHelper
     }
 
     /**
+     * Verificar si es rol Consulta
+     * 
+     * @return bool
+     */
+    public static function isConsulta(): bool
+    {
+        return self::hasRole('Consulta');
+    }
+
+    /**
+     * Verificar si es usuario regular (no admin, no supervisor, no consulta)
+     * 
+     * @return bool
+     */
+    public static function isRegularUser(): bool
+    {
+        return !self::isAdmin() && !self::isSupervisor() && !self::isConsulta();
+    }
+
+    /**
+     * Obtener la empresa del usuario de la sesión
+     * 
+     * @return string|null
+     */
+    public static function getUserCompany(): ?string
+    {
+        $user = AuthHelper::getUser();
+        return $user['empresa'] ?? null;
+    }
+
+    /**
      * Limpiar cache de permisos
      */
     public static function clearCache(): void
