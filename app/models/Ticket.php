@@ -63,16 +63,17 @@ class Ticket
         $uuid = AuthHelper::generateUuid();
         
         $sql = "INSERT INTO {$this->table} 
-                (uuid, usuario_id, empresa_solicitante, uuid_factura, serie, folio, 
+                (uuid, usuario_id, empresa_solicitante, tipo_factura, uuid_factura, serie, folio, 
                  inventario, nombre_cliente, total_factura, rfc_receptor, 
                  tipo_cancelacion, motivo, archivo_autorizacion, estado,
                  fecfac, id_pedido, id_vendedor, id_suc)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?, ?, ?, ?)";
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?, ?, ?, ?)";
         
         $this->db->query($sql, [
             $uuid,
             $data['usuario_id'],
             $data['empresa_solicitante'],
+            $data['tipo_factura'],
             $data['uuid_factura'],
             $data['serie'],
             $data['folio'],
@@ -102,7 +103,7 @@ class Ticket
     public function update(int $id, array $data): bool
     {
         $allowedFields = [
-            'empresa_solicitante', 'uuid_factura', 'serie', 'folio', 'inventario',
+            'empresa_solicitante', 'tipo_factura', 'uuid_factura', 'serie', 'folio', 'inventario',
             'nombre_cliente', 'total_factura', 'rfc_receptor', 'tipo_cancelacion',
             'motivo', 'archivo_autorizacion', 'estado', 'fecha_envio_cancelacion',
             'fecha_cancelacion_sat', 'completado_por', 'fecfac', 'id_pedido', 

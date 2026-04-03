@@ -62,6 +62,19 @@ $session->remove('old_input');
                         </select>
                     </div>
                     
+                    <!-- Tipo de Factura -->
+                    <div>
+                        <label for="tipo_factura" class="form-label">Tipo de Factura <span class="text-red-500">*</span></label>
+                        <select name="tipo_factura" id="tipo_factura" class="form-select" required>
+                            <option value="">Seleccionar tipo...</option>
+                            <?php foreach ($tipos_auto as $key => $label): ?>
+                            <option value="<?= $key ?>" <?= ($oldInput['tipo_factura'] ?? '') === $key ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($label) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
                     <!-- UUID Factura -->
                     <div>
                         <label for="uuid_factura" class="form-label">UUID de Factura <span class="text-red-500">*</span></label>

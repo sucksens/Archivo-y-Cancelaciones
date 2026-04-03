@@ -137,7 +137,8 @@ class TicketController extends BaseController
             'title' => 'Nuevo Ticket de Cancelación',
             'empresas' => EMPRESAS,
             'tipos_cancelacion' => TIPOS_CANCELACION,
-            'tipos_operacion' => TIPOS_OPERACION
+            'tipos_operacion' => TIPOS_OPERACION,
+            'tipos_auto' => TIPOS_AUTO
         ]);
     }
 
@@ -162,6 +163,8 @@ class TicketController extends BaseController
             $validator
                 ->required('empresa_solicitante', 'La empresa es requerida')
                 ->in('empresa_solicitante', array_keys(EMPRESAS))
+                ->required('tipo_factura', 'El tipo de factura es requerido')
+                ->in('tipo_factura', array_keys(TIPOS_AUTO))
                 ->required('uuid_factura', 'El UUID de factura es requerido')
                 ->uuid('uuid_factura')
                 ->required('serie', 'La serie es requerida')
@@ -207,7 +210,21 @@ class TicketController extends BaseController
 
             // --- CONSULTA A BBJ PARA VALIDAR FACTURA ---
             $empresaSolicitante = $_POST['empresa_solicitante'];
-            $DbName = ($empresaSolicitante === 'grupo_motormexa') ? "01AN_AUTOSNUEVOS" : "02AN_AUTOSNUEVOS";
+            $tipoFactura = $_POST['tipo_factura'];
+            
+            // Determinar la base de datos según empresa y tipo de factura
+            $dbMapping = [
+                'grupo_motormexa' => [
+                    'autos_nuevos' => '01AN_AUTOSNUEVOS',
+                    'seminuevos' => '01AU_SEMINUEVOS'
+                ],
+                'automotriz_motormexa' => [
+                    'autos_nuevos' => '02AN_AUTOSNUEVOS',
+                    'seminuevos' => '02AU_SEMINUEVOS'
+                ]
+            ];
+            
+            $DbName = $dbMapping[$empresaSolicitante][$tipoFactura] ?? '01AN_AUTOSNUEVOS';
             
             $facturaBridge = new FacturasBridge($DbName);
             $uuidLimpio = ValidationHelper::cleanUuid($_POST['uuid_factura']);
@@ -231,6 +248,7 @@ class TicketController extends BaseController
             $ticketId = $this->ticketModel->create([
                 'usuario_id' => $this->userId(),
                 'empresa_solicitante' => $empresaSolicitante,
+                'tipo_factura' => $tipoFactura,
                 'uuid_factura' => $uuidLimpio,
                 'serie' => ValidationHelper::sanitize($_POST['serie']),
                 'folio' => ValidationHelper::sanitize($_POST['folio']),
