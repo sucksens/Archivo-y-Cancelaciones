@@ -37,7 +37,7 @@
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Cancelación</label>
                 <select name="tipo" class="form-input">
                     <option value="">Todos los tipos</option>
                     <?php foreach ($tipos as $key => $tipo): ?>
@@ -106,8 +106,8 @@
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Cancelación</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Factura</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
@@ -122,16 +122,14 @@
                         <span class="text-sm font-medium text-gray-900">#<?= $ticket['id'] ?></span>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="text-sm font-medium text-gray-900">
-                            <?= htmlspecialchars($ticket['nombre_cliente']) ?>
-                        </div>
-                        <div class="text-xs text-gray-500">
-                            RFC: <?= htmlspecialchars($ticket['rfc_receptor']) ?>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4">
                         <div class="text-sm text-gray-900">
                             <?= htmlspecialchars($ticket['serie']) ?>-<?= htmlspecialchars($ticket['folio']) ?>
+                        </div>
+                    </td>
+
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-medium text-gray-900">
+                            <?= htmlspecialchars($tipos[$ticket['tipo_cancelacion']]) ?>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
