@@ -39,6 +39,17 @@
                 </select>
             </div>
             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Factura</label>
+                <select name="tipo_factura" class="form-input">
+                    <option value="">Todos los tipos</option>
+                    <?php foreach ($tipos_auto as $key => $label): ?>
+                    <option value="<?= $key ?>" <?= (($filters['tipo_factura'] ?? '') === $key) ? 'selected' : '' ?>>
+                        <?= $label ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
                 <input type="date" name="fecha_desde" value="<?= htmlspecialchars($filters['fecha_desde'] ?? '') ?>" 
                        class="form-input">
@@ -79,6 +90,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Factura</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
@@ -104,6 +116,11 @@
                         <div class="text-sm text-gray-900">
                             <?= htmlspecialchars($ticket['serie']) ?>-<?= htmlspecialchars($ticket['folio']) ?>
                         </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-sm text-gray-700">
+                            <?= $tipos_auto[$ticket['tipo_factura']] ?? $ticket['tipo_factura'] ?>
+                        </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="text-sm font-medium text-gray-900">

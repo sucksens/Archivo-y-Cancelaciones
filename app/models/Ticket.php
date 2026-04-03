@@ -204,6 +204,11 @@ class Ticket
             $params[] = $filters['tipo_cancelacion'];
         }
 
+        if (!empty($filters['tipo_factura'])) {
+            $where[] = 't.tipo_factura = ?';
+            $params[] = $filters['tipo_factura'];
+        }
+
         if (!empty($filters['fecha_desde'])) {
             $where[] = 'DATE(t.fecha_creacion) >= ?';
             $params[] = $filters['fecha_desde'];

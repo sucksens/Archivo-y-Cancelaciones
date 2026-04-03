@@ -42,6 +42,7 @@ class TicketController extends BaseController
             'empresa' => $this->input('empresa'),
             'estado' => $this->input('estado'),
             'tipo_cancelacion' => $this->input('tipo'),
+            'tipo_factura' => $this->input('tipo_factura'),
             'fecha_desde' => $this->input('fecha_desde'),
             'fecha_hasta' => $this->input('fecha_hasta'),
             'search' => $this->input('search')
@@ -56,7 +57,8 @@ class TicketController extends BaseController
             'filters' => $filters,
             'estados' => TICKET_ESTADOS,
             'empresas' => EMPRESAS,
-            'tipos' => TIPOS_CANCELACION
+            'tipos' => TIPOS_CANCELACION,
+            'tipos_auto' => TIPOS_AUTO
         ]);
     }
 
@@ -71,6 +73,7 @@ class TicketController extends BaseController
         $filters = [
             'estado' => $this->input('estado'),
             'tipo_cancelacion' => $this->input('tipo'),
+            'tipo_factura' => $this->input('tipo_factura'),
             'fecha_desde' => $this->input('fecha_desde'),
             'fecha_hasta' => $this->input('fecha_hasta'),
             'search' => $this->input('search')
@@ -84,7 +87,8 @@ class TicketController extends BaseController
             'pagination' => $result,
             'filters' => $filters,
             'estados' => TICKET_ESTADOS,
-            'tipos' => TIPOS_CANCELACION
+            'tipos' => TIPOS_CANCELACION,
+            'tipos_auto' => TIPOS_AUTO
         ]);
     }
 
@@ -106,6 +110,7 @@ class TicketController extends BaseController
         $filters = [
             'estado' => $this->input('estado'),
             'tipo_cancelacion' => $this->input('tipo'),
+            'tipo_factura' => $this->input('tipo_factura'),
             'fecha_desde' => $this->input('fecha_desde'),
             'fecha_hasta' => $this->input('fecha_hasta'),
             'search' => $this->input('search')
@@ -122,6 +127,7 @@ class TicketController extends BaseController
             'filters' => $filters,
             'estados' => TICKET_ESTADOS,
             'tipos' => TIPOS_CANCELACION,
+            'tipos_auto' => TIPOS_AUTO,
             'canVerifySat' => $canVerifySat
         ]);
     }
@@ -358,6 +364,7 @@ class TicketController extends BaseController
             'ticket' => $ticket,
             'estados' => TICKET_ESTADOS,
             'tipos_operacion' => TIPOS_OPERACION,
+            'tipos_auto' => TIPOS_AUTO,
             'canEdit' => $this->hasPermission('tickets.edit'),
             'canChangeStatus' => $this->hasPermission('tickets.status'),
             'canProcess' => $this->hasPermission('tickets.process')

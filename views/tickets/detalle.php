@@ -43,6 +43,12 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                         <p class="text-gray-900"><?= EMPRESAS[$ticket['empresa_solicitante']] ?? $ticket['empresa_solicitante'] ?></p>
                     </div>
                     
+                    <!-- Tipo de Factura -->
+                    <div>
+                        <label class="text-sm font-medium text-gray-500">Tipo de Factura</label>
+                        <p class="text-gray-900"><?= TIPOS_AUTO[$ticket['tipo_factura']] ?? $ticket['tipo_factura'] ?></p>
+                    </div>
+                    
                     <!-- Total -->
                     <div>
                         <label class="text-sm font-medium text-gray-500">Total de Factura</label>
