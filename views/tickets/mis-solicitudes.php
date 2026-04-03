@@ -25,7 +25,7 @@
                        placeholder="Cliente, RFC, UUID, folio..." 
                        class="form-input">
             </div>
-            <div>
+            <div class="w-40">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                 <select name="estado" class="form-input">
                     <option value="">Todos los estados</option>
@@ -36,7 +36,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
+            <div class="w-40">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Cancelación</label>
                 <select name="tipo" class="form-input">
                     <option value="">Todos los tipos</option>
@@ -47,7 +47,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
+            <div class="w-40">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Factura</label>
                 <select name="tipo_factura" class="form-input">
                     <option value="">Todos los tipos</option>
@@ -58,12 +58,12 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
+            <div class="w-40">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
                 <input type="date" name="fecha_desde" value="<?= htmlspecialchars($filters['fecha_desde'] ?? '') ?>" 
                        class="form-input">
             </div>
-            <div>
+            <div class="w-40">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
                 <input type="date" name="fecha_hasta" value="<?= htmlspecialchars($filters['fecha_hasta'] ?? '') ?>" 
                        class="form-input">
