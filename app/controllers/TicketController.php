@@ -229,7 +229,17 @@ class TicketController extends BaseController
                     'seminuevos' => '02AU_SEMINUEVOS'
                 ]
             ];
+
+            //Revision de si la factura ya tiene un ticket
+            $ticket = $this->ticketModel->findByUuid(ValidationHelper::cleanUuid($_POST['uuid_factura']));
             
+            if ($ticket) {
+                $this->session->flash('error', "La factura con UUID {$_POST['uuid_factura']} ya tiene un ticket.");
+                $this->session->set('old_input', $_POST);
+                $this->redirect('/tickets/crear');
+            }
+           
+            //Cargar la base de datos correcta para la empresa y tipo de factura
             $DbName = $dbMapping[$empresaSolicitante][$tipoFactura] ?? '01AN_AUTOSNUEVOS';
             
             $facturaBridge = new FacturasBridge($DbName);
@@ -243,9 +253,6 @@ class TicketController extends BaseController
                 $this->session->set('old_input', $_POST);
                 $this->redirect('/tickets/crear');
             }
-
-            // TODO: Validar que la factura pertenezca a la empresa si BBj devuelve ID_EMP
-            // if ($factura['ID_EMP'] != $expectedEmp) { ... }
 
             // --- INICIO DE TRANSACCIÓN ---
             $db->beginTransaction();
