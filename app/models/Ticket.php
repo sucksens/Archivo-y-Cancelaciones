@@ -53,6 +53,21 @@ class Ticket
     }
 
     /**
+     * Buscar ticket por UUID de factura
+     * 
+     * @param string $uuid UUID de la factura
+     * @return array|null
+     */
+    public function findByFacturaUuid(string $uuid): ?array
+    {
+        $sql = "SELECT t.*, u.nombre_completo as usuario_nombre
+                FROM {$this->table} t
+                LEFT JOIN usuarios u ON t.usuario_id = u.id
+                WHERE t.uuid_factura = ?";
+        return $this->db->fetchOne($sql, [$uuid]);
+    }
+
+    /**
      * Crear nuevo ticket
      * 
      * @param array $data Datos del ticket

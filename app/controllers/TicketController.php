@@ -231,7 +231,7 @@ class TicketController extends BaseController
             ];
 
             //Revision de si la factura ya tiene un ticket
-            $ticket = $this->ticketModel->findByUuid(ValidationHelper::cleanUuid($_POST['uuid_factura']));
+            $ticket = $this->ticketModel->findByFacturaUuid(ValidationHelper::cleanUuid($_POST['uuid_factura']));
             
             if ($ticket) {
                 $this->session->flash('error', "La factura con UUID {$_POST['uuid_factura']} ya tiene un ticket.");
