@@ -102,13 +102,14 @@ $session->remove('old_input');
                                required>
                     </div>
                     
-                    <!-- Inventario -->
+                    <!-- Inventario 
                     <div>
                         <label for="inventario" class="form-label">Inventario</label>
                         <input type="text" name="inventario" id="inventario" class="form-input"
                                maxlength="50"
                                value="<?= htmlspecialchars($oldInput['inventario'] ?? '') ?>">
                     </div>
+                    -->
                     
     <!-- Total Factura -->
                     <div>
