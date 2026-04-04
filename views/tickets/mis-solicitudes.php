@@ -18,7 +18,7 @@
 <!-- Filtros -->
 <div class="card mb-6">
     <form method="GET" action="<?= BASE_URL ?>mis-solicitudes" class="card-body">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="flex-1 min-w-[200px]">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
                 <input type="text" name="search" value="<?= htmlspecialchars($filters['search'] ?? '') ?>" 
@@ -47,7 +47,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="w-40">
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Factura</label>
                 <select name="tipo_factura" class="form-input">
                     <option value="">Todos los tipos</option>
@@ -58,12 +58,12 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="w-40">
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
                 <input type="date" name="fecha_desde" value="<?= htmlspecialchars($filters['fecha_desde'] ?? '') ?>" 
                        class="form-input">
             </div>
-            <div class="w-40">
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
                 <input type="date" name="fecha_hasta" value="<?= htmlspecialchars($filters['fecha_hasta'] ?? '') ?>" 
                        class="form-input">

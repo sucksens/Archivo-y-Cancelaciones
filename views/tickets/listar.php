@@ -2,13 +2,13 @@
 <div class="card mb-6">
     <div class="card-body">
         <form method="GET" action="<?= BASE_URL ?>tickets" class="flex flex-wrap gap-4">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="flex-1 min-w-[200px]">
                 <input type="text" name="search" value="<?= htmlspecialchars($filters['search'] ?? '') ?>" 
                        placeholder="Buscar por cliente, RFC, UUID o folio..."
                        class="form-input">
             </div>
             
-            <div class="w-40 mb-1">
+            <div class="w-40">
                 <select name="estado" class="form-select">
                     <option value="">Todos los estados</option>
                     <?php foreach ($estados as $key => $info): ?>
@@ -19,7 +19,7 @@
                 </select>
             </div>
             
-            <div class="w-48 mb-1">
+            <div class="w-48">
                 <select name="empresa" class="form-select">
                     <option value="">Todas las empresas</option>
                     <?php foreach ($empresas as $key => $label): ?>
@@ -30,7 +30,7 @@
                 </select>
             </div>
             
-            <div class="w-40 mb-1">
+            <div class="w-40">
                 <select name="tipo_factura" class="form-select">
                     <option value="">Todos los tipos</option>
                     <?php foreach ($tipos_auto as $key => $label): ?>
@@ -41,7 +41,7 @@
                 </select>
             </div>
             
-            <div class="w-40 mb-1">
+            <div class="w-40">
                 <select name="tipo" class="form-select">
                     <option value="">Todos los tipos</option>
                     <?php foreach ($tipos as $key => $label): ?>
