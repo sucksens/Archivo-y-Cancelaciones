@@ -8,67 +8,68 @@
 
 <!-- Filtros -->
 <div class="card mb-6">
-    <form method="GET" action="<?= BASE_URL ?>solicitudes" class="card-body">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+    <div class="card-body">
+        <form method="GET" action="<?= BASE_URL ?>solicitudes" class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[200px]">
                 <input type="text" name="search" value="<?= htmlspecialchars($filters['search'] ?? '') ?>" 
-                       placeholder="Cliente, RFC, UUID, folio..." 
+                       placeholder="Buscar por cliente, RFC, UUID o folio..."
                        class="form-input">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                <select name="estado" class="form-input">
+            
+            <div class="w-40">
+                <select name="estado" class="form-select">
                     <option value="">Todos los estados</option>
-                    <?php foreach ($estados as $key => $estado): ?>
-                    <option value="<?= $key ?>" <?= (($filters['estado'] ?? '') === $key) ? 'selected' : '' ?>>
-                        <?= $estado['label'] ?>
+                    <?php foreach ($estados as $key => $info): ?>
+                    <option value="<?= $key ?>" <?= ($filters['estado'] ?? '') === $key ? 'selected' : '' ?>>
+                        <?= $info['label'] ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Cancelación</label>
-                <select name="tipo" class="form-input">
+            
+            <div class="w-40">
+                <select name="tipo" class="form-select">
                     <option value="">Todos los tipos</option>
-                    <?php foreach ($tipos as $key => $tipo): ?>
-                    <option value="<?= $key ?>" <?= (($filters['tipo_cancelacion'] ?? '') === $key) ? 'selected' : '' ?>>
-                        <?= $tipo ?>
-                    </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo Factura</label>
-                <select name="tipo_factura" class="form-input">
-                    <option value="">Todos los tipos</option>
-                    <?php foreach ($tipos_auto as $key => $label): ?>
-                    <option value="<?= $key ?>" <?= (($filters['tipo_factura'] ?? '') === $key) ? 'selected' : '' ?>>
+                    <?php foreach ($tipos as $key => $label): ?>
+                    <option value="<?= $key ?>" <?= ($filters['tipo_cancelacion'] ?? '') === $key ? 'selected' : '' ?>>
                         <?= $label ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Desde</label>
+            
+            <div class="w-40">
+                <select name="tipo_factura" class="form-select">
+                    <option value="">Todas las facturas</option>
+                    <?php foreach ($tipos_auto as $key => $label): ?>
+                    <option value="<?= $key ?>" <?= ($filters['tipo_factura'] ?? '') === $key ? 'selected' : '' ?>>
+                        <?= $label ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="w-40">
                 <input type="date" name="fecha_desde" value="<?= htmlspecialchars($filters['fecha_desde'] ?? '') ?>" 
-                       class="form-input">
+                       placeholder="Desde" class="form-input">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Hasta</label>
+
+            <div class="w-40">
                 <input type="date" name="fecha_hasta" value="<?= htmlspecialchars($filters['fecha_hasta'] ?? '') ?>" 
-                       class="form-input">
+                       placeholder="Hasta" class="form-input">
             </div>
-        </div>
-        <div class="flex justify-end mt-4 gap-2">
-            <a href="<?= BASE_URL ?>solicitudes" class="btn btn-secondary">
-                Limpiar
-            </a>
-            <button type="submit" class="btn btn-primary">
-                Filtrar
-            </button>
-        </div>
-    </form>
+            
+            <div class="flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Buscar
+                </button>
+                <a href="<?= BASE_URL ?>solicitudes" class="btn btn-secondary">Limpiar</a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Tabla de tickets -->
