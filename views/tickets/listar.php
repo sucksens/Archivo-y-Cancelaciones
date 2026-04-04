@@ -101,7 +101,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresa</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Factura</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Cancelación</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -140,8 +140,8 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm font-medium text-gray-900">
-                            $<?= number_format($ticket['total_factura'], 2) ?>
+                        <span class="text-sm text-gray-700">
+                            <?= $tipos[$ticket['tipo_cancelacion']] ?>
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
