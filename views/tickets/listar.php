@@ -8,7 +8,7 @@
                        class="form-input">
             </div>
             
-            <div class="w-40">
+            <div class="w-40 mb-1">
                 <select name="estado" class="form-select">
                     <option value="">Todos los estados</option>
                     <?php foreach ($estados as $key => $info): ?>
@@ -19,7 +19,7 @@
                 </select>
             </div>
             
-            <div class="w-48">
+            <div class="w-48 mb-1">
                 <select name="empresa" class="form-select">
                     <option value="">Todas las empresas</option>
                     <?php foreach ($empresas as $key => $label): ?>
@@ -30,7 +30,7 @@
                 </select>
             </div>
             
-            <div class="w-40">
+            <div class="w-40 mb-1">
                 <select name="tipo_factura" class="form-select">
                     <option value="">Todos los tipos</option>
                     <?php foreach ($tipos_auto as $key => $label): ?>
@@ -41,7 +41,7 @@
                 </select>
             </div>
             
-            <div class="w-40">
+            <div class="w-40 mb-1">
                 <select name="tipo" class="form-select">
                     <option value="">Todos los tipos</option>
                     <?php foreach ($tipos as $key => $label): ?>
