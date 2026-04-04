@@ -18,8 +18,8 @@
 <!-- Filtros -->
 <div class="card mb-6">
     <form method="GET" action="<?= BASE_URL ?>mis-solicitudes" class="card-body">
-        <div class="flex-1 min-w-[200px]">
-            <div>
+        <div>
+            <div class="flex-1 min-w-[200px]">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
                 <input type="text" name="search" value="<?= htmlspecialchars($filters['search'] ?? '') ?>" 
                        placeholder="Cliente, RFC, UUID, folio..." 
