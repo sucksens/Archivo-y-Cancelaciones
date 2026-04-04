@@ -2,7 +2,7 @@
 <div class="card mb-6">
     <div class="card-body">
         <form method="GET" action="<?= BASE_URL ?>tickets" class="flex flex-wrap gap-4">
-            <div class="flex-1 min-w-[200px]">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <input type="text" name="search" value="<?= htmlspecialchars($filters['search'] ?? '') ?>" 
                        placeholder="Buscar por cliente, RFC, UUID o folio..."
                        class="form-input">
