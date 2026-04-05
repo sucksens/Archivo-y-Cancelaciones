@@ -78,4 +78,11 @@ $router->get('/admin/permisos', 'RoleController@getAllPermissions', [$authMiddle
 
 $router->get('/admin/logs', 'LogController@index', [$authMiddleware]);
 
+$router->get('/facturas', 'FacturaArchivoController@index', [$authMiddleware]);
+$router->get('/facturas/subir', 'FacturaArchivoController@create', [$authMiddleware]);
+$router->post('/facturas', 'FacturaArchivoController@store', [$authMiddleware]);
+$router->get('/facturas/{id}', 'FacturaArchivoController@show', [$authMiddleware]);
+$router->get('/facturas/{id}/descargar/{tipo}', 'FacturaArchivoController@download', [$authMiddleware]);
+$router->post('/facturas/{id}/eliminar', 'FacturaArchivoController@destroy', [$authMiddleware]);
+
 $router->dispatch();
