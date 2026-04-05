@@ -410,4 +410,57 @@ class FacturaArchivoController extends BaseController
             'pages' => ceil($total / $limit)
         ];
     }
+
+    public function parseXml(): void
+    {
+        try {
+            $this->requirePermission('facturas.upload');
+
+            if (!isset($_FILES['xml_file'])) {
+                $this->json(['error' => 'No se proporcionó ningún archivo'], 400);
+            }
+
+            $xmlFile = $_FILES['xml_file'];
+            if ($xmlFile['error'] !== UPLOAD_ERR_OK) {
+                $this->json(['error' => 'Error al subir el archivo'], 400);
+            }
+
+            $filePath = $xmlFile['tmp_name'];
+            $mimeType = $xmlFile['type'] ?: 'text/xml';
+            $cfile = curl_file_create($filePath, $mimeType, $xmlFile['name']);
+
+            $apiUrl = 'http://200.1.1.245:5000/parsear_xml/';
+            $ch = curl_init($apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, ['file' => $cfile]);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($error) {
+                $this->json(['error' => 'Error al procesar el XML: ' . $error], 500);
+            }
+
+            if ($httpCode !== 200) {
+                $this->json(['error' => 'Error del servidor: ' . $response], $httpCode);
+            }
+
+            $decoded = json_decode($response, true);
+            if (!$decoded || !isset($decoded['success']) || !$decoded['success']) {
+                $this->json(['error' => $decoded['error'] ?? 'Error al procesar el XML'], 400);
+            }
+
+            $this->json([
+                'exito' => true,
+                'datos' => $decoded['data'] ?? []
+            ]);
+
+        } catch (\Exception $e) {
+            $this->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

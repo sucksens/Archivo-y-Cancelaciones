@@ -84,5 +84,6 @@ $router->post('/facturas', 'FacturaArchivoController@store', [$authMiddleware]);
 $router->get('/facturas/{id}', 'FacturaArchivoController@show', [$authMiddleware]);
 $router->get('/facturas/{id}/descargar/{tipo}', 'FacturaArchivoController@download', [$authMiddleware]);
 $router->post('/facturas/{id}/eliminar', 'FacturaArchivoController@destroy', [$authMiddleware]);
+$router->post('/facturas/parse-xml', 'FacturaArchivoController@parseXml', [$authMiddleware]);
 
 $router->dispatch();
