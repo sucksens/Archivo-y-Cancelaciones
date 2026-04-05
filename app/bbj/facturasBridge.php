@@ -34,7 +34,7 @@ class FacturasBridge{
      * @return array
      */
      public function getFactura(string $uuid){
-               $sql = "SELECT * FROM FACTURAS WHERE FOLIOFISCAL = ? AND STATUS = 0";
+               $sql = "SELECT * FROM FACTURAS WHERE FOLIOFISCAL = ? AND STATUS = '0' ";
                return $this->db->fetchOne($sql, [$uuid]);
      }
 
