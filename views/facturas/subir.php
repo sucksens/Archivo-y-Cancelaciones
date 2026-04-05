@@ -51,36 +51,6 @@ $user = AuthHelper::getUser();
                 </div>
             </div>
 
-            <div class="mb-6 p-4 bg-primary-50 rounded-lg border border-primary-100">
-                <div class="flex items-center justify-between mb-3">
-                    <div>
-                        <h3 class="text-lg font-semibold text-primary-900">Carga Automática</h3>
-                        <p class="text-sm text-primary-700">Sube el archivo XML para autocompletar el UUID.</p>
-                    </div>
-                    <div class="bg-white p-2 rounded-lg shadow-sm">
-                        <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                    </div>
-                </div>
-                
-                <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                    <div class="w-full">
-                        <label for="xml_upload" class="sr-only">Subir XML</label>
-                        <input type="file" id="xml_upload" accept=".xml" 
-                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 transition-all cursor-pointer">
-                    </div>
-                    <div id="xml_loading" class="hidden flex items-center text-primary-600 font-medium">
-                        <svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Procesando...
-                    </div>
-                </div>
-                <div id="xml_status" class="mt-3 text-sm hidden"></div>
-            </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="empresa" class="block text-sm font-medium text-gray-700 mb-1">Empresa <span class="text-red-500">*</span></label>
@@ -112,26 +82,36 @@ $user = AuthHelper::getUser();
                        placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
                        class="form-input rounded-lg border-gray-300 focus:ring-primary-500 focus:border-primary-500 font-mono" required>
                 <p class="mt-1 text-xs text-gray-500">UUID de 36 caracteres (con guisos)</p>
+                <p id="xml_loading" class="hidden flex items-center text-primary-600 font-medium mt-1">
+                    <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Procesando XML...
+                </p>
+                <p id="xml_status" class="mt-1 text-sm hidden"></p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div class="grid-1">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
                     <label for="archivo_xml" class="block text-sm font-medium text-gray-700 mb-1">
                         Archivo XML <span class="text-red-500">*</span>
                     </label>
                     <input type="file" name="archivo_xml" id="archivo_xml" 
-                        accept=".xml,application/xml"
-                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 transition-all cursor-pointer"
-                        required>
+                           accept=".xml,application/xml"
+                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 transition-all cursor-pointer"
+                           required>
                     <p class="mt-1 text-xs text-gray-500">Solo archivos XML (máx. 10MB)</p>
                     <p id="xml_file_name" class="text-sm text-green-600 font-medium hidden mt-1"></p>
                 </div>
-                <div class="grid-1">
+
+                <div>
                     <label for="archivo_pdf" class="block text-sm font-medium text-gray-700 mb-1">
                         Archivo PDF <span class="text-gray-400">(opcional)</span>
                     </label>
                     <input type="file" name="archivo_pdf" id="archivo_pdf" 
-                        accept=".pdf,application/pdf"
-                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 transition-all cursor-pointer">
+                           accept=".pdf,application/pdf"
+                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 transition-all cursor-pointer">
                     <p class="mt-1 text-xs text-gray-500">Solo archivos PDF (máx. 10MB)</p>
                     <p id="pdf_file_name" class="text-sm text-green-600 font-medium hidden mt-1"></p>
                 </div>
@@ -151,21 +131,18 @@ $user = AuthHelper::getUser();
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const xmlUpload = document.getElementById('xml_upload');
+        const archivoXml = document.getElementById('archivo_xml');
         const xmlLoading = document.getElementById('xml_loading');
         const xmlStatus = document.getElementById('xml_status');
-        const archivoXml = document.getElementById('archivo_xml');
-        const xmlFileName = document.getElementById('xml_file_name');
-        const pdfFileName = document.getElementById('pdf_file_name');
 
-        if (xmlUpload) {
-            xmlUpload.addEventListener('change', async function(e) {
+        if (archivoXml) {
+            archivoXml.addEventListener('change', async function(e) {
                 const file = e.target.files[0];
                 if (!file) return;
 
                 xmlLoading.classList.remove('hidden');
                 xmlStatus.classList.add('hidden');
-                xmlUpload.disabled = true;
+                archivoXml.disabled = true;
 
                 const formData = new FormData();
                 formData.append('xml_file', file);
@@ -192,15 +169,14 @@ $user = AuthHelper::getUser();
                     showXmlStatus('Error de conexión con el servidor', 'text-red-600');
                 } finally {
                     xmlLoading.classList.add('hidden');
-                    xmlUpload.disabled = false;
-                    xmlUpload.value = '';
+                    archivoXml.disabled = false;
                 }
             });
         }
 
         function showXmlStatus(message, colorClass) {
             xmlStatus.textContent = message;
-            xmlStatus.className = `mt-3 text-sm flex items-center ${colorClass}`;
+            xmlStatus.className = `mt-1 text-sm flex items-center ${colorClass}`;
             xmlStatus.classList.remove('hidden');
         }
 
