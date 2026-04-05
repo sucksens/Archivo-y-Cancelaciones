@@ -113,28 +113,28 @@ $user = AuthHelper::getUser();
                        class="form-input rounded-lg border-gray-300 focus:ring-primary-500 focus:border-primary-500 font-mono" required>
                 <p class="mt-1 text-xs text-gray-500">UUID de 36 caracteres (con guisos)</p>
             </div>
-
-            <div class="mt-6">
-                <label for="archivo_xml" class="block text-sm font-medium text-gray-700 mb-1">
-                    Archivo XML <span class="text-red-500">*</span>
-                </label>
-                <input type="file" name="archivo_xml" id="archivo_xml" 
-                       accept=".xml,application/xml"
-                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 transition-all cursor-pointer"
-                       required>
-                <p class="mt-1 text-xs text-gray-500">Solo archivos XML (máx. 10MB)</p>
-                <p id="xml_file_name" class="text-sm text-green-600 font-medium hidden mt-1"></p>
-            </div>
-
-            <div class="mt-6">
-                <label for="archivo_pdf" class="block text-sm font-medium text-gray-700 mb-1">
-                    Archivo PDF <span class="text-gray-400">(opcional)</span>
-                </label>
-                <input type="file" name="archivo_pdf" id="archivo_pdf" 
-                       accept=".pdf,application/pdf"
-                       class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 transition-all cursor-pointer">
-                <p class="mt-1 text-xs text-gray-500">Solo archivos PDF (máx. 10MB)</p>
-                <p id="pdf_file_name" class="text-sm text-green-600 font-medium hidden mt-1"></p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div class="grid-1">
+                    <label for="archivo_xml" class="block text-sm font-medium text-gray-700 mb-1">
+                        Archivo XML <span class="text-red-500">*</span>
+                    </label>
+                    <input type="file" name="archivo_xml" id="archivo_xml" 
+                        accept=".xml,application/xml"
+                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 transition-all cursor-pointer"
+                        required>
+                    <p class="mt-1 text-xs text-gray-500">Solo archivos XML (máx. 10MB)</p>
+                    <p id="xml_file_name" class="text-sm text-green-600 font-medium hidden mt-1"></p>
+                </div>
+                <div class="grid-1">
+                    <label for="archivo_pdf" class="block text-sm font-medium text-gray-700 mb-1">
+                        Archivo PDF <span class="text-gray-400">(opcional)</span>
+                    </label>
+                    <input type="file" name="archivo_pdf" id="archivo_pdf" 
+                        accept=".pdf,application/pdf"
+                        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 transition-all cursor-pointer">
+                    <p class="mt-1 text-xs text-gray-500">Solo archivos PDF (máx. 10MB)</p>
+                    <p id="pdf_file_name" class="text-sm text-green-600 font-medium hidden mt-1"></p>
+                </div>
             </div>
 
             <div class="mt-8 flex justify-end">
