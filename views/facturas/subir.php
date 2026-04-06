@@ -158,11 +158,15 @@ $user = AuthHelper::getUser();
 
                     const result = await response.json();
 
-                    if (result.exito && result.datos) {
+                    if (result.exito && result.datos && (
+                        Array.isArray(result.datos) ? result.datos.length > 0 : Object.keys(result.datos).length > 0
+                    )) {
                         fillUuidFromXml(result.datos);
                         showXmlStatus('¡UUID cargado correctamente!', 'text-green-600');
+                    } else if (result.error) {
+                        showXmlStatus(result.error, 'text-red-600');
                     } else {
-                        showXmlStatus(result.error || 'Error al procesar el XML', 'text-red-600');
+                        showXmlStatus('No se pudieron extraer datos del XML', 'text-red-600');
                     }
                 } catch (error) {
                     console.error('Error:', error);
