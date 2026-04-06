@@ -465,18 +465,18 @@ class FacturaArchivoController extends BaseController
                 $this->json(['error' => 'La respuesta del servidor no es JSON válido'], 500);
             }
 
-            if (!isset($decoded['success'])) {
-                error_log("Missing 'success' key in response");
-                $this->json(['error' => 'La respuesta del servidor no tiene el formato esperado (falta success)'], 500);
+            if (!isset($decoded['exito'])) {
+                error_log("Missing 'exito' key in response");
+                $this->json(['error' => 'La respuesta del servidor no tiene el formato esperado (falta exito)'], 500);
             }
 
-            if (!$decoded['success']) {
+            if (!$decoded['exito']) {
                 $errorMsg = $decoded['error'] ?? $decoded['message'] ?? 'Error desconocido al procesar el XML';
                 error_log("API reported failure: " . $errorMsg);
                 $this->json(['error' => $errorMsg], 400);
             }
 
-            $data = $decoded['data'] ?? [];
+            $data = $decoded['datos'] ?? [];
             if (empty($data) || (is_array($data) && count($data) === 0)) {
                 error_log("API reported success but data is empty");
                 $this->json(['error' => 'El XML fue procesado pero no se encontraron datos utilizables'], 400);
