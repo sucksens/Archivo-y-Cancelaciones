@@ -181,25 +181,40 @@ class FacturaArchivoController extends BaseController
             $error = curl_error($ch);
             curl_close($ch);
 
+            $cfdi = [];
+            $timbre = [];
             $parsedData = [];
+
             if ($response && $httpCode === 200) {
                 $decoded = json_decode($response, true);
                 if ($decoded && isset($decoded['exito']) && $decoded['exito']) {
                     switch ($decoded['version']) {
                         case '4.0':
                             $cfdi = $decoded['datos']['cfdi40'] ?? [];
-                            $timbre = $decoded['datos']['tfd11'] ?? [];
+                            $timbre = $decoded['datos']['tfd11'][0] ?? [];
                             break;
                         case '3.3':
                             $cfdi = $decoded['datos']['cfdi33'] ?? [];
-                            $timbre = $decoded['datos']['tfd11'] ?? [];
+                            $timbre = $decoded['datos']['tfd11'][0] ?? [];
                             break;
                         case '3.2':
                             $cfdi = $decoded['datos']['cfdi32'] ?? [];
-                            $timbre = $decoded['datos']['tfd10'] ?? [];
+                            $timbre = $decoded['datos']['tfd10'][0] ?? [];
                             break;
                     }
+                } else {
+                    throw new \Exception('El endpoint de parsing no devolvió datos válidos');
                 }
+            } else {
+                throw new \Exception('No se pudo procesar el XML: ' . ($error ?: 'HTTP ' . $httpCode));
+            }
+
+            if (empty($cfdi)) {
+                throw new \Exception('No se pudieron extraer los datos del CFDI del XML');
+            }
+
+            if (!isset($cfdi['serie']) || !isset($cfdi['folio']) || !isset($cfdi['emisor']['rfc']) || !isset($cfdi['receptor']['rfc'])) {
+                throw new \Exception('El XML del CFDI no contiene los datos mínimos requeridos (serie, folio, rfc emisor, rfc receptor)');
             }
 
             $facturaId = $this->facturaModel->create([
@@ -209,12 +224,12 @@ class FacturaArchivoController extends BaseController
                 'uuid_factura' => $uuidLimpio,
                 'archivo_xml' => $xmlPath,
                 'archivo_pdf' => $pdfPath,
-                'serie' => $cfdi['serie'],
-                'folio' => $cfdi['folio'],
+                'serie' => $cfdi['serie'] ?? null,
+                'folio' => $cfdi['folio'] ?? null,
                 'total' => isset($cfdi['total']) ? (float) $cfdi['total'] : null,
-                'fecha_emision' => $timbre['fecha_timbrado'],
-                'rfc_emisor' => $cfdi['emisor']['rfc'],
-                'rfc_receptor' => $cfdi['receptor']['rfc'],
+                'fecha_emision' => $timbre['fecha_timbrado'] ?? null,
+                'rfc_emisor' => $cfdi['emisor']['rfc'] ?? null,
+                'rfc_receptor' => $cfdi['receptor']['rfc'] ?? null,
                 'id_suc' => $facturaBbj['ID_SUC'] ?? null,
                 'fecfac' => isset($facturaBbj['FECFAC']) ? ValidationHelper::BbjDateToMysqlDate($facturaBbj['FECFAC']) : null,
                 'inventario' => $facturaBbj['INVENTARIO'] ?? null,
