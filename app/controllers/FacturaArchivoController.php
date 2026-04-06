@@ -422,7 +422,7 @@ class FacturaArchivoController extends BaseController
 
             $xmlFile = $_FILES['xml_file'];
             if ($xmlFile['error'] !== UPLOAD_ERR_OK) {
-                $this->json(['error' => 'Error al subir el archivo'], 400);
+                $this->json(['error' => 'Error al subir el archivo: código ' . $xmlFile['error']], 400);
             }
 
             $filePath = $xmlFile['tmp_name'];
@@ -438,28 +438,60 @@ class FacturaArchivoController extends BaseController
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $error = curl_error($ch);
+            $curlError = curl_error($ch);
             curl_close($ch);
 
-            if ($error) {
-                $this->json(['error' => 'Error al procesar el XML: ' . $error], 500);
+            error_log("=== parseXml DEBUG ===");
+            error_log("HTTP Code: " . $httpCode);
+            error_log("cURL Error: " . ($curlError ?: 'None'));
+            error_log("Response (first 500 chars): " . substr($response, 0, 500));
+
+            if ($curlError) {
+                error_log("cURL Error details: " . $curlError);
+                $this->json(['error' => 'Error de conexión con el servidor de parsing: ' . $curlError], 500);
             }
 
             if ($httpCode !== 200) {
-                $this->json(['error' => 'Error del servidor: ' . $response], $httpCode);
+                error_log("Non-200 response: " . $response);
+                $this->json(['error' => 'El servidor de parsing respondió con código ' . $httpCode . ': ' . substr($response, 0, 200)], $httpCode);
             }
 
             $decoded = json_decode($response, true);
-            if (!$decoded || !isset($decoded['success']) || !$decoded['success']) {
-                $this->json(['error' => $decoded['error'] ?? 'Error al procesar el XML'], 400);
+            error_log("JSON decoded: " . ($decoded ? 'Success' : 'FAILED'));
+            error_log("Decoded structure: " . print_r($decoded, true));
+
+            if (!$decoded) {
+                error_log("json_decode failed. Response is not valid JSON.");
+                $this->json(['error' => 'La respuesta del servidor no es JSON válido'], 500);
             }
+
+            if (!isset($decoded['success'])) {
+                error_log("Missing 'success' key in response");
+                $this->json(['error' => 'La respuesta del servidor no tiene el formato esperado (falta success)'], 500);
+            }
+
+            if (!$decoded['success']) {
+                $errorMsg = $decoded['error'] ?? $decoded['message'] ?? 'Error desconocido al procesar el XML';
+                error_log("API reported failure: " . $errorMsg);
+                $this->json(['error' => $errorMsg], 400);
+            }
+
+            $data = $decoded['data'] ?? [];
+            if (empty($data) || (is_array($data) && count($data) === 0)) {
+                error_log("API reported success but data is empty");
+                $this->json(['error' => 'El XML fue procesado pero no se encontraron datos utilizables'], 400);
+            }
+
+            error_log("parseXml success. Data keys: " . implode(', ', array_keys($data)));
 
             $this->json([
                 'exito' => true,
-                'datos' => $decoded['data'] ?? []
+                'datos' => $data
             ]);
 
         } catch (\Exception $e) {
+            error_log("parseXml exception: " . $e->getMessage());
+            error_log("Stack trace: " . $e->getTraceAsString());
             $this->json(['error' => $e->getMessage()], 500);
         }
     }

@@ -157,16 +157,15 @@ $user = AuthHelper::getUser();
                     });
 
                     const result = await response.json();
+                    console.log('Parse response:', result);
 
-                    if (result.exito && result.datos && (
-                        Array.isArray(result.datos) ? result.datos.length > 0 : Object.keys(result.datos).length > 0
-                    )) {
+                    if (result.exito && result.datos && hasValidData(result.datos)) {
                         fillUuidFromXml(result.datos);
                         showXmlStatus('¡UUID cargado correctamente!', 'text-green-600');
                     } else if (result.error) {
                         showXmlStatus(result.error, 'text-red-600');
                     } else {
-                        showXmlStatus('No se pudieron extraer datos del XML', 'text-red-600');
+                        showXmlStatus('No se encontraron datos utilizables en el XML', 'text-red-600');
                     }
                 } catch (error) {
                     console.error('Error:', error);
@@ -176,6 +175,13 @@ $user = AuthHelper::getUser();
                     archivoXml.disabled = false;
                 }
             });
+        }
+
+        function hasValidData(datos) {
+            if (!datos) return false;
+            if (Array.isArray(datos)) return datos.length > 0;
+            if (typeof datos === 'object') return Object.keys(datos).length > 0;
+            return false;
         }
 
         function showXmlStatus(message, colorClass) {
