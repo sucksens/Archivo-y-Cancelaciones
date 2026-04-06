@@ -209,12 +209,12 @@ class FacturaArchivoController extends BaseController
                 'uuid_factura' => $uuidLimpio,
                 'archivo_xml' => $xmlPath,
                 'archivo_pdf' => $pdfPath,
-                'serie' => $cfdi['serie'] ?? null,
-                'folio' => $cfdi['folio'] ?? null,
+                'serie' => $cfdi['serie'],
+                'folio' => $cfdi['folio'],
                 'total' => isset($cfdi['total']) ? (float) $cfdi['total'] : null,
-                'fecha_emision' => $timbre['fecha_timbrado'] ?? null,
-                'rfc_emisor' => $cfdi['emisor']['rfc'] ?? null,
-                'rfc_receptor' => $cfdi['receptor']['rfc'] ?? null,
+                'fecha_emision' => $timbre['fecha_timbrado'],
+                'rfc_emisor' => $cfdi['emisor']['rfc'],
+                'rfc_receptor' => $cfdi['receptor']['rfc'],
                 'id_suc' => $facturaBbj['ID_SUC'] ?? null,
                 'fecfac' => isset($facturaBbj['FECFAC']) ? ValidationHelper::BbjDateToMysqlDate($facturaBbj['FECFAC']) : null,
                 'inventario' => $facturaBbj['INVENTARIO'] ?? null,
@@ -222,7 +222,7 @@ class FacturaArchivoController extends BaseController
                 'datos_extra' => json_encode($cfdi)
             ]);
 
-            $this->log('Factura subida', 'facturas', "ID: {$facturaId}, UUID: {$uuidLimpio}");
+            $this->log('Factura subida', 'facturas', "ID: {$facturaId}, UUID: {$uuidLimpio},".json_encode($cfdi)," ");
             $this->session->flash('success', 'Factura subida correctamente');
             $this->redirect('/facturas/' . $facturaId);
 
