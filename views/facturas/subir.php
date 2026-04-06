@@ -34,7 +34,7 @@ $user = AuthHelper::getUser();
         <?php endif; ?>
 
         <form action="<?= BASE_URL ?>facturas" method="POST" enctype="multipart/form-data" class="p-6">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+            <input type="hidden" name="_csrf_token" value="<?= $_SESSION['_csrf_token'] ?? '' ?>">
 
             <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <div class="flex">
