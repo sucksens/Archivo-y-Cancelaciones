@@ -104,7 +104,7 @@ unset($_SESSION['old_input']);
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                            <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' ?>">
+                            <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800' ?>">
                             <?= htmlspecialchars($empresas[$factura['empresa']] ?? $factura['empresa']) ?>
                         </span>
                     </td>

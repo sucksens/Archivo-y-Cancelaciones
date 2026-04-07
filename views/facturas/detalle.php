@@ -14,7 +14,7 @@ $canDelete = $canDelete ?? false;
 
 <div class="max-w-5xl mx-auto">
     <div class="mb-6">
-        <a href="<?= BASE_URL ?>facturas" class="text-primary-600 hover:text-primary-800 inline-flex items-center">
+        <a href="<?= BASE_URL ?>facturas" class="btn btn-secondary inline-flex items-center">
             <i class="fas fa-arrow-left mr-2"></i>Volver a Facturas
         </a>
     </div>
@@ -54,7 +54,7 @@ $canDelete = $canDelete ?? false;
                             <label class="block text-sm font-medium text-gray-500">Empresa</label>
                             <p class="mt-1 text-sm text-gray-900">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' ?>">
+                                    <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800' ?>">
                                     <?= htmlspecialchars($empresas[$factura['empresa']] ?? $factura['empresa']) ?>
                                 </span>
                             </p>
@@ -102,8 +102,17 @@ $canDelete = $canDelete ?? false;
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">Datos BBj</h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-500">Sucursal (ID_SUC)</label>
-                            <p class="mt-1 text-sm text-gray-900"><?= htmlspecialchars($factura['id_suc'] ?? '-') ?></p>
+                            <label class="block text-sm font-medium text-gray-500">Sucursal</label>
+                            <p class="mt-1 text-sm text-gray-900">
+                                <?php 
+                                    $sucursales = [
+                                        '01' => 'Vallarta',
+                                        '03' => 'Acueducto',
+                                        '05' => 'Country'
+                                    ];
+                                    echo htmlspecialchars($sucursales[$factura['id_suc']] ?? $factura['id_suc'] ?? '-');
+                                ?>
+                            </p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-500">Vendedor (ID_VENDEDOR)</label>
