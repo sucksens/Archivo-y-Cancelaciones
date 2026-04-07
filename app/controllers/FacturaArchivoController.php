@@ -165,7 +165,7 @@ class FacturaArchivoController extends BaseController
                 throw new \Exception("La factura con UUID {$uuidLimpio} no fue encontrada en el sistema administrativo ({$empresa})");
             }
 
-            $filePath = $_FILES['archivo_xml']['tmp_name'];
+            $filePath = UPLOADS_PATH . '/' . $xmlPath;
             $mimeType = $_FILES['archivo_xml']['type'] ?: 'text/xml';
             $cfile = curl_file_create($filePath, $mimeType, $_FILES['archivo_xml']['name']);
 
