@@ -15,7 +15,7 @@ $canDelete = $canDelete ?? false;
 <div class="max-w-5xl mx-auto">
     <div class="mb-6">
         <a href="<?= BASE_URL ?>facturas" class="btn btn-secondary inline-flex items-center">
-            <i class="fas fa-arrow-left mr-2"></i>Volver a Facturas
+            <i class="fas fa-arrow-left mr-2"></i> <- Volver a Facturas
         </a>
     </div>
 

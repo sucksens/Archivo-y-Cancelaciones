@@ -172,12 +172,7 @@ abstract class BaseController
      */
     protected function hasPermission(string $permission): bool
     {
-        if (!$this->user) {
-            return false;
-        }
-        
-        $permissions = $this->session->get('permissions', []);
-        return in_array($permission, $permissions);
+        return PermissionHelper::hasPermission($permission);
     }
 
     /**
