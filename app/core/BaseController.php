@@ -11,6 +11,7 @@ namespace App\Core;
 
 use App\Helpers\SessionHelper;
 use App\Helpers\AuthHelper;
+use App\Helpers\PermissionHelper;
 
 abstract class BaseController
 {
