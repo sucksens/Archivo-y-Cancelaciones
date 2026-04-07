@@ -174,12 +174,31 @@ class FacturaArchivoController extends BaseController
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, ['file' => $cfile]);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_MAXREDIRS, 3);
+            curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $error = curl_error($ch);
+            $curlError = curl_error($ch);
+            $curlErrno = curl_errno($ch);
             curl_close($ch);
+
+            error_log("=== Parse XML DEBUG ===");
+            error_log("Archivo: " . $_FILES['archivo_xml']['name']);
+            error_log("Tamaño: " . $_FILES['archivo_xml']['size'] . " bytes");
+            error_log("HTTP Code: " . $httpCode);
+            error_log("cURL Error: " . ($curlError ?: 'None'));
+            error_log("cURL Errno: " . $curlErrno);
+            error_log("Response (first 500 chars): " . ($response ? substr($response, 0, 500) : 'empty'));
+
+            if ($curlError) {
+                throw new \Exception('Error al conectar con el servidor de parsing: ' . $curlError);
+            }
 
             $cfdi = [];
             $timbre = [];
@@ -206,7 +225,16 @@ class FacturaArchivoController extends BaseController
                     throw new \Exception('El endpoint de parsing no devolvió datos válidos');
                 }
             } else {
-                throw new \Exception('No se pudo procesar el XML: ' . ($error ?: 'HTTP ' . $httpCode));
+                $errorMessage = 'No se pudo procesar el XML';
+                if ($curlErrno) {
+                    $errorMessage .= ': ' . $curlError . ' (Error ' . $curlErrno . ')';
+                } else {
+                    $errorMessage .= ': HTTP ' . $httpCode;
+                }
+                if ($response) {
+                    $errorMessage .= ' - Respuesta: ' . substr($response, 0, 200);
+                }
+                throw new \Exception($errorMessage);
             }
 
             if (empty($cfdi)) {
