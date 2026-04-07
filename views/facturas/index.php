@@ -127,12 +127,12 @@ unset($_SESSION['old_input']);
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex space-x-1">
                             <?php if ($factura['archivo_xml']): ?>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                                 XML
                             </span>
                             <?php endif; ?>
                             <?php if ($factura['archivo_pdf']): ?>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
                                 PDF
                             </span>
                             <?php endif; ?>

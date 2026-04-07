@@ -35,12 +35,12 @@ $canDelete = $canDelete ?? false;
             <div class="flex space-x-3">
                 <?php if ($canDownload): ?>
                 <?php if ($factura['archivo_xml']): ?>
-                <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/xml" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors">
+                <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/xml" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors">
                     <i class="fas fa-file-code mr-2"></i>XML
                 </a>
                 <?php endif; ?>
                 <?php if ($factura['archivo_pdf']): ?>
-                <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/pdf" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors">
+                <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/pdf" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors">
                     <i class="fas fa-file-pdf mr-2"></i>PDF
                 </a>
                 <?php endif; ?>
@@ -66,7 +66,7 @@ $canDelete = $canDelete ?? false;
                             <label class="block text-sm font-medium text-gray-500">Empresa</label>
                             <p class="mt-1 text-sm text-gray-900">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-blue-800' ?>">
+                                    <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' ?>">
                                     <?= htmlspecialchars($empresas[$factura['empresa']] ?? $factura['empresa']) ?>
                                 </span>
                             </p>
@@ -136,26 +136,26 @@ $canDelete = $canDelete ?? false;
                     <h3 class="text-lg font-semibold text-gray-800 mb-4 mt-8">Archivos</h3>
                     <div class="space-y-2">
                         <?php if ($factura['archivo_xml']): ?>
-                        <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
                             <div class="flex items-center">
-                                <i class="fas fa-file-code text-red-600 mr-3"></i>
-                                <span class="text-sm text-red-800">XML</span>
+                                <i class="fas fa-file-code text-blue-600 mr-3"></i>
+                                <span class="text-sm text-blue-800">XML</span>
                             </div>
                             <?php if ($canDownload): ?>
-                            <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/xml" class="text-red-600 hover:text-red-800" title="Descargar">
+                            <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/xml" class="text-blue-600 hover:text-blue-800" title="Descargar">
                                 <i class="fas fa-download"></i>
                             </a>
                             <?php endif; ?>
                         </div>
                         <?php endif; ?>
                         <?php if ($factura['archivo_pdf']): ?>
-                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
                             <div class="flex items-center">
-                                <i class="fas fa-file-pdf text-blue-600 mr-3"></i>
-                                <span class="text-sm text-blue-800">PDF</span>
+                                <i class="fas fa-file-pdf text-red-600 mr-3"></i>
+                                <span class="text-sm text-red-800">PDF</span>
                             </div>
                             <?php if ($canDownload): ?>
-                            <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/pdf" class="text-blue-600 hover:text-blue-800" title="Descargar">
+                            <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/pdf" class="text-red-600 hover:text-red-800" title="Descargar">
                                 <i class="fas fa-download"></i>
                             </a>
                             <?php endif; ?>
@@ -182,15 +182,6 @@ $canDelete = $canDelete ?? false;
                     </div>
                 </div>
             </div>
-
-            <?php if ($factura['datos_extra']): ?>
-            <div class="mt-8 pt-6 border-t border-gray-200">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">Datos Extra del XML</h3>
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <pre class="text-xs text-gray-700 overflow-x-auto"><?= htmlspecialchars($factura['datos_extra']) ?></pre>
-                </div>
-            </div>
-            <?php endif; ?>
         </div>
     </div>
 </div>
