@@ -97,10 +97,10 @@ unset($_SESSION['old_input']);
                 <?php else: ?>
                 <?php foreach ($facturas as $factura): ?>
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-xs font-mono text-gray-500 truncate max-w-[120px]" title="<?= htmlspecialchars($factura['uuid_factura']) ?>">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>" class="font-mono text-primary-600 hover:text-primary-900 transition-colors" title="<?= htmlspecialchars($factura['uuid_factura']) ?>">
                             <?= htmlspecialchars(substr($factura['uuid_factura'], 0, 8)) ?>...
-                        </div>
+                        </a>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
@@ -139,8 +139,8 @@ unset($_SESSION['old_input']);
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>" class="text-primary-600 hover:text-primary-900 mr-3">
-                            <i class="fas fa-eye"></i>
+                        <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>" class="text-primary-600 hover:text-primary-900 font-medium mr-3">
+                            Ver detalle
                         </a>
                         <?php if (PermissionHelper::hasPermission('facturas.download')): ?>
                         <?php if ($factura['archivo_xml']): ?>
