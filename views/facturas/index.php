@@ -76,8 +76,8 @@ unset($_SESSION['old_input']);
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UUID</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresa</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inventario</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serie/Folio</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
@@ -97,16 +97,15 @@ unset($_SESSION['old_input']);
                 <?php else: ?>
                 <?php foreach ($facturas as $factura): ?>
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>" class="font-mono text-primary-600 hover:text-primary-900 transition-colors" title="<?= htmlspecialchars($factura['uuid_factura']) ?>">
-                            <?= htmlspecialchars(substr($factura['uuid_factura'], 0, 8)) ?>...
-                        </a>
-                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                             <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800' ?>">
                             <?= htmlspecialchars($empresas[$factura['empresa']] ?? $factura['empresa']) ?>
                         </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>" class="font-mono text-primary-600 hover:text-primary-900 transition-colors" title="<?= htmlspecialchars($factura['inventario']) ?>">
+                        </a>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <?= htmlspecialchars($tipos_auto[$factura['tipo_factura']] ?? $factura['tipo_factura']) ?>

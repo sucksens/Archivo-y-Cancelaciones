@@ -208,9 +208,9 @@ class FacturaArchivo
         }
 
         if (!empty($filters['search'])) {
-            $where[] = '(fa.uuid_factura LIKE ? OR fa.serie LIKE ? OR fa.folio LIKE ? OR fa.rfc_receptor LIKE ?)';
+            $where[] = '(fa.uuid_factura LIKE ? OR fa.serie LIKE ? OR fa.folio LIKE ? OR fa.rfc_receptor LIKE ? OR fa.inventario LIKE ?)';
             $search = '%' . $filters['search'] . '%';
-            $params = array_merge($params, [$search, $search, $search, $search]);
+            $params = array_merge($params, [$search, $search, $search, $search, $search]);
         }
 
         $whereClause = implode(' AND ', $where);
