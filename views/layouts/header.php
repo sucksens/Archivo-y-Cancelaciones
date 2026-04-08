@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title><?= htmlspecialchars($title ?? 'Sistema de Cancelaciones') ?> - <?= APP_NAME ?></title>
+    <title><?= htmlspecialchars($title ?? 'Archivo y Canciones') ?> - <?= APP_NAME ?></title>
     
     <!-- Google Fonts - Inter (Motormexa Identity) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

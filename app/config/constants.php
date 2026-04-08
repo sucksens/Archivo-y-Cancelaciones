@@ -11,7 +11,7 @@
 date_default_timezone_set('America/Mexico_City');
 
 // Información del sistema
-define('APP_NAME', 'Sistema de Cancelaciones');
+define('APP_NAME', 'Archivo y Canciones');
 define('APP_VERSION', '1.0.0');
 define('APP_ENV', 'development'); // 'development' o 'production'
 
