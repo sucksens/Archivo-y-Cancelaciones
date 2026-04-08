@@ -104,7 +104,8 @@ unset($_SESSION['old_input']);
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>" class="font-mono text-primary-600 hover:text-primary-900 transition-colors" title="<?= htmlspecialchars($factura['inventario']) ?>">
+                        <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>" class="font-mono text-primary-600 hover:text-primary-900 transition-colors" title="<?= $factura['inventario'] ?>">
+                            <?= $factura['inventario'] ?>
                         </a>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
