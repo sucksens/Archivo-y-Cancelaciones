@@ -60,8 +60,8 @@ class FacturaArchivo
         $sql = "INSERT INTO {$this->table}
                 (usuario_id, empresa, tipo_factura, uuid_factura, archivo_xml, archivo_pdf,
                  serie, folio, total, fecha_emision, rfc_emisor, rfc_receptor,
-                 id_suc, fecfac, inventario, id_vendedor, datos_extra)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                 id_suc, fecfac, inventario, id_vendedor, id_pedido, datos_extra)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         $this->db->query($sql, [
             $data['usuario_id'],
@@ -80,6 +80,7 @@ class FacturaArchivo
             $data['fecfac'] ?? null,
             $data['inventario'] ?? null,
             $data['id_vendedor'] ?? null,
+            $data['id_pedido'] ?? null,
             $data['datos_extra'] ?? null
         ]);
 

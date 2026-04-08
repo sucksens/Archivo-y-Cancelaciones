@@ -128,14 +128,6 @@ class FacturaArchivoController extends BaseController
                     throw new \Exception($uploader->getFirstError() ?: 'Error al subir el archivo PDF');
                 }
             }
-            /*
-            $user = AuthHelper::getUser();
-            if ($empresa !== $user['empresa']) {
-                $uploader->delete($xmlPath);
-                if ($pdfPath) $uploader->delete($pdfPath);
-                throw new \Exception('No puedes subir facturas de una empresa diferente a la tuya');
-            }
-            */
 
             $existingFactura = $this->facturaModel->findByUuid($uuidLimpio);
             if ($existingFactura) {
@@ -259,6 +251,7 @@ class FacturaArchivoController extends BaseController
                 'rfc_emisor' => $cfdi['emisor']['rfc'] ?? null,
                 'rfc_receptor' => $cfdi['receptor']['rfc'] ?? null,
                 'id_suc' => $facturaBbj['ID_SUC'] ?? null,
+                'id_pedido' => $facturaBbj['ID_PEDIDO'] ?? null,
                 'fecfac' => isset($facturaBbj['FECFAC']) ? ValidationHelper::BbjDateToMysqlDate($facturaBbj['FECFAC']) : null,
                 'inventario' => $facturaBbj['INVENTARIO'] ?? null,
                 'id_vendedor' => $facturaBbj['ID_VENDEDOR'] ?? null,
