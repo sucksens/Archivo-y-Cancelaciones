@@ -135,6 +135,19 @@ class FacturaArchivo
     }
 
     /**
+     * Obtener todas las facturas con paginación (para rol Admin)
+     *
+     * @param int $page Página
+     * @param int $limit Límite
+     * @param array $filters Filtros adicionales
+     * @return array
+     */
+    public function getAllFacturas(int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
+    {
+        return $this->getPaginatedFacturas([], $page, $limit, $filters);
+    }
+
+    /**
      * Obtener facturas del usuario con paginación
      *
      * @param int $userId ID del usuario
@@ -145,47 +158,7 @@ class FacturaArchivo
      */
     public function getByUser(int $userId, int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
     {
-        $where = ['fa.usuario_id = ?', "fa.estado = 'activo'"];
-        $params = [$userId];
-
-        if (!empty($filters['empresa'])) {
-            $where[] = 'fa.empresa = ?';
-            $params[] = $filters['empresa'];
-        }
-
-        if (!empty($filters['tipo_factura'])) {
-            $where[] = 'fa.tipo_factura = ?';
-            $params[] = $filters['tipo_factura'];
-        }
-
-        if (!empty($filters['search'])) {
-            $where[] = '(fa.uuid_factura LIKE ? OR fa.serie LIKE ? OR fa.folio LIKE ? OR fa.rfc_receptor LIKE ?)';
-            $search = '%' . $filters['search'] . '%';
-            $params = array_merge($params, [$search, $search, $search, $search]);
-        }
-
-        $whereClause = implode(' AND ', $where);
-        $offset = ($page - 1) * $limit;
-
-        $countSql = "SELECT COUNT(*) FROM {$this->table} fa WHERE {$whereClause}";
-        $total = (int) $this->db->fetchColumn($countSql, $params);
-
-        $sql = "SELECT fa.*, u.nombre_completo as usuario_nombre
-                FROM {$this->table} fa
-                LEFT JOIN usuarios u ON fa.usuario_id = u.id
-                WHERE {$whereClause}
-                ORDER BY fa.fecha_subida DESC
-                LIMIT {$limit} OFFSET {$offset}";
-
-        $facturas = $this->db->fetchAll($sql, $params);
-
-        return [
-            'data' => $facturas,
-            'total' => $total,
-            'page' => $page,
-            'limit' => $limit,
-            'pages' => ceil($total / $limit)
-        ];
+        return $this->getPaginatedFacturas(['fa.usuario_id = ?' => $userId], $page, $limit, $filters);
     }
 
     /**
@@ -199,8 +172,34 @@ class FacturaArchivo
      */
     public function getByEmpresa(string $empresa, int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
     {
-        $where = ['fa.empresa = ?', "fa.estado = 'activo'"];
-        $params = [$empresa];
+        return $this->getPaginatedFacturas(['fa.empresa = ?' => $empresa], $page, $limit, $filters);
+    }
+
+    /**
+     * Helper privado para paginación y filtrado centralizado
+     *
+     * @param array $baseConditions Condiciones base ['columna = ?' => valor]
+     * @param int $page Página
+     * @param int $limit Límite
+     * @param array $filters Filtros adicionales
+     * @return array
+     */
+    private function getPaginatedFacturas(array $baseConditions = [], int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
+    {
+        $where = ["fa.estado = 'activo'"];
+        $params = [];
+
+        // Agregar condiciones base
+        foreach ($baseConditions as $condition => $value) {
+            $where[] = $condition;
+            $params[] = $value;
+        }
+
+        // Aplicar filtros dinámicos
+        if (!empty($filters['empresa'])) {
+            $where[] = 'fa.empresa = ?';
+            $params[] = $filters['empresa'];
+        }
 
         if (!empty($filters['tipo_factura'])) {
             $where[] = 'fa.tipo_factura = ?';
@@ -216,9 +215,11 @@ class FacturaArchivo
         $whereClause = implode(' AND ', $where);
         $offset = ($page - 1) * $limit;
 
+        // Contar total
         $countSql = "SELECT COUNT(*) FROM {$this->table} fa WHERE {$whereClause}";
         $total = (int) $this->db->fetchColumn($countSql, $params);
 
+        // Obtener datos
         $sql = "SELECT fa.*, u.nombre_completo as usuario_nombre
                 FROM {$this->table} fa
                 LEFT JOIN usuarios u ON fa.usuario_id = u.id
@@ -233,7 +234,7 @@ class FacturaArchivo
             'total' => $total,
             'page' => $page,
             'limit' => $limit,
-            'pages' => ceil($total / $limit)
+            'pages' => ($limit > 0) ? (int) ceil($total / $limit) : 1
         ];
     }
 

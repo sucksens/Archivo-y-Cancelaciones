@@ -44,7 +44,7 @@ class FacturaArchivoController extends BaseController
         ];
 
         if (PermissionHelper::hasPermission('facturas.view.all')) {
-            $result = $this->getAllFacturas($filters, $page);
+            $result = $this->facturaModel->getAllFacturas($page, ITEMS_PER_PAGE, $filters);
         } elseif (PermissionHelper::hasPermission('facturas.view.empresa')) {
             $empresa = PermissionHelper::getUserCompany();
             if (!$empresa) {
@@ -415,58 +415,6 @@ class FacturaArchivoController extends BaseController
         }
     }
 
-    /**
-     * Obtener todas las facturas (para administradores)
-     *
-     * @param array $filters Filtros
-     * @param int $page Página
-     * @param int $limit Límite
-     * @return array
-     */
-    private function getAllFacturas(array $filters = [], int $page = 1, int $limit = ITEMS_PER_PAGE): array
-    {
-        $where = ["fa.estado = 'activo'"];
-        $params = [];
-
-        if (!empty($filters['empresa'])) {
-            $where[] = 'fa.empresa = ?';
-            $params[] = $filters['empresa'];
-        }
-
-        if (!empty($filters['tipo_factura'])) {
-            $where[] = 'fa.tipo_factura = ?';
-            $params[] = $filters['tipo_factura'];
-        }
-
-        if (!empty($filters['search'])) {
-            $where[] = '(fa.uuid_factura LIKE ? OR fa.serie LIKE ? OR fa.folio LIKE ?)';
-            $search = '%' . $filters['search'] . '%';
-            $params = array_merge($params, [$search, $search, $search]);
-        }
-
-        $whereClause = implode(' AND ', $where);
-        $offset = ($page - 1) * $limit;
-
-        $countSql = "SELECT COUNT(*) FROM facturas_archivo fa WHERE {$whereClause}";
-        $total = (int) $this->db->fetchColumn($countSql, $params);
-
-        $sql = "SELECT fa.*, u.nombre_completo as usuario_nombre
-                FROM facturas_archivo fa
-                LEFT JOIN usuarios u ON fa.usuario_id = u.id
-                WHERE {$whereClause}
-                ORDER BY fa.fecha_subida DESC
-                LIMIT {$limit} OFFSET {$offset}";
-
-        $facturas = $this->db->fetchAll($sql, $params);
-
-        return [
-            'data' => $facturas,
-            'total' => $total,
-            'page' => $page,
-            'limit' => $limit,
-            'pages' => ceil($total / $limit)
-        ];
-    }
 
     public function parseXml(): void
     {
