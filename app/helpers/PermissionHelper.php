@@ -54,8 +54,12 @@ class PermissionHelper
         // Obtener permisos de cache o sesión
         $permissions = self::getPermissions($userId);
         
-        // Admin tiene todos los permisos
+        // Admin tiene todos los permisos (por código o por nombre de rol)
         if (in_array('admin.all', $permissions)) {
+            return true;
+        }
+
+        if (self::hasRole('Administrador', $userId)) {
             return true;
         }
         

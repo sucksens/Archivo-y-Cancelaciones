@@ -27,13 +27,13 @@ class FacturasBridge{
           $this->db = DatabaseBBj::getInstance($this->DatabaseName);
       }
 
-      /**
-       * Obtiene la factura de bbj
-       * 
-       * @param string $uuid
-       * @return array
-       */
-      public function getFactura(string $uuid): array
+       /**
+        * Obtiene la factura de bbj
+        * 
+        * @param string $uuid
+        * @return array|null
+        */
+      public function getFactura(string $uuid): ?array
       {
             $sql = "SELECT * FROM FACTURAS WHERE FOLIOFISCAL = ? AND STATUS = '0' ";
             return $this->db->fetchOne($sql, [$uuid]);
