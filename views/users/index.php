@@ -19,14 +19,6 @@
                 </select>
             </div>
             
-            <div class="w-32">
-                <select name="activo" class="form-select">
-                    <option value="">Todos</option>
-                    <option value="1" <?= ($filters['activo'] ?? '') === '1' ? 'selected' : '' ?>>Activos</option>
-                    <option value="0" <?= ($filters['activo'] ?? '') === '0' ? 'selected' : '' ?>>Inactivos</option>
-                </select>
-            </div>
-            
             <div class="w-40">
                 <select name="rol" class="form-select">
                     <option value="">Todos los roles</option>
@@ -37,6 +29,15 @@
                     <?php endforeach; ?>
                 </select>
             </div>
+
+            <div class="w-32">
+                <select name="activo" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="1" <?= ($filters['activo'] ?? '') === '1' ? 'selected' : '' ?>>Activos</option>
+                    <option value="0" <?= ($filters['activo'] ?? '') === '0' ? 'selected' : '' ?>>Inactivos</option>
+                </select>
+            </div>
+            
             
             <div class="flex gap-2">
                 <button type="submit" class="btn btn-primary">
