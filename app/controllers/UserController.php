@@ -38,7 +38,8 @@ class UserController extends BaseController
         $filters = [
             'empresa' => $this->input('empresa'),
             'activo' => $this->input('activo'),
-            'search' => $this->input('search')
+            'search' => $this->input('search'),
+            'rol' => $this->input('rol')
         ];
 
         $result = $this->userModel->getAll($filters, $page);
@@ -48,7 +49,8 @@ class UserController extends BaseController
             'users' => $result['data'],
             'pagination' => $result,
             'filters' => $filters,
-            'empresas' => EMPRESAS
+            'empresas' => EMPRESAS,
+            'roles' => $this->roleModel->getAll()
         ]);
     }
 

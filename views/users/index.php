@@ -27,6 +27,17 @@
                 </select>
             </div>
             
+            <div class="w-40">
+                <select name="rol" class="form-select">
+                    <option value="">Todos los roles</option>
+                    <?php foreach ($roles as $role): ?>
+                    <option value="<?= $role['id'] ?>" <?= ($filters['rol'] ?? '') === $role['id'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($role['nombre']) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            
             <div class="flex gap-2">
                 <button type="submit" class="btn btn-primary">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

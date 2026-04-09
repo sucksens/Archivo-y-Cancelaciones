@@ -209,6 +209,14 @@ class User
             $params = array_merge($params, [$search, $search, $search]);
         }
 
+        if (!empty($filters['rol'])) {
+            $where[] = 'EXISTS (
+                SELECT 1 FROM usuario_rol ur 
+                WHERE ur.usuario_id = usuarios.id AND ur.rol_id = ?
+            )';
+            $params[] = $filters['rol'];
+        }
+
         $whereClause = implode(' AND ', $where);
         $offset = ($page - 1) * $limit;
 
