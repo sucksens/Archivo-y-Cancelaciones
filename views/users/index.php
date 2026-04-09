@@ -32,7 +32,7 @@
 
             <div class="w-32">
                 <select name="activo" class="form-select">
-                    <option value="">Todos</option>
+                    <option value="">Todos Estados</option>
                     <option value="1" <?= ($filters['activo'] ?? '') === '1' ? 'selected' : '' ?>>Activos</option>
                     <option value="0" <?= ($filters['activo'] ?? '') === '0' ? 'selected' : '' ?>>Inactivos</option>
                 </select>
