@@ -51,6 +51,15 @@ class FacturaArchivoController extends BaseController
                 $this->session->flash('error', 'No tienes una empresa asignada');
                 $this->redirect('/dashboard');
             }
+            
+            // Aplicar filtro automático para rol Consulta con especialidad
+            if (PermissionHelper::isConsulta()) {
+                $especialidadFilter = PermissionHelper::getConsultaTipoFacturaFilter();
+                if ($especialidadFilter) {
+                    $filters['tipo_factura'] = $especialidadFilter;
+                }
+            }
+            
             $result = $this->facturaModel->getByEmpresa($empresa, $page, ITEMS_PER_PAGE, $filters);
         } else {
             $result = $this->facturaModel->getByUser($this->userId(), $page, ITEMS_PER_PAGE, $filters);
@@ -62,7 +71,10 @@ class FacturaArchivoController extends BaseController
             'pagination' => $result,
             'filters' => $filters,
             'empresas' => EMPRESAS,
-            'tipos_auto' => TIPOS_AUTO
+            'tipos_auto' => TIPOS_AUTO,
+            'isConsultaWithEspecialidad' => PermissionHelper::isConsultaWithEspecialidad(),
+            'userEspecialidadLabel' => PermissionHelper::getUserEspecialidad() ? 
+                (ESPECIALIDADES_USUARIO[PermissionHelper::getUserEspecialidad()]['label'] ?? '') : ''
         ]);
     }
 
