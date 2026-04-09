@@ -198,7 +198,7 @@ class User
             $params[] = $filters['empresa'];
         }
 
-        if (isset($filters['activo'])) {
+        if (isset($filters['activo']) && $filters['activo'] !== '') {
             $where[] = 'activo = ?';
             $params[] = $filters['activo'];
         }
