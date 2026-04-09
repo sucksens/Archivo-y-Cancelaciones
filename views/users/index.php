@@ -20,6 +20,17 @@
             </div>
             
             <div class="w-40">
+                <select name="especialidad" class="form-select">
+                    <option value="">Todas las especialidades</option>
+                    <?php foreach ($especialidades as $key => $label): ?>
+                    <option value="<?= $key ?>" <?= ($especialidades[$key]['label'] ?? '') === $key ? 'selected' : '' ?>>
+                        <?= $especialidades[$key]['label'] ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="w-40">
                 <select name="rol" class="form-select">
                     <option value="">Todos los roles</option>
                     <?php foreach ($roles as $role): ?>

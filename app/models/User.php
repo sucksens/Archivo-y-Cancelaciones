@@ -218,6 +218,11 @@ class User
             $params[] = $filters['rol'];
         }
 
+        if (!empty($filters['especialidad'])) {
+            $where[] = 'especialidad_usuario = ?';
+            $params[] = $filters['especialidad'];
+        }
+
         $whereClause = implode(' AND ', $where);
         $offset = ($page - 1) * $limit;
 

@@ -39,7 +39,8 @@ class UserController extends BaseController
             'empresa' => $this->input('empresa'),
             'activo' => $this->input('activo'),
             'search' => $this->input('search'),
-            'rol' => $this->input('rol')
+            'rol' => $this->input('rol'),
+            'especialidad' => $this->input('especialidad')
         ];
 
         $result = $this->userModel->getAll($filters, $page);
@@ -50,6 +51,7 @@ class UserController extends BaseController
             'pagination' => $result,
             'filters' => $filters,
             'empresas' => EMPRESAS,
+            'especialidades' => ESPECIALIDADES_USUARIO,
             'roles' => $this->roleModel->getAll()
         ]);
     }
