@@ -418,9 +418,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.ok) {
                     // Mostrar resultado con un toast
                     let mensaje = `<strong>${result.estado_validacion}</strong><br>${result.mensaje}`;
-                    if (result.id_operacion) {
-                        mensaje += `<br><small class="opacity-75">ID: ${result.id_operacion}</small>`;
-                    }
+                    mensaje += `<br><small class="opacity-75">Cancelacion: ${result.estatus_cancelacion}</small>`;
+                    mensaje += `<br><small class="opacity-75">ID: ${result.id_operacion}</small>`;
                     
                     showToast(mensaje, result.procesamiento_exitoso ? 'success' : 'warning');
                 } else {
