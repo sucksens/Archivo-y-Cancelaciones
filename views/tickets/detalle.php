@@ -126,7 +126,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                             <td class="px-6 py-4 text-xs font-mono text-gray-500">
                                 <?= htmlspecialchars(substr($op['uuid_operacion'], 0, 18)) ?>...
                             </td>
-                            -->
+                        -->
                             <td class="px-6 py-4 text-sm text-gray-700">
                                 <?= htmlspecialchars($tipos_operacion[$op['tipo_operacion']] ?? $op['tipo_operacion']) ?>
                             </td>
@@ -208,12 +208,8 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                     </tbody>
                 </table>
             </div>
-            <?php else: ?>
-            <div class="card-body py-8 text-center text-gray-500 italic">
-                No hay operaciones relacionadas con este ticket.
-            </div>
-            <?php endif; ?>
         </div>
+        <?php endif; ?>
     </div>
     
     <!-- Panel Lateral -->
@@ -302,7 +298,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                 <div class="divide-y divide-gray-100">
                     <?php foreach (array_slice($ticket['auditoria'], 0, 5) as $audit): ?>
                     <div class="p-4">
-                        <p class="text-sm font-medium text-gray-900"><?= htmlspecialchars($audit['accion']) ?></p>
+                        <p class="text-sm font-medium text-gray-900"><?= htmlspecialchars($audit['accion']) .' a '. htmlspecialchars($audit['valor_nuevo']) ?></p>
                         <p class="text-xs text-gray-500 mt-1">
                             <?= htmlspecialchars($audit['usuario_nombre']) ?> · 
                             <?= date('d/m/Y H:i', strtotime($audit['fecha'])) ?>
