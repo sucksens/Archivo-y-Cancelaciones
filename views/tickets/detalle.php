@@ -208,8 +208,12 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                     </tbody>
                 </table>
             </div>
+            <?php else: ?>
+            <div class="card-body py-8 text-center text-gray-500 italic">
+                No hay operaciones relacionadas con este ticket.
+            </div>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
     </div>
     
     <!-- Panel Lateral -->
