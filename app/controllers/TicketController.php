@@ -554,7 +554,7 @@ class TicketController extends BaseController
             }
 
             $flag = $this->input('flag');
-            $allowedFlags = ['cancelada', 'cancelado_sistema', 'cancelado_sat'];
+            $allowedFlags = ['solicitada_cancelacion', 'cancelado_sistema', 'cancelado_sat'];
 
             if (!in_array($flag, $allowedFlags)) {
                 $this->json(['error' => 'Bandera no válida'], 400);
@@ -563,16 +563,16 @@ class TicketController extends BaseController
             $nuevoValor = $operacion[$flag] ? 0 : 1;
             $updateData = [$flag => $nuevoValor];
 
-            // Si se marca como cancelado, guardamos la fecha
+            // Si se marca como cancelado, guardamos la fecha (fecha_cancelacion se maneja via trigger)
             if ($nuevoValor === 1) {
-                if ($flag === 'cancelada' || $flag === 'cancelado_sistema') {
+                if ($flag === 'cancelado_sistema') {
                     $updateData['fecha_cancelacion'] = date('Y-m-d H:i:s');
                 } elseif ($flag === 'cancelado_sat') {
                     $updateData['fecha_cancelacion_sat'] = date('Y-m-d H:i:s');
                 }
             } else {
                 // Si se desmarca, podríamos limpiar la fecha, pero mejor dejarla como histórico o limpiarla según regla de negocio
-                if ($flag === 'cancelada' || $flag === 'cancelado_sistema') {
+                if ($flag === 'cancelado_sistema') {
                     $updateData['fecha_cancelacion'] = null;
                 } elseif ($flag === 'cancelado_sat') {
                     $updateData['fecha_cancelacion_sat'] = null;

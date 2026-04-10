@@ -157,7 +157,6 @@ CREATE TABLE IF NOT EXISTS factura_operaciones (
     monto DECIMAL(15,2) NULL,
     fecha_operacion DATE NULL,
     requiere_cancelacion TINYINT(1) DEFAULT 0,
-    cancelada TINYINT(1) DEFAULT 0,
     cancelado_sistema TINYINT(1) DEFAULT 0,
     cancelado_sat TINYINT(1) DEFAULT 0,
     fecha_cancelacion TIMESTAMP NULL,
