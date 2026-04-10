@@ -104,7 +104,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Factura</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">UUID</th>
+                            <!--<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">UUID</th>-->
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Monto</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Requiere Canc.</th>
@@ -122,9 +122,11 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                             <td class="px-6 py-4 text-sm text-gray-900">
                                 <?= $op['serie'] .'-'. $op['id_compago'] ?>
                             </td>
+                            <!--
                             <td class="px-6 py-4 text-xs font-mono text-gray-500">
                                 <?= htmlspecialchars(substr($op['uuid_operacion'], 0, 18)) ?>...
                             </td>
+                            -->
                             <td class="px-6 py-4 text-sm text-gray-700">
                                 <?= htmlspecialchars($tipos_operacion[$op['tipo_operacion']] ?? $op['tipo_operacion']) ?>
                             </td>
