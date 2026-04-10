@@ -7,7 +7,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     
     <!-- Información Principal -->
-    <div class="lg:col-span-2 space-y-6">
+    <div class="lg:col-span-2 space-y-6 min-w-0">
         
         <!-- Datos del Ticket -->
         <div class="card card-accent-top card-accent-blue">
@@ -73,7 +73,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                 <!-- Motivo -->
                 <div class="mt-6 pt-6 border-t border-gray-200">
                     <label class="text-sm font-medium text-gray-500">Motivo de Cancelación</label>
-                    <p class="text-gray-900 mt-2 whitespace-pre-line"><?= htmlspecialchars($ticket['motivo']) ?></p>
+                    <p class="text-gray-900 mt-2 whitespace-pre-line break-words"><?= htmlspecialchars($ticket['motivo']) ?></p>
                 </div>
                 
                 <!-- Archivo -->
@@ -94,11 +94,11 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
         </div>
         
         <!-- Operaciones Relacionadas -->
+        <?php if (!empty($ticket['operaciones'])): ?>
         <div class="card">
             <div class="card-header grid grid-2">
                 <h3 class="text-lg font-semibold text-gray-900 grid-span-1">Operaciones Relacionadas</h3>
             </div>
-            <?php if (!empty($ticket['operaciones'])): ?>
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b border-gray-200">
@@ -213,7 +213,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
     </div>
     
     <!-- Panel Lateral -->
-    <div class="space-y-6">
+    <div class="space-y-6 min-w-0">
         
         <!-- Cambiar Estado -->
         <?php if ($canChangeStatus): ?>
@@ -298,7 +298,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                 <div class="divide-y divide-gray-100">
                     <?php foreach (array_slice($ticket['auditoria'], 0, 5) as $audit): ?>
                     <div class="p-4">
-                        <p class="text-sm font-medium text-gray-900"><?= htmlspecialchars($audit['accion']) .' a '. htmlspecialchars($audit['valor_nuevo']) ?></p>
+                        <p class="text-sm font-medium text-gray-900 break-words"><?= htmlspecialchars($audit['accion']) .' a '. htmlspecialchars($audit['valor_nuevo']) ?></p>
                         <p class="text-xs text-gray-500 mt-1">
                             <?= htmlspecialchars($audit['usuario_nombre']) ?> · 
                             <?= date('d/m/Y H:i', strtotime($audit['fecha'])) ?>
