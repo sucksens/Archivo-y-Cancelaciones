@@ -169,6 +169,13 @@ class TicketController extends BaseController
     {
         $this->requirePermission('tickets.create');
 
+        // Validación: Usuarios con empresa='ambas' no pueden crear tickets
+        $userCompany = \App\Helpers\PermissionHelper::getUserCompany();
+        if ($userCompany === 'ambas') {
+            $this->session->flash('error', 'Usuarios con acceso a ambas empresas no pueden crear tickets');
+            $this->redirect('/tickets/crear');
+        }
+
         $db = \App\Core\Database::getInstance();
         $ticketId = null;
 
@@ -366,9 +373,11 @@ class TicketController extends BaseController
         }
 
         // Verificar permisos
+        $userCompany = PermissionHelper::getUserCompany();
         $canView = $this->hasPermission('tickets.view.all') 
                 || ($this->hasPermission('tickets.view.own') && $ticket['usuario_id'] === $this->userId())
-                || ($this->hasPermission('tickets.view.empresa') && $ticket['empresa_solicitante'] === PermissionHelper::getUserCompany());
+                || ($this->hasPermission('tickets.view.empresa') && 
+                    ($ticket['empresa_solicitante'] === $userCompany || $userCompany === 'ambas'));
 
 
         if (!$canView) {

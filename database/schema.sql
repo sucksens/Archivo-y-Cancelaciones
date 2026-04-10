@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     email VARCHAR(100) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     nombre_completo VARCHAR(150) NOT NULL,
-    empresa ENUM('grupo_motormexa', 'automotriz_motormexa') NOT NULL,
+    empresa ENUM('grupo_motormexa', 'automotriz_motormexa', 'ambas') NOT NULL,
     departamento VARCHAR(100) NULL,
     activo TINYINT(1) DEFAULT 1,
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

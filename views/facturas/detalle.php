@@ -54,7 +54,8 @@ $canDelete = $canDelete ?? false;
                             <label class="block text-sm font-medium text-gray-500">Empresa</label>
                             <p class="mt-1 text-sm text-gray-900">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800' ?>">
+                                    <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 
+                                       ($factura['empresa'] === 'ambas' ? 'bg-purple-100 text-purple-800' : 'bg-red-100 text-red-800') ?>">
                                     <?= htmlspecialchars($empresas[$factura['empresa']] ?? $factura['empresa']) ?>
                                 </span>
                             </p>

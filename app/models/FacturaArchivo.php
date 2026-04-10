@@ -173,6 +173,11 @@ class FacturaArchivo
      */
     public function getByEmpresa(string $empresa, int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
     {
+        if ($empresa === 'ambas') {
+            // No agregar filtro de empresa
+            return $this->getPaginatedFacturas([], $page, $limit, $filters);
+        }
+        
         return $this->getPaginatedFacturas(['fa.empresa = ?' => $empresa], $page, $limit, $filters);
     }
 
@@ -197,7 +202,7 @@ class FacturaArchivo
         }
 
         // Aplicar filtros dinámicos
-        if (!empty($filters['empresa'])) {
+        if (!empty($filters['empresa']) && $filters['empresa'] !== 'ambas') {
             $where[] = 'fa.empresa = ?';
             $params[] = $filters['empresa'];
         }
@@ -284,8 +289,13 @@ class FacturaArchivo
      */
     public function countByEmpresaAndTipo(string $empresa, ?string $tipoFactura = null): int
     {
-        $sql = "SELECT COUNT(*) FROM {$this->table} WHERE empresa = ? AND estado = 'activo'";
-        $params = [$empresa];
+        $sql = "SELECT COUNT(*) FROM {$this->table} WHERE estado = 'activo'";
+        $params = [];
+        
+        if ($empresa !== 'ambas') {
+            $sql .= " AND empresa = ?";
+            $params[] = $empresa;
+        }
 
         if ($tipoFactura) {
             $sql .= ' AND tipo_factura = ?';

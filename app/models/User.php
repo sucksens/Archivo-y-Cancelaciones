@@ -194,7 +194,7 @@ class User
         $where = ['1=1'];
         $params = [];
 
-        if (!empty($filters['empresa'])) {
+        if (!empty($filters['empresa']) && $filters['empresa'] !== 'ambas') {
             $where[] = 'empresa = ?';
             $params[] = $filters['empresa'];
         }
