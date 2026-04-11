@@ -156,17 +156,6 @@
                            class="text-primary-600 hover:text-primary-700 font-medium text-sm mr-3">
                             Ver detalle →
                         </a>
-                        <?php if ($canVerifySat && in_array($ticket['estado'], ['pendiente', 'en_revision'])): ?>
-                        <button type="button" 
-                                onclick="verifySatStatus(<?= $ticket['id'] ?>)"
-                                class="text-orange-600 hover:text-orange-700 font-medium text-sm"
-                                title="Verificar status en SAT">
-                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Verificar SAT
-                        </button>
-                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>
