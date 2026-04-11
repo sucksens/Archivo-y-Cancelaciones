@@ -111,8 +111,13 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Solicitada Cancelación</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Cancelado Sistema</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Cancelado SAT</th>
+                            <?php if ($canChangeStatus || $canVerifySat): ?>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Validar SAT</th>
+                            <?php else: ?>
                             <?php if ($canChangeStatus): ?>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            <?php endif; ?>
                             <?php endif; ?>
                         </tr>
                     </thead>
@@ -167,6 +172,72 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                     <?php endif; ?>
                                 </span>
                             </td>
+                            <?php if ($canChangeStatus || $canVerifySat): ?>
+                            <td class="px-6 py-4 text-center">
+                                <?php if ($canChangeStatus): ?>
+                                <div class="flex items-center justify-center space-x-2">
+                                    <button type="button" 
+                                            class="btn-toggle-flag p-1 text-blue-600 hover:text-blue-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
+                                            data-op-id="<?= $op['id'] ?>"
+                                            data-flag="solicitada_cancelacion"
+                                            title="Solicitada Cancelación"
+                                            <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" 
+                                            class="btn-toggle-flag p-1 text-green-600 hover:text-green-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
+                                            data-op-id="<?= $op['id'] ?>"
+                                            data-flag="cancelado_sistema"
+                                            title="Cancelado Sistema"
+                                            <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </button>
+                                    <button type="button" 
+                                            class="btn-toggle-flag p-1 text-purple-600 hover:text-purple-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
+                                            data-op-id="<?= $op['id'] ?>"
+                                            data-flag="cancelado_sat"
+                                            title="Cancelado SAT"
+                                            <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4 0 003 15z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <?php endif; ?>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <?php 
+                                $mostrarBoton = $op['requiere_cancelacion'] && 
+                                                $op['solicitada_cancelacion'] && 
+                                                !$op['cancelado_sat'];
+                                ?>
+                                <?php if ($mostrarBoton): ?>
+                                <button type="button"
+                                        class="btn-validate-sat-ops p-2 text-orange-600 hover:text-orange-800 transition-colors"
+                                        data-op-id="<?= $op['id'] ?>"
+                                        data-op-uuid="<?= htmlspecialchars($op['uuid_operacion']) ?>"
+                                        data-op-serie="<?= htmlspecialchars($op['serie']) ?>"
+                                        data-ticket-id="<?= $ticket['id'] ?>"
+                                        title="Validar Status SAT">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </button>
+                                <?php else: ?>
+                                <span class="text-gray-300">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </span>
+                                <?php endif; ?>
+                            </td>
+                            <?php else: ?>
                             <?php if ($canChangeStatus): ?>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center space-x-2">
@@ -197,11 +268,12 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                             title="Cancelado SAT"
                                             <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4 0 003 15z" />
                                         </svg>
                                     </button>
                                 </div>
                             </td>
+                            <?php endif; ?>
                             <?php endif; ?>
                         </tr>
                         <?php endforeach; ?>
@@ -416,7 +488,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json();
 
                 if (response.ok) {
-                    // Mostrar resultado con un toast
                     let mensaje = `<strong>${result.estado_validacion}</strong><br>Cancelacion: ${result.estatus_cancelacion}`;
                     mensaje += `<br><small class="opacity-75">${result.mensaje}</small>`;
                     
@@ -434,5 +505,55 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // Validación SAT para operaciones
+    document.querySelectorAll('.btn-validate-sat-ops').forEach(button => {
+        button.addEventListener('click', async function() {
+            const opId = this.dataset.opId;
+            const tr = this.closest('tr');
+            
+            try {
+                this.disabled = true;
+                const originalContent = this.innerHTML;
+                this.innerHTML = `
+                    <svg class="animate-spin w-5 h-5 text-orange-600" 
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                `;
+
+                const response = await fetch(`<?= BASE_URL ?>tickets/operacion/${opId}/validar-sat`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '<?= \App\Helpers\AuthHelper::generateCsrfToken() ?>'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    let mensaje = `<strong>${result.estado_validacion}</strong><br>Cancelación: ${result.estatus_cancelacion}`;
+                    mensaje += `<br><small class="opacity-75">${result.mensaje}</small>`;
+                    
+                    showToast(mensaje, result.procesamiento_exitoso ? 'success' : 'warning');
+                    
+                    if (result.updated_cancelado_sat) {
+                        setTimeout(() => location.reload(), 1500);
+                    }
+                } else {
+                    showToast(result.error || 'No se pudo verificar el estatus.', 'error');
+                }
+
+                this.innerHTML = originalContent;
+                this.disabled = false;
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error de conexión con el servidor.', 'error');
+                this.disabled = false;
+            }
+        });
+    });
 });
 </script>
