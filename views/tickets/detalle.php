@@ -306,6 +306,17 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
         </div>
         <?php endif; ?>
         
+        <div class="flex flex-col space-y-3">
+            <button type="button" 
+                    id="btnVerificarSat"
+                    class="btn btn-info w-full <?= $ticket['estado'] !== 'proceso_cancelacion' ? 'opacity-50 cursor-not-allowed' : '' ?>"
+                    <?= $ticket['estado'] !== 'proceso_cancelacion' ? 'disabled' : '' ?>>
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Verificar Status SAT
+            </button>
+        </div>
         <!-- Información del Usuario -->
         <div class="card">
             <div class="card-header">
@@ -376,15 +387,6 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
         <?php endif; ?>
         
         <div class="flex flex-col space-y-3">
-            <button type="button" 
-                    id="btnVerificarSat"
-                    class="btn btn-info w-full <?= $ticket['estado'] !== 'proceso_cancelacion' ? 'opacity-50 cursor-not-allowed' : '' ?>"
-                    <?= $ticket['estado'] !== 'proceso_cancelacion' ? 'disabled' : '' ?>>
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Verificar Status SAT
-            </button>
 
             <?php if (PermissionHelper::isConsulta()): ?>
             <a href="<?= BASE_URL ?>solicitudes" class="btn btn-secondary w-full">
