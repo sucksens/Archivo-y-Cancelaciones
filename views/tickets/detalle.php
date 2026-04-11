@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (response.ok) {
                     // Mostrar resultado con un toast
-                    let mensaje = `<strong>${result.estado_validacion}</strong><br>${result.estatus_cancelacion}`;
+                    let mensaje = `<strong>${result.estado_validacion}</strong><br>Cancelacion: ${result.estatus_cancelacion}`;
                     mensaje += `<br><small class="opacity-75">${result.mensaje}</small>`;
                     
                     showToast(mensaje, result.procesamiento_exitoso ? 'success' : 'warning');
