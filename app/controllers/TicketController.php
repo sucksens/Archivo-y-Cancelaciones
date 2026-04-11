@@ -755,7 +755,7 @@ class TicketController extends BaseController
 
             $decodedResponse = json_decode($response, true);
             
-            if ($httpCode >= 400) {
+            if ($httpCode >= 422) {
                 $this->json([
                     'error' => 'El servidor de validación respondió con un error',
                     'detail' => $decodedResponse['detail'] ?? $response
@@ -764,8 +764,8 @@ class TicketController extends BaseController
             }
 
             $updatedCanceladoSat = false;
-            if (isset($decodedResponse['estatus_cancelacion']) && 
-                (strtolower($decodedResponse['estatus_cancelacion']) === 'cancelado' ||
+            if (isset($decodedResponse['estado_validacion']) && 
+                (strtolower($decodedResponse['estado_validacion']) === 'Cancelado' ||
                  $decodedResponse['procesamiento_exitoso'])) {
                 
                 $this->operacionModel->update($operacion['id'], [
@@ -785,11 +785,6 @@ class TicketController extends BaseController
                 $updatedCanceladoSat = true;
             } else {
                 $estadoValidacion = $decodedResponse['estado_validacion'] ?? 'Desconocido';
-                $this->ticketModel->audit(
-                    $ticket['id'],
-                    $this->userId(),
-                    "Validación SAT para operación #{$operacion['id']} - Estado: {$estadoValidacion}"
-                );
             }
 
             $this->log("Consultó estatus SAT para operación #{$id}", 'tickets');
