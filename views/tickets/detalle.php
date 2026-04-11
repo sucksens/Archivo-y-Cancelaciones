@@ -111,13 +111,11 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Solicitada Cancelación</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Cancelado Sistema</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Cancelado SAT</th>
-                            <?php if ($canChangeStatus || $canVerifySat): ?>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Validar SAT</th>
-                            <?php else: ?>
                             <?php if ($canChangeStatus): ?>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
                             <?php endif; ?>
+                            <?php if ($canVerifySat): ?>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Validar SAT</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
@@ -127,11 +125,6 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                             <td class="px-6 py-4 text-sm text-gray-900">
                                 <?= $op['serie'] .'-'. $op['id_compago'] ?>
                             </td>
-                            <!--
-                            <td class="px-6 py-4 text-xs font-mono text-gray-500">
-                                <?= htmlspecialchars(substr($op['uuid_operacion'], 0, 18)) ?>...
-                            </td>
-                        -->
                             <td class="px-6 py-4 text-sm text-gray-700">
                                 <?= htmlspecialchars($tipos_operacion[$op['tipo_operacion']] ?? $op['tipo_operacion']) ?>
                             </td>
@@ -172,9 +165,8 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                     <?php endif; ?>
                                 </span>
                             </td>
-                            <?php if ($canChangeStatus || $canVerifySat): ?>
+                            <?php if ($canChangeStatus): ?>
                             <td class="px-6 py-4 text-center">
-                                <?php if ($canChangeStatus): ?>
                                 <div class="flex items-center justify-center space-x-2">
                                     <button type="button" 
                                             class="btn-toggle-flag p-1 text-blue-600 hover:text-blue-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
@@ -207,38 +199,9 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                         </svg>
                                     </button>
                                 </div>
-                                <?php endif; ?>
-                            </td>
-                            <td class="px-6 py-4 text-center">
-                                <?php 
-                                $mostrarBoton = $op['requiere_cancelacion'] && 
-                                                $op['solicitada_cancelacion'] && 
-                                                !$op['cancelado_sat'];
-                                ?>
-                                <?php if ($mostrarBoton): ?>
-                                <button type="button"
-                                        class="btn-validate-sat-ops p-2 text-orange-600 hover:text-orange-800 transition-colors"
-                                        data-op-id="<?= $op['id'] ?>"
-                                        data-op-uuid="<?= htmlspecialchars($op['uuid_operacion']) ?>"
-                                        data-op-serie="<?= htmlspecialchars($op['serie']) ?>"
-                                        data-ticket-id="<?= $ticket['id'] ?>"
-                                        title="Validar Status SAT">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </button>
-                                <?php else: ?>
-                                <span class="text-gray-300">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </span>
-                                <?php endif; ?>
                             </td>
                             <?php else: ?>
-                            <?php if ($canChangeStatus): ?>
+                                <?php if ($canChangeStatus): ?>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center space-x-2">
                                     <button type="button" 
@@ -273,7 +236,37 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                     </button>
                                 </div>
                             </td>
+                                <?php endif; ?>
                             <?php endif; ?>
+                            <?php if ($canVerifySat): ?>
+                            <td class="px-6 py-4 text-center">
+                                <?php 
+                                $mostrarBoton = $op['requiere_cancelacion'] && 
+                                                $op['solicitada_cancelacion'] && 
+                                                !$op['cancelado_sat'];
+                                ?>
+                                <?php if ($mostrarBoton): ?>
+                                <button type="button"
+                                        class="btn-validate-sat-ops p-2 text-orange-600 hover:text-orange-800 transition-colors"
+                                        data-op-id="<?= $op['id'] ?>"
+                                        data-op-uuid="<?= htmlspecialchars($op['uuid_operacion']) ?>"
+                                        data-op-serie="<?= htmlspecialchars($op['serie']) ?>"
+                                        data-ticket-id="<?= $ticket['id'] ?>"
+                                        title="Validar Status SAT">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </button>
+                                <?php else: ?>
+                                <span class="text-gray-300">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </span>
+                                <?php endif; ?>
+                            </td>
                             <?php endif; ?>
                         </tr>
                         <?php endforeach; ?>
