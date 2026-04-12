@@ -53,7 +53,6 @@ define('TICKET_ESTADOS', [
     'proceso_cancelacion' => ['label' => 'En Proceso', 'color' => 'orange', 'icon' => 'refresh'],
     'rechazado' => ['label' => 'Rechazado', 'color' => 'gray', 'icon' => 'ban'],
     'cancelado' => ['label' => 'Cancelado', 'color' => 'red', 'icon' => 'x-circle'],
-    'completado' => ['label' => 'Completado', 'color' => 'green', 'icon' => 'check-circle']
 ]);
 
 // Tipos de cancelación
