@@ -54,7 +54,7 @@ class ComentarioTicket
      * @param array $data Datos del comentario
      * @return int|false ID del comentario creado o false en caso de error
      */
-    public function create(array $data): int|false
+    public function create(array $data)
     {
         $sql = "INSERT INTO {$this->table} (ticket_id, usuario_id, comentario) 
                 VALUES (?, ?, ?)";
