@@ -388,6 +388,10 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                 const formData = new FormData(this);
                 const response = await fetch('<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/uuid-nueva', {
                     method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '<?= \App\Helpers\AuthHelper::generateCsrfToken() ?>'
+                    },
                     body: formData
                 });
 
@@ -395,20 +399,21 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
 
                 if (response.ok) {
                     if (result.success) {
-                        window.location.reload();
+                        showToast(result.message || 'UUID actualizado correctamente', 'success');
+                        setTimeout(() => window.location.reload(), 1500);
                     } else {
-                        alert(result.error || 'Error al guardar el UUID');
+                        showToast(result.error || 'Error al guardar el UUID', 'error');
                         btn.disabled = false;
                         btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
                     }
                 } else {
-                    alert(result.error || 'Error al guardar el UUID');
+                    showToast(result.error || 'Error al guardar el UUID', 'error');
                     btn.disabled = false;
                     btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error de conexión con el servidor.');
+                showToast('Error de conexión con el servidor.', 'error');
                 btn.disabled = false;
                 btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
             }
