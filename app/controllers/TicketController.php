@@ -458,6 +458,79 @@ class TicketController extends BaseController
     }
 
     /**
+     * Actualizar el UUID de la factura nueva (solo rol Usuario en estado liberado)
+     *
+     * @param int $id ID del ticket
+     */
+    public function updateUuidFacturaNueva(int $id): void
+    {
+        if (!PermissionHelper::isRegularUser()) {
+            if ($this->isAjax()) {
+                $this->json(['error' => 'Solo usuarios pueden ingresar el UUID de factura nueva'], 403);
+            }
+            http_response_code(403);
+            exit('Acceso denegado');
+        }
+
+        $ticket = $this->ticketModel->find($id);
+        if (!$ticket) {
+            $this->json(['error' => 'Ticket no encontrado'], 404);
+        }
+
+        if ($ticket['tipo_cancelacion'] !== 'refacturacion') {
+            $this->json(['error' => 'Este ticket no es de refacturación'], 400);
+        }
+
+        if ($ticket['estado'] !== 'liberado') {
+            $this->json(['error' => 'El ticket debe estar en estado Liberado'], 400);
+        }
+
+        $uuid = trim($this->input('uuid_factura_nueva'));
+        if (empty($uuid)) {
+            $this->json(['error' => 'El UUID es requerido'], 400);
+        }
+
+        if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $uuid)) {
+            $this->json(['error' => 'El UUID no tiene el formato válido'], 400);
+        }
+
+        try {
+            $this->validateCsrf();
+
+            $this->ticketModel->update($id, ['uuid_factura_nueva' => $uuid]);
+
+            $this->ticketModel->audit(
+                $id,
+                $this->userId(),
+                'Ingreso UUID factura nueva',
+                'uuid_factura_nueva',
+                null,
+                $uuid
+            );
+
+            $this->log('UUID de factura nueva actualizado', 'tickets', "ID: {$id}, UUID: {$uuid}");
+
+            if ($this->isAjax()) {
+                $this->json([
+                    'success' => true,
+                    'message' => 'UUID de factura nueva actualizado correctamente',
+                    'uuid_factura_nueva' => $uuid
+                ]);
+            }
+
+            $this->session->flash('success', 'UUID de factura nueva actualizado correctamente');
+            $this->redirect('/tickets/' . $id);
+
+        } catch (\Exception $e) {
+            if ($this->isAjax()) {
+                $this->json(['error' => 'Error al actualizar UUID'], 500);
+            }
+            $this->session->flash('error', 'Error al actualizar UUID');
+            $this->redirect('/tickets/' . $id);
+        }
+    }
+
+    /**
      * Eliminar ticket
      * 
      * @param int $id ID del ticket
