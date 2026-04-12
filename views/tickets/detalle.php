@@ -815,7 +815,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             });
         });
-    });
 
     // Formulario de agregar comentario
     const formComentario = document.getElementById('formComentario');
