@@ -55,6 +55,9 @@ $router->post('/tickets/{id}/validar-sat', 'TicketController@validateSatStatus',
 $router->post('/tickets/operacion/{id}/validar-sat', 'TicketController@validateOperacionSatStatus', [$authMiddleware]);
 $router->post('/tickets/parse-xml', 'TicketController@parseXml', [$authMiddleware]);
 $router->get('/tickets/{id}/archivo', 'TicketController@downloadFile', [$authMiddleware]);
+$router->get('/tickets/{id}/comentarios', 'TicketController@getComments', [$authMiddleware]);
+$router->post('/tickets/{id}/comentarios', 'TicketController@addComment', [$authMiddleware]);
+$router->post('/tickets/{id}/comentarios/{comentarioId}/eliminar', 'TicketController@deleteComment', [$authMiddleware]);
 
 $router->get('/mis-solicitudes', 'TicketController@misSolicitudes', [$authMiddleware]);
 $router->get('/solicitudes', 'TicketController@solicitudes', [$authMiddleware]);
