@@ -838,7 +838,7 @@ class TicketController extends BaseController
 
             $updatedCanceladoSat = false;
             if (isset($decodedResponse['estado_validacion']) && 
-                (strtolower($decodedResponse['estado_validacion']) === 'Cancelado' && 
+                (strtolower($decodedResponse['estado_validacion']) === 'cancelado' && 
                 $decodedResponse['procesamiento_exitoso'])) {
                 
                 $this->operacionModel->update($operacion['id'], [
