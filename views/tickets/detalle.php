@@ -393,15 +393,22 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
 
                 const result = await response.json();
 
-                if (result.success) {
-                    window.location.reload();
+                if (response.ok) {
+                    if (result.success) {
+                        window.location.reload();
+                    } else {
+                        alert(result.error || 'Error al guardar el UUID');
+                        btn.disabled = false;
+                        btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
+                    }
                 } else {
                     alert(result.error || 'Error al guardar el UUID');
                     btn.disabled = false;
                     btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
                 }
             } catch (error) {
-                alert('Error de conexión. Intente de nuevo.');
+                console.error('Error:', error);
+                alert('Error de conexión con el servidor.');
                 btn.disabled = false;
                 btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
             }

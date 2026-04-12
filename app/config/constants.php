@@ -49,11 +49,11 @@ define('EMPRESAS', [
 define('TICKET_ESTADOS', [
     'pendiente' => ['label' => 'Pendiente', 'color' => 'yellow', 'icon' => 'clock'],
     'en_revision' => ['label' => 'En Revisión', 'color' => 'blue', 'icon' => 'eye'],
+    'liberado' => ['label' => 'Liberado', 'color' => 'purple', 'icon' => 'unlock'],
     'proceso_cancelacion' => ['label' => 'En Proceso', 'color' => 'orange', 'icon' => 'refresh'],
-    'cancelado' => ['label' => 'Cancelado', 'color' => 'red', 'icon' => 'x-circle'],
     'rechazado' => ['label' => 'Rechazado', 'color' => 'gray', 'icon' => 'ban'],
-    'completado' => ['label' => 'Completado', 'color' => 'green', 'icon' => 'check-circle'],
-    'liberado' => ['label' => 'Liberado', 'color' => 'purple', 'icon' => 'unlock']
+    'cancelado' => ['label' => 'Cancelado', 'color' => 'red', 'icon' => 'x-circle'],
+    'completado' => ['label' => 'Completado', 'color' => 'green', 'icon' => 'check-circle']
 ]);
 
 // Tipos de cancelación
