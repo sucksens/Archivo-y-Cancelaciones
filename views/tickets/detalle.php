@@ -45,11 +45,11 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                 <span class="px-3 py-1 rounded-full bg-<?= $estadoInfo['color'] ?>-100 text-<?= $estadoInfo['color'] ?>-700 text-xs font-bold uppercase">
                     <?= $estadoInfo['label'] ?>
                 </span>
+                <p class="font-bold text-primary-500 leading-tight uppercase"><?= TIPOS_CANCELACION[$ticket['tipo_cancelacion']] ?? $ticket['tipo_cancelacion'] ?></p>
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] uppercase font-bold text-slate-400">UUID:</span>
                     <span class="text-xs text-slate-500 font-mono"><?= htmlspecialchars($ticket['uuid_factura']) ?></span>
                 </div>
-                <p class="font-bold text-primary-500 leading-tight uppercase"><?= TIPOS_CANCELACION[$ticket['tipo_cancelacion']] ?? $ticket['tipo_cancelacion'] ?></p>
             </div>
             <div class="flex flex-col sm:flex-row gap-2">
                 <?php if ($canChangeStatus): ?>
@@ -102,8 +102,10 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
             
             <!-- Tipo de Factura -->
             <div class="space-y-1">
-                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tipo de Factura</p>
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Factura</p>
                 <p class="font-bold text-slate-800 leading-tight"><?= $ticket['serie'] ?>-<?= $ticket['folio']?></p>
+
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tipo de Factura</p>
                 <p class="font-bold text-slate-800 leading-tight"><?= TIPOS_AUTO[$ticket['tipo_factura']] ?? $ticket['tipo_factura'] ?></p>
                 <!--
                 <div class="flex items-center gap-1.5">
@@ -113,9 +115,9 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                 -->
             </div>
             
-            <!-- Tipo de Cancelación -->
+            <!-- Motivo de Cancelación -->
             <div class="space-y-1">
-                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tipo de Cancelación</p>
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Motivo de Cancelación</p>
                 <!--<p class="font-bold text-primary-500 leading-tight uppercase"><?= TIPOS_CANCELACION[$ticket['tipo_cancelacion']] ?? $ticket['tipo_cancelacion'] ?></p>-->
                 <p class="font-bold text-primary-500 leading-tight uppercase"><?= htmlspecialchars($ticket['motivo']) ?></p>
             </div>
@@ -148,13 +150,18 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Fecha de Creación</p>
                 <p class="text-sm font-semibold text-slate-800"><?= date('d/m/Y H:i', strtotime($ticket['fecha_creacion'])) ?></p>
                 <?php if ($ticket['fecha_envio_cancelacion']): ?>
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Fecha de Solicitud</p>
                 <p class="text-[10px] text-slate-500">Enviado: <?= date('d/m/Y', strtotime($ticket['fecha_envio_cancelacion'])) ?></p>
+                <?php endif; ?>
+                <?php if ($ticket['fecha_cancelacion_sat']): ?>
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Fecha de Cancelación</p>
+                <p class="text-[10px] text-slate-500">Cancelado: <?= date('d/m/Y', strtotime($ticket['fecha_cancelacion_sat'])) ?></p>
                 <?php endif; ?>
             </div>
             
             <!-- Documentos Adjuntos -->
             <div class="lg:col-span-1 space-y-2">
-                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Documentos Adjuntos</p>
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Archivo de Autorizacion</p>
                 <div class="flex flex-wrap gap-2">
                     <a href="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/archivo"
                        class="flex items-center gap-1.5 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 cursor-pointer hover:bg-red-100 transition-colors">
