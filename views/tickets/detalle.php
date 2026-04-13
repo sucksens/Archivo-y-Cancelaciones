@@ -90,7 +90,17 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
             <!-- Empresa Solicitante -->
             <div class="space-y-1">
                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Empresa Solicitante</p>
-                <p class="font-bold text-slate-800 leading-tight"><?= EMPRESAS[$ticket['empresa_solicitante']] ?? $ticket['empresa_solicitante'] ?></p>
+                <?php 
+                $empresaColor = 'gray';
+                if ($ticket['empresa_solicitante'] === 'grupo_motormexa') {
+                    $empresaColor = 'blue';
+                } elseif ($ticket['empresa_solicitante'] === 'automotriz_motormexa') {
+                    $empresaColor = 'red';
+                }
+                ?>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold <?= $empresaColor === 'blue' ? 'bg-primary-100 text-primary-700' : ($empresaColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700') ?>">
+                    <?= EMPRESAS[$ticket['empresa_solicitante']] ?? $ticket['empresa_solicitante'] ?>
+                </span>
             </div>
             
             <!-- Cliente / Receptor -->
@@ -234,35 +244,35 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                 <table class="w-full text-left text-sm whitespace-nowrap">
                     <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
                         <tr>
-                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider">Factura</th>
-                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider">Tipo</th>
-                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-right">Monto</th>
-                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Requiere Canc.</th>
-                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Solicitada Canc.</th>
-                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Canc. Sistema</th>
-                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Canc. SAT</th>
+                            <th class="px-4 py-2 font-bold uppercase text-[10px] tracking-wider">Factura</th>
+                            <th class="px-4 py-2 font-bold uppercase text-[10px] tracking-wider">Tipo</th>
+                            <th class="px-4 py-2 font-bold uppercase text-[10px] tracking-wider text-right">Monto</th>
+                            <th class="px-4 py-2 font-bold uppercase text-[10px] tracking-wider text-center">Requiere Canc.</th>
+                            <th class="px-4 py-2 font-bold uppercase text-[10px] tracking-wider text-center">Solicitada Canc.</th>
+                            <th class="px-4 py-2 font-bold uppercase text-[10px] tracking-wider text-center">Canc. Sistema</th>
+                            <th class="px-4 py-2 font-bold uppercase text-[10px] tracking-wider text-center">Canc. SAT</th>
                             <?php if ($canChangeStatus): ?>
-                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Acciones</th>
+                            <th class="px-4 py-2 font-bold uppercase text-[10px] tracking-wider text-center">Acciones</th>
                             <?php endif; ?>
                             <?php if ($canVerifySat): ?>
-                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Validar</th>
+                            <th class="px-4 py-2 font-bold uppercase text-[10px] tracking-wider text-center">Validar</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         <?php foreach ($ticket['operaciones'] as $op): ?>
                         <tr class="hover:bg-slate-50 transition-colors" data-op-id="<?= $op['id'] ?>">
-                            <td class="px-6 py-4 font-bold text-slate-700"><?= $op['serie'] ?>-<?= $op['id_compago'] ?></td>
-                            <td class="px-6 py-4 text-slate-500"><?= htmlspecialchars($tipos_operacion[$op['tipo_operacion']] ?? $op['tipo_operacion']) ?></td>
-                            <td class="px-6 py-4 text-right font-black"><?= $op['monto'] ? '$' . number_format($op['monto'], 2) : '-' ?></td>
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-4 py-2 font-bold text-slate-700"><?= $op['serie'] ?>-<?= $op['id_compago'] ?></td>
+                            <td class="px-4 py-2 text-slate-500"><?= htmlspecialchars($tipos_operacion[$op['tipo_operacion']] ?? $op['tipo_operacion']) ?></td>
+                            <td class="px-4 py-2 text-right font-black"><?= $op['monto'] ? '$' . number_format($op['monto'], 2) : '-' ?></td>
+                            <td class="px-4 py-2 text-center">
                                 <?php if ($op['requiere_cancelacion']): ?>
                                 <span class="px-2 py-0.5 rounded bg-primary-50 text-primary-700 text-[10px] font-bold">Sí</span>
                                 <?php else: ?>
                                 <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-bold">No</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-4 py-2 text-center">
                                 <span class="flag-badge" data-flag="solicitada_cancelacion">
                                     <?php if ($op['solicitada_cancelacion']): ?>
                                     <span class="px-2 py-0.5 rounded bg-primary-50 text-primary-700 text-[10px] font-bold">Sí</span>
@@ -271,7 +281,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                                     <?php endif; ?>
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-4 py-2 text-center">
                                 <span class="flag-badge" data-flag="cancelado_sistema">
                                     <?php if ($op['cancelado_sistema']): ?>
                                     <span class="px-2 py-0.5 rounded bg-update-50 text-update-600 text-[10px] font-bold">Sí</span>
@@ -280,7 +290,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                                     <?php endif; ?>
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-4 py-2 text-center">
                                 <span class="flag-badge" data-flag="cancelado_sat">
                                     <?php if ($op['cancelado_sat']): ?>
                                     <span class="px-2 py-0.5 rounded bg-update-50 text-update-600 text-[10px] font-bold">Sí</span>
@@ -290,7 +300,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                                 </span>
                             </td>
                             <?php if ($canChangeStatus): ?>
-                            <td class="px-6 py-4">
+                            <td class="px-4 py-2">
                                 <div class="flex items-center justify-center gap-2 <?= !$op['requiere_cancelacion'] ? 'opacity-25' : '' ?>">
                                     <button type="button" 
                                             class="btn-toggle-flag p-1 text-primary-500 hover:text-primary-700 transition-colors"
@@ -326,7 +336,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                             </td>
                             <?php endif; ?>
                             <?php if ($canVerifySat): ?>
-                            <td class="px-6 py-4 text-center">
+                            <td class="px-4 py-2 text-center">
                                 <?php 
                                 $mostrarBoton = $op['requiere_cancelacion'] && 
                                                 $op['solicitada_cancelacion'] && 
