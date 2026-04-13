@@ -124,7 +124,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
             
             <!-- Monto Total -->
             <div class="space-y-1">
-                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Monto Total del Ticket</p>
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Total de la Factura</p>
                 <div class="flex items-baseline gap-2">
                     <p class="font-black text-2xl text-slate-900 leading-tight">$<?= number_format($ticket['total_factura'], 2) ?></p>
                     <p class="text-[10px] text-slate-500 font-mono font-bold uppercase tracking-widest">MXN</p>
@@ -138,11 +138,11 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                 <p class="text-sm font-semibold text-slate-800"><?= date('d/m/Y H:i', strtotime($ticket['fecha_creacion'])) ?></p>
                 <?php if ($ticket['fecha_envio_cancelacion']): ?>
                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Fecha de Solicitud</p>
-                <p class="text-[10px] text-slate-500">Enviado: <?= date('d/m/Y', strtotime($ticket['fecha_envio_cancelacion'])) ?></p>
+                <p class="text-[10px] text-slate-500">Enviado: <?= date('d/m/Y H:i', strtotime($ticket['fecha_envio_cancelacion'])) ?></p>
                 <?php endif; ?>
                 <?php if ($ticket['fecha_cancelacion_sat']): ?>
                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Fecha de Cancelación</p>
-                <p class="text-[10px] text-slate-500">Cancelado: <?= date('d/m/Y', strtotime($ticket['fecha_cancelacion_sat'])) ?></p>
+                <p class="text-[10px] text-slate-500">Cancelado: <?= date('d/m/Y H:i', strtotime($ticket['fecha_cancelacion_sat'])) ?></p>
                 <?php endif; ?>
             </div>
 
