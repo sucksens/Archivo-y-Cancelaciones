@@ -871,96 +871,97 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+});
 
-    // Función para agregar comentario al DOM
-    function addComentarioToUI(comentario) {
-        const lista = document.getElementById('listaComentarios');
-        const emptyState = lista.querySelector('.text-center');
-        if (emptyState) {
-            emptyState.remove();
-        }
+// Función para agregar comentario al DOM
+function addComentarioToUI(comentario) {
+    const lista = document.getElementById('listaComentarios');
+    const emptyState = lista.querySelector('.text-center');
+    if (emptyState) {
+        emptyState.remove();
+    }
 
-        const isAdmin = comentario.rol_nombre === 'Administrador';
-        const borderColor = isAdmin ? 'border-l-red-500 bg-red-50' : 'border-l-primary-500 bg-primary-50';
-        const badgeClass = isAdmin ? 'badge-red' : 'badge-blue';
-        const avatarClass = isAdmin ? 'bg-red-100 text-red-700' : 'bg-primary-100 text-primary-700';
+    const isAdmin = comentario.rol_nombre === 'Administrador';
+    const borderColor = isAdmin ? 'border-l-red-500 bg-red-50' : 'border-l-primary-500 bg-primary-50';
+    const badgeClass = isAdmin ? 'badge-red' : 'badge-blue';
+    const avatarClass = isAdmin ? 'bg-red-100 text-red-700' : 'bg-primary-100 text-primary-700';
 
-        const html = `
-            <div class="border-l-4 ${borderColor} rounded-r-lg p-4 animate-slide-in"
-                 id="comentario-${comentario.id}">
-                <div class="flex items-start space-x-3">
-                    <div class="flex-shrink-0">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center ${avatarClass}">
-                            <span class="font-bold text-sm">
-                                ${comentario.usuario_nombre.charAt(0).toUpperCase()}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-2">
-                                <span class="font-semibold text-gray-900">
-                                    ${comentario.usuario_nombre}
-                                </span>
-                                <span class="badge ${badgeClass}">
-                                    ${comentario.rol_nombre}
-                                </span>
-                            </div>
-                            <?php if (PermissionHelper::isAdmin()): ?>
-                            <button onclick="eliminarComentario(${comentario.id})"
-                                    class="text-red-500 hover:text-red-700 transition-colors"
-                                    title="Eliminar comentario">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
-                            <?php endif; ?>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1">hace un momento</p>
-                        <p class="text-gray-900 mt-2 whitespace-pre-line break-words">
-                            ${comentario.comentario}
-                        </p>
+    const html = `
+        <div class="border-l-4 ${borderColor} rounded-r-lg p-4 animate-slide-in"
+                id="comentario-${comentario.id}">
+            <div class="flex items-start space-x-3">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center ${avatarClass}">
+                        <span class="font-bold text-sm">
+                            ${comentario.usuario_nombre.charAt(0).toUpperCase()}
+                        </span>
                     </div>
                 </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="font-semibold text-gray-900">
+                                ${comentario.usuario_nombre}
+                            </span>
+                            <span class="badge ${badgeClass}">
+                                ${comentario.rol_nombre}
+                            </span>
+                        </div>
+                        <?php if (PermissionHelper::isAdmin()): ?>
+                        <button onclick="eliminarComentario(${comentario.id})"
+                                class="text-red-500 hover:text-red-700 transition-colors"
+                                title="Eliminar comentario">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                        <?php endif; ?>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">hace un momento</p>
+                    <p class="text-gray-900 mt-2 whitespace-pre-line break-words">
+                        ${comentario.comentario}
+                    </p>
+                </div>
             </div>
-        `;
+        </div>
+    `;
 
-        lista.insertAdjacentHTML('afterbegin', html);
+    lista.insertAdjacentHTML('afterbegin', html);
+}
+
+// Función para eliminar comentario
+async function eliminarComentario(comentarioId) {
+    if (!confirm('¿Estás seguro de eliminar este comentario? Esta acción no se puede deshacer.')) {
+        return;
     }
 
-    // Función para eliminar comentario
-    async function eliminarComentario(comentarioId) {
-        if (!confirm('¿Estás seguro de eliminar este comentario? Esta acción no se puede deshacer.')) {
-            return;
-        }
-
-        try {
-            const response = await fetch(`<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/comentarios/${comentarioId}/eliminar`, {
-                method: 'POST',
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': '<?= \App\Helpers\AuthHelper::generateCsrfToken() ?>'
-                }
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                showToast('Comentario eliminado correctamente', 'success');
-
-                const comentarioElement = document.getElementById(`comentario-${comentarioId}`);
-                if (comentarioElement) {
-                    comentarioElement.classList.add('animate-fade-out');
-                    setTimeout(() => comentarioElement.remove(), 300);
-                }
-            } else {
-                showToast(result.error || 'Error al eliminar comentario', 'error');
+    try {
+        const response = await fetch(`<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/comentarios/${comentarioId}/eliminar`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': '<?= \App\Helpers\AuthHelper::generateCsrfToken() ?>'
             }
-        } catch (error) {
-            console.error('Error:', error);
-            showToast('Error de conexión con el servidor', 'error');
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            showToast('Comentario eliminado correctamente', 'success');
+
+            const comentarioElement = document.getElementById(`comentario-${comentarioId}`);
+            if (comentarioElement) {
+                comentarioElement.classList.add('animate-fade-out');
+                setTimeout(() => comentarioElement.remove(), 300);
+            }
+        } else {
+            showToast(result.error || 'Error al eliminar comentario', 'error');
         }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Error de conexión con el servidor', 'error');
     }
-});
+}
+
 </script>
