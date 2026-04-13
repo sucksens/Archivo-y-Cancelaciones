@@ -30,317 +30,258 @@ function timeAgo($datetime) {
 }
 
 $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'color' => 'gray'];
+
+// Obtener iniciales del usuario
+$userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
 ?>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    
-    <!-- Información Principal -->
-    <div class="lg:col-span-2 space-y-6 min-w-0">
-        
-        <!-- Datos del Ticket -->
-        <div class="card card-accent-top card-accent-blue">
-            <div class="card-header flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">Ticket #<?= $ticket['id'] ?></h3>
-                    <p class="text-sm text-gray-500">UUID: <?= htmlspecialchars($ticket['uuid']) ?></p>
-                </div>
-                <span class="badge badge-<?= $estadoInfo['color'] ?> text-base px-4 py-2">
+<!-- Header unificado del Ticket -->
+<section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6">
+    <div class="flex flex-col gap-6">
+        <!-- Línea superior: Título, Estado, UUID y Acciones -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div class="flex items-center flex-wrap gap-3">
+                <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">Ticket #<?= $ticket['id'] ?></h2>
+                <span class="px-3 py-1 rounded-full bg-<?= $estadoInfo['color'] ?>-100 text-<?= $estadoInfo['color'] ?>-700 text-xs font-bold uppercase">
                     <?= $estadoInfo['label'] ?>
                 </span>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] uppercase font-bold text-slate-400">UUID:</span>
+                    <span class="text-xs text-slate-500 font-mono"><?= htmlspecialchars($ticket['uuid_factura']) ?></span>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <?php if ($canChangeStatus): ?>
+                <form id="statusForm" class="inline-flex">
+                    <?= \App\Helpers\AuthHelper::getCsrfField() ?>
+                    <select name="estado" id="estadoSelect" 
+                            class="text-xs font-bold px-3 py-2 rounded-l-lg border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                        <?php foreach ($estados as $key => $info): ?>
+                        <option value="<?= $key ?>" <?= $ticket['estado'] === $key ? 'selected' : '' ?>>
+                            <?= $info['label'] ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <button type="submit" 
+                            class="bg-update-500 hover:bg-update-600 text-white px-4 py-2 rounded-r-lg text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Actualizar
+                    </button>
+                </form>
+                <?php endif; ?>
+                
+                <button type="button" 
+                        id="btnVerificarSat"
+                        class="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2 <?= $ticket['estado'] !== 'proceso_cancelacion' ? 'opacity-50 cursor-not-allowed' : '' ?>"
+                        <?= $ticket['estado'] !== 'proceso_cancelacion' ? 'disabled' : '' ?>>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Validar SAT
+                </button>
+            </div>
+        </div>
+        
+        <!-- Grid de información del ticket -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
+            <!-- Empresa Solicitante -->
+            <div class="space-y-1">
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Empresa Solicitante</p>
+                <p class="font-bold text-slate-800 leading-tight"><?= EMPRESAS[$ticket['empresa_solicitante']] ?? $ticket['empresa_solicitante'] ?></p>
             </div>
             
-            <div class="card-body">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Cliente -->
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Cliente</label>
-                        <p class="text-gray-900 font-medium"><?= htmlspecialchars($ticket['nombre_cliente']) ?></p>
-                        <p class="text-sm text-gray-500">RFC: <?= htmlspecialchars($ticket['rfc_receptor']) ?></p>
-                    </div>
-                    
-                    <!-- Factura -->
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Factura</label>
-                        <p class="text-gray-900 font-medium"><?= htmlspecialchars($ticket['serie']) ?>-<?= htmlspecialchars($ticket['folio']) ?></p>
-                        <p class="text-xs text-gray-500 font-mono break-all"><?= htmlspecialchars($ticket['uuid_factura']) ?></p>
-                    </div>
-                    
-                    <!-- Empresa -->
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Empresa Solicitante</label>
-                        <p class="text-gray-900"><?= EMPRESAS[$ticket['empresa_solicitante']] ?? $ticket['empresa_solicitante'] ?></p>
-                    </div>
-                    
-                    <!-- Tipo de Factura -->
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Tipo de Factura</label>
-                        <p class="text-gray-900"><?= TIPOS_AUTO[$ticket['tipo_factura']] ?? $ticket['tipo_factura'] ?></p>
-                    </div>
-                    
-                    <!-- Total -->
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Total de Factura</label>
-                        <p class="text-2xl font-bold text-gray-900">$<?= number_format($ticket['total_factura'], 2) ?></p>
-                    </div>
-                    
-                    <!-- Inventario -->
-                    <?php if ($ticket['inventario']): ?>
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Inventario</label>
-                        <p class="text-gray-900"><?= htmlspecialchars($ticket['inventario']) ?></p>
-                    </div>
-                    <?php endif; ?>
-                    
-                    <!-- Tipo de Cancelación -->
-                    <div>
-                        <label class="text-sm font-medium text-gray-500">Tipo de Cancelación</label>
-                        <p class="text-gray-900"><?= TIPOS_CANCELACION[$ticket['tipo_cancelacion']] ?? $ticket['tipo_cancelacion'] ?></p>
-                    </div>
-
-                    <!-- UUID de Factura Nueva (solo para refacturaciones) -->
-                    <?php if ($ticket['tipo_cancelacion'] === 'refacturacion' && !empty($ticket['uuid_factura_nueva'])): ?>
-                    <div class="col-span-2 md:col-span-1">
-                        <label class="text-sm font-medium text-gray-500">UUID de Factura Nueva</label>
-                        <p class="text-sm text-gray-900 font-mono break-all mt-1">
-                            <?= htmlspecialchars($ticket['uuid_factura_nueva']) ?>
-                        </p>
-                    </div>
-                    <?php endif; ?>
+            <!-- Cliente / Receptor -->
+            <div class="space-y-1">
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Cliente / Receptor</p>
+                <p class="font-bold text-slate-800 leading-tight"><?= htmlspecialchars($ticket['nombre_cliente']) ?></p>
+                <p class="text-[10px] text-slate-500 font-mono uppercase"><?= htmlspecialchars($ticket['rfc_receptor']) ?></p>
+            </div>
+            
+            <!-- Tipo de Factura -->
+            <div class="space-y-1">
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tipo de Factura</p>
+                <p class="font-bold text-slate-800 leading-tight"><?= TIPOS_AUTO[$ticket['tipo_factura']] ?? $ticket['tipo_factura'] ?></p>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
+                    <span class="text-[10px] text-slate-500 font-bold uppercase"><?= $ticket['serie'] ?>-<?= $ticket['folio'] ?></span>
                 </div>
-                
-                <!-- Motivo -->
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <label class="text-sm font-medium text-gray-500">Motivo de Cancelación</label>
-                    <p class="text-gray-900 mt-2 whitespace-pre-line break-words"><?= htmlspecialchars($ticket['motivo']) ?></p>
+            </div>
+            
+            <!-- Tipo de Cancelación -->
+            <div class="space-y-1">
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tipo de Cancelación</p>
+                <p class="font-bold text-primary-500 leading-tight uppercase"><?= TIPOS_CANCELACION[$ticket['tipo_cancelacion']] ?? $ticket['tipo_cancelacion'] ?></p>
+                <p class="text-[10px] text-slate-500"><?= htmlspecialchars($ticket['motivo']) ?></p>
+            </div>
+            
+            <!-- Monto Total -->
+            <div class="space-y-1">
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Monto Total del Ticket</p>
+                <div class="flex items-baseline gap-2">
+                    <p class="font-black text-2xl text-slate-900 leading-tight">$<?= number_format($ticket['total_factura'], 2) ?></p>
+                    <p class="text-[10px] text-slate-500 font-mono font-bold uppercase tracking-widest">MXN</p>
                 </div>
-                
-                <!-- Archivo -->
-                <div class="mt-6 pt-6 border-t border-gray-200">
-                    <label class="text-sm font-medium text-gray-500">Archivo de Autorización</label>
-                    <a href="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/archivo" 
-                       class="mt-2 flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <svg class="w-10 h-10 text-danger-500 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            </div>
+            
+            <!-- Solicitante Interno -->
+            <div class="space-y-1">
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Solicitante Interno</p>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                        <?= $userInitials ?>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold"><?= htmlspecialchars($ticket['usuario_nombre'] ?? 'Usuario') ?></p>
+                        <p class="text-[10px] text-slate-500"><?= htmlspecialchars($ticket['usuario_email'] ?? '') ?></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fechas -->
+            <div class="space-y-1">
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Fecha de Creación</p>
+                <p class="text-sm font-semibold text-slate-800"><?= date('d/m/Y H:i', strtotime($ticket['fecha_creacion'])) ?></p>
+                <?php if ($ticket['fecha_envio_cancelacion']): ?>
+                <p class="text-[10px] text-slate-500">Enviado: <?= date('d/m/Y', strtotime($ticket['fecha_envio_cancelacion'])) ?></p>
+                <?php endif; ?>
+            </div>
+            
+            <!-- Documentos Adjuntos -->
+            <div class="lg:col-span-1 space-y-2">
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Documentos Adjuntos</p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/archivo"
+                       class="flex items-center gap-1.5 bg-red-50 px-3 py-1.5 rounded-lg border border-red-100 cursor-pointer hover:bg-red-100 transition-colors">
+                        <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
-                        <div>
-                            <p class="font-medium text-gray-900"><?= basename($ticket['archivo_autorizacion']) ?></p>
-                            <p class="text-sm text-gray-500">Click para descargar</p>
-                        </div>
+                        <span class="text-xs font-bold text-red-700"><?= basename($ticket['archivo_autorizacion']) ?></span>
                     </a>
                 </div>
             </div>
         </div>
-
-        <!-- SECCIÓN DE COMENTARIOS -->
-        <?php if (!empty($comentarios) || PermissionHelper::hasPermission('tickets.comments.add')): ?>
-        <div class="card mt-6" id="comentariosSection">
-            <div class="card-header flex items-center justify-between bg-gradient-to-r from-primary-500 to-primary-700">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-semibold text-white">💬 Comentarios</h3>
-                        <?php if (!empty($comentarios)): ?>
-                        <p class="text-primary-100 text-sm">
-                            <?= count($comentarios) ?> comentario(s)
-                        </p>
-                        <?php endif; ?>
-                    </div>
+        
+        <!-- UUID Factura Nueva (solo para refacturaciones) -->
+        <?php if ($ticket['tipo_cancelacion'] === 'refacturacion'): ?>
+        <div class="border-t border-slate-100 pt-4">
+            <?php if (!empty($ticket['uuid_factura_nueva'])): ?>
+            <div class="flex items-center gap-3 bg-purple-50 rounded-lg p-3">
+                <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                    <p class="text-[10px] uppercase font-bold text-purple-600 tracking-wider">UUID de Factura Nueva</p>
+                    <p class="text-sm text-purple-900 font-mono"><?= htmlspecialchars($ticket['uuid_factura_nueva']) ?></p>
                 </div>
             </div>
-
-            <div class="card-body">
-                <!-- Formulario para agregar comentario (solo Admin y Supervisor Cancelaciones) -->
-                <?php if (PermissionHelper::hasPermission('tickets.comments.add')): ?>
-                <form id="formComentario" class="mb-6">
-                    <?= \App\Helpers\AuthHelper::getCsrfField() ?>
-
-                    <div>
-                        <label for="comentario" class="form-label">
-                            Agregar un comentario
-                        </label>
-                        <textarea id="comentario"
-                                  name="comentario"
-                                  rows="3"
-                                  class="form-input"
-                                  placeholder="Escribe tu comentario aquí..."
-                                  required
-                                  minlength="5"
-                                  maxlength="1000"></textarea>
-                        <p class="text-xs text-gray-500 mt-1">
-                            Mínimo 5 caracteres. Máximo 1000.
-                        </p>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary mt-3">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
-                        </svg>
-                        Publicar Comentario
+            <?php elseif (PermissionHelper::isRegularUser() && $ticket['estado'] === 'liberado'): ?>
+            <!-- Formulario para ingresar UUID -->
+            <form id="uuidForm" class="bg-purple-50 rounded-lg p-4">
+                <?= \App\Helpers\AuthHelper::getCsrfField() ?>
+                <label class="text-[10px] uppercase font-bold text-purple-600 tracking-wider">Ingresar UUID de Factura Nueva</label>
+                <div class="flex gap-2 mt-2">
+                    <input type="text"
+                           name="uuid_factura_nueva"
+                           id="uuid_factura_nueva"
+                           class="flex-1 px-3 py-2 text-sm font-mono border border-purple-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                           placeholder="Ej: 123e4567-e89b-12d3-a456-426614174000"
+                           pattern="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+                           required
+                           maxlength="36">
+                    <button type="submit" id="btnGuardarUuid" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition-all">
+                        Guardar
                     </button>
-                </form>
-                <?php endif; ?>
-
-                <!-- Lista de comentarios -->
-                <?php if (!empty($comentarios)): ?>
-                <div id="listaComentarios" class="space-y-4">
-                    <?php foreach ($comentarios as $comentario): ?>
-                    <div class="border-l-4
-                        <?= $comentario['rol_nombre'] === 'Administrador'
-                           ? 'border-l-red-500 bg-red-50'
-                           : 'border-l-primary-500 bg-primary-50' ?>
-                        rounded-r-lg p-4"
-                         id="comentario-<?= $comentario['id'] ?>">
-                        <div class="flex items-start space-x-3">
-                            <!-- Avatar -->
-                            <div class="flex-shrink-0">
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center
-                                     <?= $comentario['rol_nombre'] === 'Administrador'
-                                        ? 'bg-red-100 text-red-700'
-                                        : 'bg-primary-100 text-primary-700' ?>">
-                                    <span class="font-bold text-sm">
-                                        <?= strtoupper(substr($comentario['usuario_nombre'], 0, 1)) ?>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Contenido -->
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-2">
-                                        <span class="font-semibold text-gray-900">
-                                            <?= htmlspecialchars($comentario['usuario_nombre']) ?>
-                                        </span>
-                                        <span class="badge
-                                            <?= $comentario['rol_nombre'] === 'Administrador'
-                                               ? 'badge-red' : 'badge-blue' ?>">
-                                            <?= $comentario['rol_nombre'] ?>
-                                        </span>
-                                    </div>
-
-                                    <!-- Botón eliminar (solo Admin) -->
-                                    <?php if (PermissionHelper::isAdmin()): ?>
-                                    <button onclick="eliminarComentario(<?= $comentario['id'] ?>)"
-                                            class="text-red-500 hover:text-red-700 transition-colors"
-                                            title="Eliminar comentario">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
-                                    <?php endif; ?>
-                                </div>
-
-                                <p class="text-xs text-gray-500 mt-1">
-                                    <?= timeAgo($comentario['fecha_creacion']) ?>
-                                </p>
-
-                                <p class="text-gray-900 mt-2 whitespace-pre-line break-words">
-                                    <?= htmlspecialchars($comentario['comentario']) ?>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
                 </div>
-                <?php else: ?>
-                <div class="text-center py-8 text-gray-500">
-                    <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                    </svg>
-                    <p>Aún no hay comentarios en este ticket.</p>
-                    <?php if (PermissionHelper::hasPermission('tickets.comments.add')): ?>
-                    <p class="text-sm mt-1">Sé el primero en comentar.</p>
-                    <?php endif; ?>
-                </div>
-                <?php endif; ?>
-            </div>
+            </form>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
+    </div>
+</section>
 
+<!-- Layout de 2 columnas -->
+<div class="flex flex-col lg:flex-row gap-6">
+    <!-- Columna izquierda (62%) -->
+    <div class="lg:w-[62%] flex flex-col gap-6">
+        
         <!-- Operaciones Relacionadas -->
         <?php if (!empty($ticket['operaciones'])): ?>
-        <div class="card">
-            <div class="card-header grid grid-2">
-                <h3 class="text-lg font-semibold text-gray-900 grid-span-1">Operaciones Relacionadas</h3>
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    <h3 class="font-bold text-slate-800">Operaciones Relacionadas</h3>
+                </div>
+                <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Vista Detallada</div>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                <table class="w-full text-left text-sm whitespace-nowrap">
+                    <thead class="bg-slate-50 text-slate-500 border-b border-slate-200">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Factura</th>
-                            <!--<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">UUID</th>-->
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Monto</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Requiere Canc.</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Solicitada Cancelación</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Cancelado Sistema</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Cancelado SAT</th>
+                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider">Factura</th>
+                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider">Tipo</th>
+                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-right">Monto</th>
+                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Requiere Canc.</th>
+                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Solicitada Canc.</th>
+                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Canc. Sistema</th>
+                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Canc. SAT</th>
                             <?php if ($canChangeStatus): ?>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Acciones</th>
                             <?php endif; ?>
                             <?php if ($canVerifySat): ?>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Validar SAT</th>
+                            <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">Validar</th>
                             <?php endif; ?>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody class="divide-y divide-slate-100">
                         <?php foreach ($ticket['operaciones'] as $op): ?>
-                        <tr data-op-id="<?= $op['id'] ?>">
-                            <td class="px-6 py-4 text-sm text-gray-900">
-                                <?= $op['serie'] .'-'. $op['id_compago'] ?>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-700">
-                                <?= htmlspecialchars($tipos_operacion[$op['tipo_operacion']] ?? $op['tipo_operacion']) ?>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-right font-medium text-gray-900">
-                                <?= $op['monto'] ? '$' . number_format($op['monto'], 2) : '-' ?>
-                            </td>
+                        <tr class="hover:bg-slate-50 transition-colors" data-op-id="<?= $op['id'] ?>">
+                            <td class="px-6 py-4 font-bold text-slate-700"><?= $op['serie'] ?>-<?= $op['id_compago'] ?></td>
+                            <td class="px-6 py-4 text-slate-500"><?= htmlspecialchars($tipos_operacion[$op['tipo_operacion']] ?? $op['tipo_operacion']) ?></td>
+                            <td class="px-6 py-4 text-right font-black"><?= $op['monto'] ? '$' . number_format($op['monto'], 2) : '-' ?></td>
                             <td class="px-6 py-4 text-center">
                                 <?php if ($op['requiere_cancelacion']): ?>
-                                <span class="badge badge-blue">Sí</span>
+                                <span class="px-2 py-0.5 rounded bg-primary-50 text-primary-700 text-[10px] font-bold">Sí</span>
                                 <?php else: ?>
-                                <span class="badge badge-gray">No</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-bold">No</span>
                                 <?php endif; ?>
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <span class="flag-badge" data-flag="solicitada_cancelacion">
                                     <?php if ($op['solicitada_cancelacion']): ?>
-                                    <span class="badge badge-blue">Sí</span>
+                                    <span class="px-2 py-0.5 rounded bg-primary-50 text-primary-700 text-[10px] font-bold">Sí</span>
                                     <?php else: ?>
-                                    <span class="badge badge-gray">No</span>
+                                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-bold">No</span>
                                     <?php endif; ?>
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <span class="flag-badge" data-flag="cancelado_sistema">
                                     <?php if ($op['cancelado_sistema']): ?>
-                                    <span class="badge badge-green">Sí</span>
+                                    <span class="px-2 py-0.5 rounded bg-update-50 text-update-600 text-[10px] font-bold">Sí</span>
                                     <?php else: ?>
-                                    <span class="badge badge-gray">No</span>
+                                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-bold">No</span>
                                     <?php endif; ?>
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <span class="flag-badge" data-flag="cancelado_sat">
                                     <?php if ($op['cancelado_sat']): ?>
-                                    <span class="badge badge-green">Sí</span>
+                                    <span class="px-2 py-0.5 rounded bg-update-50 text-update-600 text-[10px] font-bold">Sí</span>
                                     <?php else: ?>
-                                    <span class="badge badge-gray">No</span>
+                                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-bold">No</span>
                                     <?php endif; ?>
                                 </span>
                             </td>
                             <?php if ($canChangeStatus): ?>
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex items-center justify-center space-x-2">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center justify-center gap-2 <?= !$op['requiere_cancelacion'] ? 'opacity-25' : '' ?>">
                                     <button type="button" 
-                                            class="btn-toggle-flag p-1 text-blue-600 hover:text-blue-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
+                                            class="btn-toggle-flag p-1 text-primary-500 hover:text-primary-700 transition-colors"
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="solicitada_cancelacion"
                                             title="Solicitada Cancelación"
@@ -350,7 +291,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                         </svg>
                                     </button>
                                     <button type="button" 
-                                            class="btn-toggle-flag p-1 text-green-600 hover:text-green-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
+                                            class="btn-toggle-flag p-1 text-update-500 hover:text-update-700 transition-colors"
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="cancelado_sistema"
                                             title="Cancelado Sistema"
@@ -360,43 +301,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                         </svg>
                                     </button>
                                     <button type="button" 
-                                            class="btn-toggle-flag p-1 text-purple-600 hover:text-purple-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
-                                            data-op-id="<?= $op['id'] ?>"
-                                            data-flag="cancelado_sat"
-                                            title="Cancelado SAT"
-                                            <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4 0 003 15z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                            <?php else: ?>
-                                <?php if ($canChangeStatus): ?>
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex items-center justify-center space-x-2">
-                                    <button type="button" 
-                                            class="btn-toggle-flag p-1 text-blue-600 hover:text-blue-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
-                                            data-op-id="<?= $op['id'] ?>"
-                                            data-flag="solicitada_cancelacion"
-                                            title="Solicitada Cancelación"
-                                            <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                        </svg>
-                                    </button>
-                                    <button type="button" 
-                                            class="btn-toggle-flag p-1 text-green-600 hover:text-green-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
-                                            data-op-id="<?= $op['id'] ?>"
-                                            data-flag="cancelado_sistema"
-                                            title="Cancelado Sistema"
-                                            <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </button>
-                                    <button type="button" 
-                                            class="btn-toggle-flag p-1 text-purple-600 hover:text-purple-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
+                                            class="btn-toggle-flag p-1 text-brand-purple hover:text-purple-700 transition-colors"
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="cancelado_sat"
                                             title="Cancelado SAT"
@@ -407,7 +312,6 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                     </button>
                                 </div>
                             </td>
-                                <?php endif; ?>
                             <?php endif; ?>
                             <?php if ($canVerifySat): ?>
                             <td class="px-6 py-4 text-center">
@@ -418,7 +322,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                 ?>
                                 <?php if ($mostrarBoton): ?>
                                 <button type="button"
-                                        class="btn-validate-sat-ops p-2 text-orange-600 hover:text-orange-800 transition-colors"
+                                        class="btn-validate-sat-ops p-2 text-warning-500 hover:text-warning-700 transition-colors"
                                         data-op-id="<?= $op['id'] ?>"
                                         data-op-uuid="<?= htmlspecialchars($op['uuid_operacion']) ?>"
                                         data-op-serie="<?= htmlspecialchars($op['serie']) ?>"
@@ -430,7 +334,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                     </svg>
                                 </button>
                                 <?php else: ?>
-                                <span class="text-gray-300">
+                                <span class="text-slate-300">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                                               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -444,234 +348,184 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                     </tbody>
                 </table>
             </div>
-        </div>
-        <?php endif; ?>
-    </div>
-    
-    <!-- Panel Lateral -->
-    <div class="space-y-6 min-w-0">
-        
-        <!-- Cambiar Estado -->
-        <?php if ($canChangeStatus): ?>
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-lg font-semibold text-gray-900">Cambiar Estado</h3>
-            </div>
-            <div class="card-body">
-                <form action="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/estado" method="POST" id="statusForm">
-                    <?= \App\Helpers\AuthHelper::getCsrfField() ?>
-                    
-                    <select name="estado" class="form-select mb-4" id="estadoSelect">
-                        <?php foreach ($estados as $key => $info): ?>
-                        <option value="<?= $key ?>" <?= $ticket['estado'] === $key ? 'selected' : '' ?>>
-                            <?= $info['label'] ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
-                    
-                    <button type="submit" class="btn btn-update w-full">
-                        Actualizar Estado
-                    </button>
-                </form>
-            </div>
-        </div>
+        </section>
         <?php endif; ?>
         
-        <div class="flex flex-col space-y-3">
-            <button type="button" 
-                    id="btnVerificarSat"
-                    class="btn btn-info w-full <?= $ticket['estado'] !== 'proceso_cancelacion' ? 'opacity-50 cursor-not-allowed' : '' ?>"
-                    <?= $ticket['estado'] !== 'proceso_cancelacion' ? 'disabled' : '' ?>>
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Verificar Status SAT
-            </button>
-        </div>
-
-        <!-- Ingresar UUID Factura Nueva (solo rol Usuario, estado liberado, refacturación) -->
-        <?php
-        $canIngresarUuid = PermissionHelper::isRegularUser()
-            && $ticket['tipo_cancelacion'] === 'refacturacion'
-            && $ticket['estado'] === 'liberado'
-            && empty($ticket['uuid_factura_nueva']);
-        ?>
-
-        <?php if ($canIngresarUuid): ?>
-        <div class="card mt-4 border-l-4 border-l-purple-500">
-            <div class="card-header bg-purple-50">
-                <h3 class="text-lg font-semibold text-purple-900">Ingresar UUID de Factura Nueva</h3>
-                <p class="text-sm text-purple-700 mt-1">
-                    Ingrese el UUID de la factura nueva emitida para poder proceder con la cancelación con relación.
-                </p>
-            </div>
-            <div class="card-body">
-                <form action="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/uuid-nueva" method="POST" id="uuidForm">
-                    <?= \App\Helpers\AuthHelper::getCsrfField() ?>
-
-                    <div class="mb-4">
-                        <label for="uuid_factura_nueva" class="form-label">
-                            UUID de la Factura Nueva <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text"
-                               name="uuid_factura_nueva"
-                               id="uuid_factura_nueva"
-                               class="form-input font-mono text-sm"
-                               placeholder="Ej: 123e4567-e89b-12d3-a456-426614174000"
-                               pattern="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
-                               title="Formato: 123e4567-e89b-12d3-a456-426614174000"
-                               required
-                               maxlength="36">
-                        <p class="text-xs text-gray-500 mt-1">
-                            Ingrese el UUID de la factura nueva emitida en la refacturación.
-                        </p>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-full" id="btnGuardarUuid">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        Guardar UUID de Factura Nueva
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <script>
-        document.getElementById('uuidForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const btn = document.getElementById('btnGuardarUuid');
-            btn.disabled = true;
-            btn.innerHTML = '<svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Guardando...';
-
-            try {
-                const formData = new FormData(this);
-                const response = await fetch('<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/uuid-nueva', {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': '<?= \App\Helpers\AuthHelper::generateCsrfToken() ?>'
-                    },
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    if (result.success) {
-                        showToast(result.message || 'UUID actualizado correctamente', 'success');
-                        setTimeout(() => window.location.reload(), 1500);
-                    } else {
-                        showToast(result.error || 'Error al guardar el UUID', 'error');
-                        btn.disabled = false;
-                        btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
-                    }
-                } else {
-                    showToast(result.error || 'Error al guardar el UUID', 'error');
-                    btn.disabled = false;
-                    btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('Error de conexión con el servidor.', 'error');
-                btn.disabled = false;
-                btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
-            }
-        });
-        </script>
-        <?php endif; ?>
-
-        <!-- Información del Usuario -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-lg font-semibold text-gray-900">Solicitante</h3>
-            </div>
-            <div class="card-body">
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
-                        <span class="text-primary-700 font-semibold text-lg">
-                            <?= strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 1)) ?>
-                        </span>
-                    </div>
-                    <div>
-                        <p class="font-medium text-gray-900"><?= htmlspecialchars($ticket['usuario_nombre'] ?? 'Usuario') ?></p>
-                        <p class="text-sm text-gray-500"><?= htmlspecialchars($ticket['usuario_email'] ?? '') ?></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Fechas -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-lg font-semibold text-gray-900">Fechas</h3>
-            </div>
-            <div class="card-body space-y-4">
-                <div>
-                    <label class="text-xs font-medium text-gray-500 uppercase">Fecha de Creación</label>
-                    <p class="text-gray-900"><?= date('d/m/Y H:i', strtotime($ticket['fecha_creacion'])) ?></p>
-                </div>
-                
-                <?php if ($ticket['fecha_envio_cancelacion']): ?>
-                <div>
-                    <label class="text-xs font-medium text-gray-500 uppercase">Enviado a Cancelar</label>
-                    <p class="text-gray-900"><?= date('d/m/Y H:i', strtotime($ticket['fecha_envio_cancelacion'])) ?></p>
-                </div>
-                <?php endif; ?>
-                
-                <?php if ($ticket['fecha_cancelacion_sat']): ?>
-                <div>
-                    <label class="text-xs font-medium text-gray-500 uppercase">Cancelado en SAT</label>
-                    <p class="text-gray-900"><?= date('d/m/Y H:i', strtotime($ticket['fecha_cancelacion_sat'])) ?></p>
-                </div>
-                <?php endif; ?>
-            </div>
-        </div>
-        
-        <!-- Timeline de Auditoría -->
-        <?php if (!empty($ticket['auditoria'])): ?>
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-lg font-semibold text-gray-900">Historial</h3>
-            </div>
-            <div class="card-body p-0">
-                <div class="divide-y divide-gray-100">
-                    <?php foreach (array_slice($ticket['auditoria'], 0, 5) as $audit): ?>
-                    <div class="p-4">
-                        <p class="text-sm font-medium text-gray-900 break-words"><?= htmlspecialchars($audit['accion']) .' a '. htmlspecialchars($audit['valor_nuevo']) ?></p>
-                        <p class="text-xs text-gray-500 mt-1">
-                            <?= htmlspecialchars($audit['usuario_nombre']) ?> · 
-                            <?= date('d/m/Y H:i', strtotime($audit['fecha'])) ?>
-                        </p>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
-        
-        <div class="flex flex-col space-y-3">
-
+        <!-- Volver al listado -->
+        <div class="flex">
             <?php if (PermissionHelper::isConsulta()): ?>
-            <a href="<?= BASE_URL ?>solicitudes" class="btn btn-secondary w-full">
-                ← Volver al listado
+            <a href="<?= BASE_URL ?>solicitudes" class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-primary-500 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Volver al listado
             </a>
             <?php elseif (PermissionHelper::hasPermission('tickets.view.all')): ?>
-            <a href="<?= BASE_URL ?>tickets" class="btn btn-secondary w-full">
-                ← Volver al listado
+            <a href="<?= BASE_URL ?>tickets" class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-primary-500 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Volver al listado
             </a>
             <?php else: ?>
-            <a href="<?= BASE_URL ?>mis-solicitudes" class="btn btn-secondary w-full">
-                ← Volver al listado
+            <a href="<?= BASE_URL ?>mis-solicitudes" class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-primary-500 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Volver al listado
             </a>
             <?php endif; ?>
         </div>
     </div>
+    
+    <!-- Columna derecha (38%) - Stream de Actividad y Comentarios -->
+    <div class="lg:w-[38%] flex flex-col">
+        <section class="bg-slate-50 rounded-xl shadow-lg border-2 border-slate-200 flex flex-col min-h-[600px] overflow-hidden lg:sticky lg:top-24">
+            <!-- Header del panel -->
+            <div class="p-4 bg-white border-b border-slate-200 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <h3 class="font-bold text-slate-800">Actividad y Comentarios</h3>
+                </div>
+                <span class="bg-primary-500 text-white px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-tighter">
+                    Stream Unificado
+                </span>
+            </div>
+            
+            <!-- Stream de actividad -->
+            <div class="p-5 flex-1 overflow-y-auto custom-scrollbar space-y-6" id="activityStream" style="position: relative;">
+                <!-- Línea vertical del timeline -->
+                <style>
+                    #activityStream::before {
+                        content: '';
+                        position: absolute;
+                        left: 31px;
+                        top: 20px;
+                        bottom: 20px;
+                        width: 2px;
+                        background-color: #e2e8f0;
+                        z-index: 0;
+                    }
+                </style>
+                
+                <!-- Historial de auditoría -->
+                <?php if (!empty($ticket['auditoria'])): ?>
+                    <?php foreach (array_reverse($ticket['auditoria']) as $audit): ?>
+                    <div class="relative z-10 flex gap-4">
+                        <div class="w-8 h-8 rounded-full bg-primary-500 flex-shrink-0 flex items-center justify-center text-white ring-4 ring-slate-50">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <div class="bg-primary-50 p-3 rounded-xl border border-primary-100">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-[10px] font-black uppercase text-primary-700">Cambio de Estado</span>
+                                    <span class="text-[10px] text-slate-400 font-medium"><?= date('d/m H:i', strtotime($audit['fecha'])) ?></span>
+                                </div>
+                                <p class="text-xs font-bold text-primary-900"><?= htmlspecialchars($audit['accion']) ?> a <?= htmlspecialchars($audit['valor_nuevo']) ?></p>
+                                <p class="text-[11px] text-primary-700/80 mt-1">Por: <?= htmlspecialchars($audit['usuario_nombre']) ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+                
+                <!-- Comentarios -->
+                <div id="listaComentarios" class="space-y-6">
+                    <?php if (!empty($comentarios)): ?>
+                        <?php foreach ($comentarios as $comentario): ?>
+                        <?php 
+                        $isAdmin = $comentario['rol_nombre'] === 'Administrador';
+                        $bgColor = $isAdmin ? 'bg-red-500' : 'bg-primary-600';
+                        $cardBg = $isAdmin ? 'border-red-100' : 'border-primary-100';
+                        ?>
+                        <div class="relative z-10 flex gap-4" id="comentario-<?= $comentario['id'] ?>">
+                            <div class="w-8 h-8 rounded-full <?= $bgColor ?> flex-shrink-0 flex items-center justify-center text-white font-bold text-xs ring-4 ring-slate-50">
+                                <?= strtoupper(substr($comentario['usuario_nombre'], 0, 2)) ?>
+                            </div>
+                            <div class="flex-1">
+                                <div class="bg-white p-4 rounded-xl shadow-sm border-2 <?= $cardBg ?>">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-xs font-black text-slate-800"><?= htmlspecialchars($comentario['usuario_nombre']) ?></span>
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold <?= $isAdmin ? 'bg-red-100 text-red-700' : 'bg-primary-100 text-primary-700' ?>">
+                                                <?= $comentario['rol_nombre'] ?>
+                                            </span>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[10px] text-slate-400 font-medium"><?= timeAgo($comentario['fecha_creacion']) ?></span>
+                                            <?php if (PermissionHelper::isAdmin()): ?>
+                                            <button onclick="eliminarComentario(<?= $comentario['id'] ?>)"
+                                                    class="text-red-400 hover:text-red-600 transition-colors"
+                                                    title="Eliminar comentario">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line"><?= htmlspecialchars($comentario['comentario']) ?></p>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <?php if (empty($ticket['auditoria'])): ?>
+                        <div class="text-center py-8 text-slate-400">
+                            <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            <p class="text-sm">No hay actividad aún</p>
+                        </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
+            <!-- Formulario para agregar comentario -->
+            <?php if (PermissionHelper::hasPermission('tickets.comments.add')): ?>
+            <div class="p-4 bg-white border-t border-slate-200 mt-auto">
+                <form id="formComentario">
+                    <?= \App\Helpers\AuthHelper::getCsrfField() ?>
+                    <div class="relative">
+                        <textarea id="comentario"
+                                  name="comentario"
+                                  class="w-full bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-primary-500 focus:border-primary-500 p-4 pb-12 transition-all placeholder:text-slate-400 resize-none"
+                                  placeholder="Añadir un comentario o nota interna..."
+                                  rows="3"
+                                  required
+                                  minlength="5"
+                                  maxlength="1000"></textarea>
+                        <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-[10px] text-slate-400">Mín. 5 caracteres</span>
+                            </div>
+                            <button type="submit" 
+                                    class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md">
+                                Enviar
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <?php endif; ?>
+        </section>
+    </div>
 </div>
 
+<!-- Scripts -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Toggle de banderas en operaciones
     const toggleButtons = document.querySelectorAll('.btn-toggle-flag');
     
     toggleButtons.forEach(button => {
@@ -680,9 +534,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const flag = this.dataset.flag;
             const tr = this.closest('tr');
             const badgeContainer = tr.querySelector(`.flag-badge[data-flag="${flag}"]`);
-            
-            // Si la bandera que tocamos es 'cancelado_sistema', también queremos actualizar visualmente 'cancelada' si existe
-            // pero en la DB ya manejamos que cancelado_sistema es el nuevo estándar.
             
             try {
                 this.disabled = true;
@@ -703,11 +554,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Actualizar badge
                     if (result.nuevo_valor) {
-                        badgeContainer.innerHTML = `<span class="badge badge-green">Sí</span>`;
+                        badgeContainer.innerHTML = `<span class="px-2 py-0.5 rounded bg-update-50 text-update-600 text-[10px] font-bold">Sí</span>`;
                     } else {
-                        badgeContainer.innerHTML = `<span class="badge badge-gray">No</span>`;
+                        badgeContainer.innerHTML = `<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-bold">No</span>`;
                     }
                 } else {
                     alert(result.error || 'Error al actualizar');
@@ -722,7 +572,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Verificación SAT
+    // Verificación SAT del ticket principal
     const btnVerificarSat = document.getElementById('btnVerificarSat');
     if (btnVerificarSat) {
         btnVerificarSat.addEventListener('click', async function() {
@@ -730,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.disabled = true;
                 const originalContent = this.innerHTML;
                 this.innerHTML = `
-                    <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -766,18 +616,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Validación SAT para operaciones
+    // Validación SAT para operaciones individuales
     document.querySelectorAll('.btn-validate-sat-ops').forEach(button => {
         button.addEventListener('click', async function() {
             const opId = this.dataset.opId;
-            const tr = this.closest('tr');
             
             try {
                 this.disabled = true;
                 const originalContent = this.innerHTML;
                 this.innerHTML = `
-                    <svg class="animate-spin w-5 h-5 text-orange-600" 
-                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <svg class="animate-spin w-5 h-5 text-warning-500" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -813,8 +661,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 showToast('Error de conexión con el servidor.', 'error');
                 this.disabled = false;
             }
-            });
         });
+    });
+
+    // Formulario de cambio de estado
+    const statusForm = document.getElementById('statusForm');
+    if (statusForm) {
+        statusForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const select = document.getElementById('estadoSelect');
+            const btn = this.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+            
+            try {
+                const formData = new FormData(this);
+                const response = await fetch(`<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/estado`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    showToast('Estado actualizado correctamente', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('Error al actualizar estado', 'error');
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error de conexión', 'error');
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        });
+    }
 
     // Formulario de agregar comentario
     const formComentario = document.getElementById('formComentario');
@@ -826,11 +714,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const btnOriginalContent = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = `
-                <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
                 </svg>
-                Publicando...
+                Enviando...
             `;
 
             try {
@@ -849,12 +737,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.ok && result.success) {
                     showToast('Comentario publicado correctamente', 'success');
 
-                    // Agregar comentario al DOM
                     if (result.comentario) {
                         addComentarioToUI(result.comentario);
                     }
 
-                    // Limpiar formulario
                     formComentario.reset();
                     btn.innerHTML = btnOriginalContent;
                     btn.disabled = false;
@@ -871,6 +757,46 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // UUID Form
+    const uuidForm = document.getElementById('uuidForm');
+    if (uuidForm) {
+        uuidForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('btnGuardarUuid');
+            btn.disabled = true;
+            btn.textContent = 'Guardando...';
+
+            try {
+                const formData = new FormData(this);
+                const response = await fetch('<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/uuid-nueva', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '<?= \App\Helpers\AuthHelper::generateCsrfToken() ?>'
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showToast(result.message || 'UUID actualizado correctamente', 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    showToast(result.error || 'Error al guardar el UUID', 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Guardar';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error de conexión con el servidor.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Guardar';
+            }
+        });
+    }
 });
 
 // Función para agregar comentario al DOM
@@ -882,52 +808,37 @@ function addComentarioToUI(comentario) {
     }
 
     const isAdmin = comentario.rol_nombre === 'Administrador';
-    const borderColor = isAdmin ? 'border-l-red-500 bg-red-50' : 'border-l-primary-500 bg-primary-50';
-    const badgeClass = isAdmin ? 'badge-red' : 'badge-blue';
-    const avatarClass = isAdmin ? 'bg-red-100 text-red-700' : 'bg-primary-100 text-primary-700';
+    const bgColor = isAdmin ? 'bg-red-500' : 'bg-primary-600';
+    const cardBorder = isAdmin ? 'border-red-100' : 'border-primary-100';
+    const badgeClass = isAdmin ? 'bg-red-100 text-red-700' : 'bg-primary-100 text-primary-700';
 
     const html = `
-        <div class="border-l-4 ${borderColor} rounded-r-lg p-4 animate-slide-in"
-                id="comentario-${comentario.id}">
-            <div class="flex items-start space-x-3">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center ${avatarClass}">
-                        <span class="font-bold text-sm">
-                            ${comentario.usuario_nombre.charAt(0).toUpperCase()}
-                        </span>
-                    </div>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <span class="font-semibold text-gray-900">
-                                ${comentario.usuario_nombre}
-                            </span>
-                            <span class="badge ${badgeClass}">
+        <div class="relative z-10 flex gap-4 animate-slide-in" id="comentario-${comentario.id}">
+            <div class="w-8 h-8 rounded-full ${bgColor} flex-shrink-0 flex items-center justify-center text-white font-bold text-xs ring-4 ring-slate-50">
+                ${comentario.usuario_nombre.substring(0, 2).toUpperCase()}
+            </div>
+            <div class="flex-1">
+                <div class="bg-white p-4 rounded-xl shadow-sm border-2 ${cardBorder}">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-slate-800">${comentario.usuario_nombre}</span>
+                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${badgeClass}">
                                 ${comentario.rol_nombre}
                             </span>
                         </div>
-                        <?php if (PermissionHelper::isAdmin()): ?>
-                        <button onclick="eliminarComentario(${comentario.id})"
-                                class="text-red-500 hover:text-red-700 transition-colors"
-                                title="Eliminar comentario">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                        </button>
-                        <?php endif; ?>
+                        <span class="text-[10px] text-slate-400 font-medium">hace un momento</span>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">hace un momento</p>
-                    <p class="text-gray-900 mt-2 whitespace-pre-line break-words">
-                        ${comentario.comentario}
-                    </p>
+                    <p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line">${comentario.comentario}</p>
                 </div>
             </div>
         </div>
     `;
 
-    lista.insertAdjacentHTML('afterbegin', html);
+    lista.insertAdjacentHTML('beforeend', html);
+    
+    // Scroll to new comment
+    const activityStream = document.getElementById('activityStream');
+    activityStream.scrollTop = activityStream.scrollHeight;
 }
 
 // Función para eliminar comentario
@@ -963,5 +874,4 @@ async function eliminarComentario(comentarioId) {
         showToast('Error de conexión con el servidor', 'error');
     }
 }
-
 </script>
