@@ -97,7 +97,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
             <div class="space-y-1">
                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Cliente / Receptor</p>
                 <p class="font-bold text-slate-800 leading-tight"><?= htmlspecialchars($ticket['nombre_cliente']) ?></p>
-                <p class="text-[10px] text-slate-500 font-mono uppercase"><?= htmlspecialchars($ticket['rfc_receptor']) ?></p>
+                <p class="text-[20px] text-slate-500 font-mono uppercase"><?= htmlspecialchars($ticket['rfc_receptor']) ?></p>
             </div>
             
             <!-- Tipo de Factura -->
@@ -131,19 +131,6 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                 </div>
             </div>
             
-            <!-- Solicitante Interno -->
-            <div class="space-y-1">
-                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Solicitante Interno</p>
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
-                        <?= $userInitials ?>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold"><?= htmlspecialchars($ticket['usuario_nombre'] ?? 'Usuario') ?></p>
-                        <p class="text-[10px] text-slate-500"><?= htmlspecialchars($ticket['usuario_email'] ?? '') ?></p>
-                    </div>
-                </div>
-            </div>
             
             <!-- Fechas -->
             <div class="space-y-1">
@@ -157,6 +144,20 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Fecha de Cancelación</p>
                 <p class="text-[10px] text-slate-500">Cancelado: <?= date('d/m/Y', strtotime($ticket['fecha_cancelacion_sat'])) ?></p>
                 <?php endif; ?>
+            </div>
+
+            <!-- Solicitante Interno -->
+            <div class="space-y-1">
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Solicitante Interno</p>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-600">
+                        <?= $userInitials ?>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold"><?= htmlspecialchars($ticket['usuario_nombre'] ?? 'Usuario') ?></p>
+                        <p class="text-[10px] text-slate-500"><?= htmlspecialchars($ticket['usuario_email'] ?? '') ?></p>
+                    </div>
+                </div>
             </div>
             
             <!-- Documentos Adjuntos -->
