@@ -49,6 +49,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                     <span class="text-[10px] uppercase font-bold text-slate-400">UUID:</span>
                     <span class="text-xs text-slate-500 font-mono"><?= htmlspecialchars($ticket['uuid_factura']) ?></span>
                 </div>
+                <p class="font-bold text-primary-500 leading-tight uppercase"><?= TIPOS_CANCELACION[$ticket['tipo_cancelacion']] ?? $ticket['tipo_cancelacion'] ?></p>
             </div>
             <div class="flex flex-col sm:flex-row gap-2">
                 <?php if ($canChangeStatus): ?>
@@ -102,18 +103,21 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
             <!-- Tipo de Factura -->
             <div class="space-y-1">
                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tipo de Factura</p>
+                <p class="font-bold text-slate-800 leading-tight"><?= $ticket['serie'] ?>-<?= $ticket['folio']?></p>
                 <p class="font-bold text-slate-800 leading-tight"><?= TIPOS_AUTO[$ticket['tipo_factura']] ?? $ticket['tipo_factura'] ?></p>
+                <!--
                 <div class="flex items-center gap-1.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-primary-500"></span>
-                    <span class="text-[10px] text-slate-500 font-bold uppercase"><?= $ticket['serie'] ?>-<?= $ticket['folio'] ?></span>
+                    <span class="text-[10px] text-slate-500 font-bold uppercase"><?= $ticket['uuid'] ?></span>
                 </div>
+                -->
             </div>
             
             <!-- Tipo de Cancelación -->
             <div class="space-y-1">
                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tipo de Cancelación</p>
-                <p class="font-bold text-primary-500 leading-tight uppercase"><?= TIPOS_CANCELACION[$ticket['tipo_cancelacion']] ?? $ticket['tipo_cancelacion'] ?></p>
-                <p class="text-[10px] text-slate-500"><?= htmlspecialchars($ticket['motivo']) ?></p>
+                <!--<p class="font-bold text-primary-500 leading-tight uppercase"><?= TIPOS_CANCELACION[$ticket['tipo_cancelacion']] ?? $ticket['tipo_cancelacion'] ?></p>-->
+                <p class="font-bold text-primary-500 leading-tight uppercase"><?= htmlspecialchars($ticket['motivo']) ?></p>
             </div>
             
             <!-- Monto Total -->
