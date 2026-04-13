@@ -417,7 +417,38 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
             </div>
             
             <!-- Stream de actividad -->
-            <div class="p-5 flex-1 overflow-y-auto custom-scrollbar space-y-6" id="activityStream" style="position: relative;">
+            <?php
+            // Preparar stream unificado de actividad (auditoría + comentarios)
+            $unifiedActivity = [];
+            
+            if (!empty($ticket['auditoria'])) {
+                foreach ($ticket['auditoria'] as $audit) {
+                    $unifiedActivity[] = [
+                        'type' => 'audit',
+                        'timestamp' => strtotime($audit['fecha']),
+                        'data' => $audit
+                    ];
+                }
+            }
+            
+            if (!empty($comentarios)) {
+                foreach ($comentarios as $comentario) {
+                    $unifiedActivity[] = [
+                        'type' => 'comment',
+                        'timestamp' => strtotime($comentario['fecha_creacion']),
+                        'data' => $comentario
+                    ];
+                }
+            }
+            
+            // Ordenar por timestamp descendente (lo más nuevo arriba)
+            usort($unifiedActivity, function($a, $b) {
+                return $b['timestamp'] - $a['timestamp'];
+            });
+            ?>
+            
+            <div class="p-5 flex-1 overflow-y-auto custom-scrollbar space-y-6" id="activityStream" 
+                 style="position: relative; max-height: 500px; min-height: 400px;">
                 <!-- Línea vertical del timeline -->
                 <style>
                     #activityStream::before {
@@ -425,79 +456,15 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                         position: absolute;
                         left: 31px;
                         top: 20px;
-                        bottom: 20px;
+                        bottom: 0px;
                         width: 2px;
-                        background-color: #e2e8f0;
+                        background-color: #f1f5f9;
                         z-index: 0;
                     }
                 </style>
                 
-                <!-- Historial de auditoría -->
-                <?php if (!empty($ticket['auditoria'])): ?>
-                    <?php foreach (array_reverse($ticket['auditoria']) as $audit): ?>
-                    <div class="relative z-10 flex gap-4">
-                        <div class="w-8 h-8 rounded-full bg-primary-500 flex-shrink-0 flex items-center justify-center text-white ring-4 ring-slate-50">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="bg-primary-50 p-3 rounded-xl border border-primary-100">
-                                <div class="flex justify-between items-center mb-1">
-                                    <span class="text-[10px] font-black uppercase text-primary-700">Cambio de Estado</span>
-                                    <span class="text-[10px] text-slate-400 font-medium"><?= date('d/m H:i', strtotime($audit['fecha'])) ?></span>
-                                </div>
-                                <p class="text-xs font-bold text-primary-900"><?= htmlspecialchars($audit['accion']) ?> a <?= htmlspecialchars($audit['valor_nuevo']) ?></p>
-                                <p class="text-[11px] text-primary-700/80 mt-1">Por: <?= htmlspecialchars($audit['usuario_nombre']) ?></p>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-                
-                <!-- Comentarios -->
-                <div id="listaComentarios" class="space-y-6">
-                    <?php if (!empty($comentarios)): ?>
-                        <?php foreach ($comentarios as $comentario): ?>
-                        <?php 
-                        $isAdmin = $comentario['rol_nombre'] === 'Administrador';
-                        $bgColor = $isAdmin ? 'bg-red-500' : 'bg-primary-600';
-                        $cardBg = $isAdmin ? 'border-red-100' : 'border-primary-100';
-                        ?>
-                        <div class="relative z-10 flex gap-4" id="comentario-<?= $comentario['id'] ?>">
-                            <div class="w-8 h-8 rounded-full <?= $bgColor ?> flex-shrink-0 flex items-center justify-center text-white font-bold text-xs ring-4 ring-slate-50">
-                                <?= strtoupper(substr($comentario['usuario_nombre'], 0, 2)) ?>
-                            </div>
-                            <div class="flex-1">
-                                <div class="bg-white p-4 rounded-xl shadow-sm border-2 <?= $cardBg ?>">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs font-black text-slate-800"><?= htmlspecialchars($comentario['usuario_nombre']) ?></span>
-                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold <?= $isAdmin ? 'bg-red-100 text-red-700' : 'bg-primary-100 text-primary-700' ?>">
-                                                <?= $comentario['rol_nombre'] ?>
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-[10px] text-slate-400 font-medium"><?= timeAgo($comentario['fecha_creacion']) ?></span>
-                                            <?php if (PermissionHelper::isAdmin()): ?>
-                                            <button onclick="eliminarComentario(<?= $comentario['id'] ?>)"
-                                                    class="text-red-400 hover:text-red-600 transition-colors"
-                                                    title="Eliminar comentario">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                </svg>
-                                            </button>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                    <p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line"><?= htmlspecialchars($comentario['comentario']) ?></p>
-                                </div>
-                            </div>
-                        </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <?php if (empty($ticket['auditoria'])): ?>
+                <div id="listaActividad" class="space-y-6">
+                    <?php if (empty($unifiedActivity)): ?>
                         <div class="text-center py-8 text-slate-400">
                             <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -505,7 +472,67 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                             </svg>
                             <p class="text-sm">No hay actividad aún</p>
                         </div>
-                        <?php endif; ?>
+                    <?php else: ?>
+                        <?php foreach ($unifiedActivity as $item): ?>
+                            <?php if ($item['type'] === 'audit'): ?>
+                                <?php $audit = $item['data']; ?>
+                                <div class="relative z-10 flex gap-4">
+                                    <div class="w-8 h-8 rounded-full bg-primary-500 flex-shrink-0 flex items-center justify-center text-white ring-4 ring-slate-50 shadow-sm transition-transform hover:scale-110">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="bg-primary-50 p-3 rounded-xl border border-primary-100 shadow-sm">
+                                            <div class="flex justify-between items-center mb-1">
+                                                <span class="text-[10px] font-black uppercase text-primary-700 tracking-wider">Cambio de Estado</span>
+                                                <span class="text-[10px] text-slate-400 font-bold"><?= date('d/m H:i', strtotime($audit['fecha'])) ?></span>
+                                            </div>
+                                            <p class="text-xs font-bold text-primary-900"><?= htmlspecialchars($audit['accion']) ?> a <?= htmlspecialchars($audit['valor_nuevo']) ?></p>
+                                            <p class="text-[11px] text-primary-700/80 mt-1 font-medium">Por: <?= htmlspecialchars($audit['usuario_nombre']) ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php else: ?>
+                                <?php 
+                                $comentario = $item['data'];
+                                $isAdmin = $comentario['rol_nombre'] === 'Administrador';
+                                $bgColor = $isAdmin ? 'bg-red-500' : 'bg-primary-600';
+                                $cardBg = $isAdmin ? 'border-red-100 ring-red-50' : 'border-primary-100 ring-primary-50';
+                                ?>
+                                <div class="relative z-10 flex gap-4" id="comentario-<?= $comentario['id'] ?>">
+                                    <div class="w-8 h-8 rounded-full <?= $bgColor ?> flex-shrink-0 flex items-center justify-center text-white font-bold text-[10px] ring-4 ring-slate-50 shadow-sm transition-transform hover:scale-110">
+                                        <?= strtoupper(substr($comentario['usuario_nombre'], 0, 2)) ?>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 ring-4 <?= $cardBg ?>">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-xs font-black text-slate-800"><?= htmlspecialchars($comentario['usuario_nombre']) ?></span>
+                                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-tighter <?= $isAdmin ? 'bg-red-100 text-red-700' : 'bg-primary-100 text-primary-700' ?>">
+                                                        <?= $comentario['rol_nombre'] ?>
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[10px] text-slate-400 font-bold"><?= timeAgo($comentario['fecha_creacion']) ?></span>
+                                                    <?php if (PermissionHelper::isAdmin()): ?>
+                                                    <button onclick="eliminarComentario(<?= $comentario['id'] ?>)"
+                                                            class="text-red-300 hover:text-red-500 transition-colors"
+                                                            title="Eliminar comentario">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                        </svg>
+                                                    </button>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line"><?= htmlspecialchars($comentario['comentario']) ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
             </div>
