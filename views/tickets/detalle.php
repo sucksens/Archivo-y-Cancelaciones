@@ -267,17 +267,17 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                             <td class="px-4 py-2 text-right font-black"><?= $op['monto'] ? '$' . number_format($op['monto'], 2) : '-' ?></td>
                             <td class="px-4 py-2 text-center">
                                 <?php if ($op['requiere_cancelacion']): ?>
-                                <span class="px-2 py-0.5 rounded bg-primary-50 text-primary-700 text-[10px] font-bold">Sí</span>
+                                <span class="px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-black uppercase tracking-tight shadow-sm">Sí</span>
                                 <?php else: ?>
-                                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-bold">No</span>
+                                <span class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-tight">No</span>
                                 <?php endif; ?>
                             </td>
                             <td class="px-4 py-2 text-center">
                                 <span class="flag-badge" data-flag="solicitada_cancelacion">
                                     <?php if ($op['solicitada_cancelacion']): ?>
-                                    <span class="px-2 py-0.5 rounded bg-primary-50 text-primary-700 text-[10px] font-bold">Sí</span>
+                                    <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black uppercase tracking-tight shadow-sm">Sí</span>
                                     <?php else: ?>
-                                    <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-bold">No</span>
+                                    <span class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-tight">No</span>
                                     <?php endif; ?>
                                 </span>
                             </td>
@@ -604,9 +604,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (result.success) {
                     if (result.nuevo_valor) {
-                        badgeContainer.innerHTML = `<span class="px-2 py-0.5 rounded bg-update-50 text-update-600 text-[10px] font-bold">Sí</span>`;
+                        badgeContainer.innerHTML = `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black uppercase tracking-tight shadow-sm">Sí</span>`;
                     } else {
-                        badgeContainer.innerHTML = `<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 text-[10px] font-bold">No</span>`;
+                        badgeContainer.innerHTML = `<span class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-tight">No</span>`;
                     }
                 } else {
                     alert(result.error || 'Error al actualizar');
