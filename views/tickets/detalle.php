@@ -448,7 +448,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
             ?>
             
             <div class="p-5 flex-1 overflow-y-auto custom-scrollbar space-y-6" id="activityStream" 
-                 style="position: relative; max-height: 500px; min-height: 400px;">
+                 style="position: relative; max-height: 300px; min-height: 200px;">
                 <!-- Línea vertical del timeline -->
                 <style>
                     #activityStream::before {
