@@ -267,17 +267,17 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                             <td class="px-4 py-2 text-right font-black"><?= $op['monto'] ? '$' . number_format($op['monto'], 2) : '-' ?></td>
                             <td class="px-4 py-2 text-center">
                                 <?php if ($op['requiere_cancelacion']): ?>
-                                <span class="px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-black uppercase tracking-tight shadow-sm">Sí</span>
+                                <span class="px-2.5 py-0.7 rounded-full bg-blue-100 text-blue-700 text-xs font-black uppercase tracking-tight shadow-sm">Sí</span>
                                 <?php else: ?>
-                                <span class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-tight">No</span>
+                                <span class="px-2.5 py-0.7 rounded-full bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-tight">No</span>
                                 <?php endif; ?>
                             </td>
                             <td class="px-4 py-2 text-center">
                                 <span class="flag-badge" data-flag="solicitada_cancelacion">
                                     <?php if ($op['solicitada_cancelacion']): ?>
-                                    <span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black uppercase tracking-tight shadow-sm">Sí</span>
+                                    <span class="px-2.5 py-0.7 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black uppercase tracking-tight shadow-sm">Sí</span>
                                     <?php else: ?>
-                                    <span class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-tight">No</span>
+                                    <span class="px-2.5 py-0.7 rounded-full bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-tight">No</span>
                                     <?php endif; ?>
                                 </span>
                             </td>
