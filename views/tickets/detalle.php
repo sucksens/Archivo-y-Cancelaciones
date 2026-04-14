@@ -402,7 +402,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
     
     <!-- Columna derecha (38%) - Stream de Actividad y Comentarios -->
     <div class="lg:w-[38%] flex flex-col">
-        <section class="bg-slate-50 rounded-xl shadow-lg border-2 border-slate-200 flex flex-col min-h-[600px] overflow-hidden lg:sticky lg:top-24">
+        <section class="bg-slate-50 rounded-xl shadow-lg border-2 border-slate-200 flex flex-col overflow-hidden lg:sticky lg:top-24">
             <!-- Header del panel -->
             <div class="p-4 bg-white border-b border-slate-200 flex items-center justify-between shadow-sm">
                 <div class="flex items-center gap-2">
@@ -447,8 +447,8 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
             });
             ?>
             
-            <div class="p-5 flex-1 overflow-y-auto custom-scrollbar space-y-6" id="activityStream" 
-                 style="position: relative; max-height: 300px; min-height: 200px;">
+            <div class="p-5 overflow-y-auto custom-scrollbar space-y-6" id="activityStream" 
+                 style="position: relative; max-height: 300px;">
                 <!-- Línea vertical del timeline -->
                 <style>
                     #activityStream::before {
