@@ -115,6 +115,9 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Factura</p>
                 <p class="font-bold text-slate-800 leading-tight"><?= $ticket['serie'] ?>-<?= $ticket['folio']?></p>
 
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Inventario</p>
+                <p class="font-bold text-slate-800 leading-tight"><?= $ticket['inventario'] ?></p>
+
                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tipo de Factura</p>
                 <p class="font-bold text-slate-800 leading-tight"><?= TIPOS_AUTO[$ticket['tipo_factura']] ?? $ticket['tipo_factura'] ?></p>
                 <!--
