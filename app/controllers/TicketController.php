@@ -428,19 +428,84 @@ class TicketController extends BaseController
             }
 
             $estadoAnterior = $ticket['estado'];
-            $this->ticketModel->updateStatus($id, $nuevoEstado, $this->userId());
             
-            // Registrar auditoría
-            $this->ticketModel->audit(
-                $id, 
-                $this->userId(), 
-                'Cambio de estado',
-                'estado',
-                $estadoAnterior,
-                $nuevoEstado
-            );
+            // Si es rechazado, procesar datos adicionales
+            if ($nuevoEstado === 'rechazado') {
+                $rechazadoPorError = $this->input('rechazado_por_error', 0);
+                $tipoError = $this->input('tipo_error_rechazo');
+                $comentario = $this->input('comentario_rechazo');
+                
+                // Validar datos de rechazo
+                if ($rechazadoPorError) {
+                    if (!in_array($tipoError, ['tipo_cancelacion', 'archivo_no_coincide'])) {
+                        $this->json(['error' => 'Tipo de error no válido'], 400);
+                    }
+                } else {
+                    // Si NO es por error, el comentario es obligatorio
+                    if (empty(trim($comentario))) {
+                        $this->json(['error' => 'El comentario es obligatorio para rechazos válidos'], 400);
+                    }
+                }
+                
+                // Actualizar ticket con datos de error
+                $updateData = [
+                    'estado' => $nuevoEstado,
+                    'rechazado_por_error' => $rechazadoPorError,
+                    'tipo_error_rechazo' => $rechazadoPorError ? $tipoError : null
+                ];
+                
+                $this->ticketModel->update($id, $updateData);
+                
+                // Agregar comentario usando el sistema existente si hay uno
+                if (!empty(trim($comentario))) {
+                    $this->comentarioModel->create([
+                        'ticket_id' => $id,
+                        'usuario_id' => $this->userId(),
+                        'comentario' => $comentario
+                    ]);
+                }
+                
+                // Registrar auditoría especial si es por error
+                if ($rechazadoPorError) {
+                    $this->ticketModel->audit(
+                        $id, 
+                        $this->userId(), 
+                        'Ticket rechazado por error',
+                        'tipo_error_rechazo',
+                        null,
+                        $tipoError
+                    );
+                    
+                    $this->log('Ticket rechazado por error', 'tickets', "ID: {$id}, Error: {$tipoError}");
+                } else {
+                    // Auditoría de rechazo normal (con comentario)
+                    $this->ticketModel->audit(
+                        $id, 
+                        $this->userId(), 
+                        'Ticket rechazado',
+                        'estado',
+                        $estadoAnterior,
+                        $nuevoEstado
+                    );
+                    
+                    $this->log('Ticket rechazado', 'tickets', "ID: {$id}, Comentario: {$comentario}");
+                }
+            } else {
+                // Flujo normal para otros estados
+                $this->ticketModel->updateStatus($id, $nuevoEstado, $this->userId());
+                
+                // Registrar auditoría
+                $this->ticketModel->audit(
+                    $id, 
+                    $this->userId(), 
+                    'Cambio de estado',
+                    'estado',
+                    $estadoAnterior,
+                    $nuevoEstado
+                );
 
-            $this->log('Cambio de estado de ticket', 'tickets', "ID: {$id}, {$estadoAnterior} -> {$nuevoEstado}");
+                $this->log('Cambio de estado de ticket', 'tickets', "ID: {$id}, {$estadoAnterior} -> {$nuevoEstado}");
+            }
 
             if ($this->isAjax()) {
                 $this->json([
@@ -1045,6 +1110,124 @@ class TicketController extends BaseController
 
         } catch (\Exception $e) {
             $this->json(['error' => 'Error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Corregir error de rechazo (solo Supervisor)
+     * 
+     * @param int $id ID del ticket
+     */
+    public function correctRejectionError(int $id): void
+    {
+        $this->requirePermission('tickets.correct_rejection_errors');
+
+        try {
+            $this->validateCsrf();
+
+            $ticket = $this->ticketModel->find($id);
+            if (!$ticket) {
+                $this->json(['error' => 'Ticket no encontrado'], 404);
+            }
+
+            if ($ticket['estado'] !== 'rechazado' || !$ticket['rechazado_por_error']) {
+                $this->json(['error' => 'Este ticket no está rechazado por error'], 400);
+            }
+
+            $accion = $this->input('accion');
+            $updateData = [];
+
+            switch ($accion) {
+                case 'actualizar_tipo':
+                    $nuevoTipo = $this->input('tipo_cancelacion');
+                    if (in_array($nuevoTipo, ['cancelacion_total', 'refacturacion'])) {
+                        $updateData['tipo_cancelacion'] = $nuevoTipo;
+                    } else {
+                        $this->json(['error' => 'Tipo de cancelación no válido'], 400);
+                    }
+                    break;
+
+                case 'subir_archivo':
+                    $fileData = $_FILES['nuevo_archivo'] ?? null;
+                    
+                    if (!$fileData || $fileData['error'] === UPLOAD_ERR_NO_FILE) {
+                        $this->json(['error' => 'El archivo es requerido'], 400);
+                    }
+                    
+                    $uploader = new FileUploadHelper();
+                    $filePath = $uploader->upload($fileData);
+                    
+                    if (!$filePath) {
+                        $errorMsg = $uploader->getFirstError() ?: 'Error al subir el archivo';
+                        $this->json(['error' => $errorMsg], 400);
+                    }
+                    
+                    // Eliminar archivo anterior
+                    if ($ticket['archivo_autorizacion']) {
+                        $uploader->delete($ticket['archivo_autorizacion']);
+                    }
+                    
+                    $updateData['archivo_autorizacion'] = $filePath;
+                    break;
+
+                default:
+                    $this->json(['error' => 'Acción no válida'], 400);
+            }
+
+            if (!empty($updateData)) {
+                $db = \App\Core\Database::getInstance();
+                $db->beginTransaction();
+
+                // Actualizar ticket
+                $updateData['rechazado_por_error'] = 0;
+                $updateData['tipo_error_rechazo'] = null;
+                $this->ticketModel->update($id, $updateData);
+
+                // Cambiar estado a pendiente para reprocesar
+                $this->ticketModel->updateStatus($id, 'pendiente', $this->userId());
+
+                // Auditoría
+                $detalleAccion = $accion === 'actualizar_tipo' 
+                    ? 'Tipo de cancelación actualizado' 
+                    : 'Archivo de autorización actualizado';
+                    
+                $this->ticketModel->audit(
+                    $id, 
+                    $this->userId(), 
+                    'Corrección de error de rechazo',
+                    $accion,
+                    $ticket[$accion === 'actualizar_tipo' ? 'tipo_cancelacion' : 'archivo_autorizacion'],
+                    $updateData[$accion === 'actualizar_tipo' ? 'tipo_cancelacion' : 'archivo_autorizacion']
+                );
+
+                $db->commit();
+
+                $this->log('Corrección de error de rechazo', 'tickets', "ID: {$id}, Acción: {$accion}");
+
+                if ($this->isAjax()) {
+                    $this->json([
+                        'success' => true,
+                        'message' => 'Error corregido correctamente. El ticket ahora está en estado pendiente.'
+                    ]);
+                }
+
+                $this->session->flash('success', 'Error corregido correctamente');
+                $this->redirect('/tickets/' . $id);
+            } else {
+                $this->json(['error' => 'No se realizaron cambios'], 400);
+            }
+
+        } catch (\Exception $e) {
+            $db = \App\Core\Database::getInstance();
+            if ($db->getConnection()->inTransaction()) {
+                $db->rollBack();
+            }
+
+            if ($this->isAjax()) {
+                $this->json(['error' => 'Error al corregir: ' . $e->getMessage()], 500);
+            }
+            $this->session->flash('error', 'Error al corregir el error');
+            $this->redirect('/tickets/' . $id);
         }
     }
 }

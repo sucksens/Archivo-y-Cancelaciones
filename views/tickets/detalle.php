@@ -85,6 +85,163 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
             </div>
         </div>
         
+        <!-- Panel de Corrección de Error (solo para tickets rechazados por error) -->
+        <?php if ($ticket['estado'] === 'rechazado' && $ticket['rechazado_por_error'] && \App\Helpers\PermissionHelper::hasPermission('tickets.correct_rejection_errors')): ?>
+        <section class="bg-orange-50 border-2 border-orange-200 rounded-xl p-5 mb-6 shadow-sm">
+            <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-bold text-orange-900 mb-2">Corrección de Error de Rechazo</h4>
+                    <p class="text-sm text-orange-800 mb-4">
+                        Este ticket fue marcado como rechazado por error: 
+                        <strong class="font-black bg-orange-200 px-2 py-0.5 rounded">
+                            <?= TIPOS_ERROR_RECHAZO[$ticket['tipo_error_rechazo']] ?? $ticket['tipo_error_rechazo'] ?>
+                        </strong>
+                    </p>
+                    
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <!-- Formulario: Actualizar tipo de cancelación -->
+                        <form id="formActualizarTipo" class="flex-1 bg-white rounded-lg p-4 border border-orange-200">
+                            <?= \App\Helpers\AuthHelper::getCsrfField() ?>
+                            <input type="hidden" name="accion" value="actualizar_tipo">
+                            
+                            <label class="block text-xs font-bold text-orange-900 uppercase tracking-wider mb-2">
+                                Corregir Tipo de Cancelación
+                            </label>
+                            
+                            <select name="tipo_cancelacion" 
+                                    class="w-full px-3 py-2 border border-orange-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 mb-3">
+                                <?php foreach (TIPOS_CANCELACION as $key => $label): ?>
+                                <option value="<?= $key ?>" <?= $ticket['tipo_cancelacion'] === $key ? '' : '' ?>>
+                                    <?= $label ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                            
+                            <button type="submit" 
+                                    class="w-full bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Actualizar Tipo
+                            </button>
+                        </form>
+                        
+                        <!-- Formulario: Subir nuevo archivo -->
+                        <form id="formSubirArchivo" class="flex-1 bg-white rounded-lg p-4 border border-orange-200">
+                            <?= \App\Helpers\AuthHelper::getCsrfField() ?>
+                            <input type="hidden" name="accion" value="subir_archivo">
+                            
+                            <label class="block text-xs font-bold text-orange-900 uppercase tracking-wider mb-2">
+                                Subir Archivo Correcto
+                            </label>
+                            
+                            <input type="file" 
+                                   name="nuevo_archivo" 
+                                   accept=".pdf,.xml" 
+                                   class="w-full px-3 py-2 border border-orange-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 mb-3"
+                                   required>
+                            
+                            <button type="submit" 
+                                    class="w-full bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                </svg>
+                                Subir Archivo
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <script>
+        // Formulario de actualización de tipo
+        const formActualizarTipo = document.getElementById('formActualizarTipo');
+        if (formActualizarTipo) {
+            formActualizarTipo.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const btn = this.querySelector('button[type="submit"]');
+                const originalContent = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = `<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Actualizando...`;
+                
+                try {
+                    const formData = new FormData(this);
+                    const response = await fetch(`<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/corregir-error`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok && result.success) {
+                        showToast(result.message, 'success');
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        showToast(result.error || 'Error al actualizar tipo', 'error');
+                        btn.innerHTML = originalContent;
+                        btn.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Error de conexión con el servidor', 'error');
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }
+            });
+        }
+        
+        // Formulario de subir archivo
+        const formSubirArchivo = document.getElementById('formSubirArchivo');
+        if (formSubirArchivo) {
+            formSubirArchivo.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const btn = this.querySelector('button[type="submit"]');
+                const originalContent = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = `<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Subiendo...`;
+                
+                try {
+                    const formData = new FormData(this);
+                    const response = await fetch(`<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/corregir-error`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok && result.success) {
+                        showToast(result.message, 'success');
+                        setTimeout(() => window.location.reload(), 1500);
+                    } else {
+                        showToast(result.error || 'Error al subir archivo', 'error');
+                        btn.innerHTML = originalContent;
+                        btn.disabled = false;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Error de conexión con el servidor', 'error');
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }
+            });
+        }
+        </script>
+        <?php endif; ?>
+        
         <!-- Grid de información del ticket -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
             <!-- Empresa Solicitante -->
@@ -925,5 +1082,208 @@ async function eliminarComentario(comentarioId) {
         console.error('Error:', error);
         showToast('Error de conexión con el servidor', 'error');
     }
+}
+
+// ============================================
+// MODAL DE RECHAZO
+// ============================================
+
+let rechazoData = {
+    rechazado_por_error: 0,
+    tipo_error_rechazo: null,
+    comentario_rechazo: null
+};
+
+// Detectar cambio a estado "rechazado"
+const estadoSelect = document.getElementById('estadoSelect');
+const statusForm = document.getElementById('statusForm');
+
+if (estadoSelect && statusForm) {
+    estadoSelect.addEventListener('change', function() {
+        if (this.value === 'rechazado') {
+            mostrarModalRechazo();
+        } else {
+            rechazoData = {
+                rechazado_por_error: 0,
+                tipo_error_rechazo: null,
+                comentario_rechazo: null
+            };
+        }
+    });
+}
+
+function mostrarModalRechazo() {
+    const modalContent = `
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+            <div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4 shadow-2xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-slate-800">Motivo de Rechazo</h3>
+                    <button onclick="cerrarModalRechazo()" class="text-slate-400 hover:text-slate-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Opción 1: Es un error -->
+                <div class="mb-4 p-4 border border-orange-200 bg-orange-50 rounded-lg">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" id="esError" class="rounded w-5 h-5 text-orange-600 border-orange-300" onchange="toggleTipoError()">
+                        <div>
+                            <span class="font-semibold text-orange-900">Marcar como rechazado por error</span>
+                            <p class="text-sm text-orange-700 mt-1">El sistema o un usuario cometió un error</p>
+                        </div>
+                    </label>
+                </div>
+                
+                <!-- Tipo de error (solo si es error) -->
+                <div id="tipoErrorContainer" class="hidden mb-4">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Tipo de Error:
+                    </label>
+                    <select id="tipoError" class="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                        <option value="">Seleccionar tipo de error</option>
+                        <option value="tipo_cancelacion">Tipo de Cancelación Incorrecto</option>
+                        <option value="archivo_no_coincide">Archivo no coincide con factura subida</option>
+                    </select>
+                </div>
+                
+                <!-- Opción 2: Comentario -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        Comentario (razón del cliente):
+                    </label>
+                    <textarea id="comentarioRechazo" rows="3" 
+                              class="w-full px-4 py-3 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                              placeholder="Explique por qué el cliente rechazó la cancelación..."></textarea>
+                </div>
+                
+                <!-- Botones -->
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="cerrarModalRechazo()" 
+                            class="px-5 py-2.5 text-slate-600 hover:text-slate-800 font-medium">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="confirmarRechazo()" 
+                            class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-lg font-bold shadow-md transition-all">
+                        Confirmar Rechazo
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Crear modal
+    const modalDiv = document.createElement('div');
+    modalDiv.id = 'modalRechazo';
+    modalDiv.innerHTML = modalContent;
+    document.body.appendChild(modalDiv);
+}
+
+function cerrarModalRechazo() {
+    const modal = document.getElementById('modalRechazo');
+    if (modal) {
+        modal.remove();
+        // Resetear el select al estado anterior
+        const estadoActual = '<?= $ticket['estado'] ?>';
+        estadoSelect.value = estadoActual;
+    }
+}
+
+function toggleTipoError() {
+    const esError = document.getElementById('esError').checked;
+    const tipoErrorContainer = document.getElementById('tipoErrorContainer');
+    
+    if (esError) {
+        tipoErrorContainer.classList.remove('hidden');
+    } else {
+        tipoErrorContainer.classList.add('hidden');
+    }
+}
+
+function confirmarRechazo() {
+    const esError = document.getElementById('esError').checked;
+    const tipoError = document.getElementById('tipoError').value;
+    const comentario = document.getElementById('comentarioRechazo').value.trim();
+    
+    // Validaciones
+    if (esError && !tipoError) {
+        showToast('Seleccione un tipo de error', 'error');
+        return;
+    }
+    
+    if (!esError && !comentario) {
+        showToast('Agregue un comentario sobre la razón del rechazo', 'error');
+        return;
+    }
+    
+    // Guardar datos
+    rechazoData = {
+        rechazado_por_error: esError ? 1 : 0,
+        tipo_error_rechazo: tipoError || null,
+        comentario_rechazo: comentario || null
+    };
+    
+    // Cerrar modal y continuar con el envío del formulario
+    const modal = document.getElementById('modalRechazo');
+    if (modal) {
+        modal.remove();
+    }
+    
+    // Enviar el formulario de estado
+    const btn = statusForm.querySelector('button[type="submit"]');
+    if (btn) {
+        btn.click();
+    }
+}
+
+// Interceptar el envío del formulario para agregar los datos de rechazo
+if (statusForm) {
+    const originalSubmit = statusForm.onsubmit;
+    
+    statusForm.addEventListener('submit', async function(e) {
+        if (estadoSelect.value === 'rechazado') {
+            e.preventDefault();
+            
+            // Crear FormData y agregar datos de rechazo
+            const formData = new FormData(statusForm);
+            formData.append('rechazado_por_error', rechazoData.rechazado_por_error);
+            if (rechazoData.tipo_error_rechazo) {
+                formData.append('tipo_error_rechazo', rechazoData.tipo_error_rechazo);
+            }
+            if (rechazoData.comentario_rechazo) {
+                formData.append('comentario_rechazo', rechazoData.comentario_rechazo);
+            }
+            
+            const btn = this.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+            
+            try {
+                const response = await fetch(`<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/estado`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    showToast('Estado actualizado correctamente', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showToast('Error al actualizar estado', 'error');
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error de conexión', 'error');
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            }
+        }
+    });
 }
 </script>
