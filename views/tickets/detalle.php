@@ -951,13 +951,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (result.success) {
                     showToast('Comentario publicado correctamente', 'success');
 
-                    if (result.comentario) {
-                        addComentarioToUI(result.comentario);
-                    }
-
                     formComentario.reset();
                     btn.innerHTML = btnOriginalContent;
                     btn.disabled = false;
+
+                    setTimeout(() => window.location.reload(), 1500);
                 } else {
                     showToast(result.error || 'Error al publicar comentario', 'error');
                     btn.innerHTML = btnOriginalContent;
@@ -1012,48 +1010,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-// Función para agregar comentario al DOM
-function addComentarioToUI(comentario) {
-    const lista = document.getElementById('listaActividades');
-    const emptyState = lista.querySelector('.text-center');
-    if (emptyState) {
-        emptyState.remove();
-    }
-
-    const isAdmin = comentario.rol_nombre === 'Administrador';
-    const bgColor = isAdmin ? 'bg-red-500' : 'bg-primary-600';
-    const cardBorder = isAdmin ? 'border-red-100' : 'border-primary-100';
-    const badgeClass = isAdmin ? 'bg-red-100 text-red-700' : 'bg-primary-100 text-primary-700';
-
-    const html = `
-        <div class="relative z-10 flex gap-4 animate-slide-in" id="comentario-${comentario.id}">
-            <div class="w-8 h-8 rounded-full ${bgColor} flex-shrink-0 flex items-center justify-center text-white font-bold text-xs ring-4 ring-slate-50">
-                ${comentario.usuario_nombre.substring(0, 2).toUpperCase()}
-            </div>
-            <div class="flex-1">
-                <div class="bg-white p-4 rounded-xl shadow-sm border-2 ${cardBorder}">
-                    <div class="flex justify-between items-center mb-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-black text-slate-800">${comentario.usuario_nombre}</span>
-                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ${badgeClass}">
-                                ${comentario.rol_nombre}
-                            </span>
-                        </div>
-                        <span class="text-[10px] text-slate-400 font-medium">hace un momento</span>
-                    </div>
-                    <p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line">${comentario.comentario}</p>
-                </div>
-            </div>
-        </div>
-    `;
-
-    lista.insertAdjacentHTML('beforeend', html);
-    
-    // Scroll to new comment
-    const activityStream = document.getElementById('activityStream');
-    activityStream.scrollTop = activityStream.scrollHeight;
-}
 
 // Función para eliminar comentario
 async function eliminarComentario(comentarioId) {
