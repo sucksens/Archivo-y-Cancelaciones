@@ -31,8 +31,8 @@ class User
     public function find(int $id): ?array
     {
         $sql = "SELECT id, username, email, nombre_completo, empresa, departamento, 
-                       activo, fecha_creacion, ultimo_login
-                FROM {$this->table} WHERE id = ?";
+                       especialidad_usuario, activo, fecha_creacion, ultimo_login
+                 FROM {$this->table} WHERE id = ?";
         return $this->db->fetchOne($sql, [$id]);
     }
 
@@ -115,8 +115,8 @@ class User
     public function create(array $data): ?int
     {
         $sql = "INSERT INTO {$this->table} 
-                (username, email, password_hash, nombre_completo, empresa, departamento, activo)
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+                (username, email, password_hash, nombre_completo, empresa, departamento, especialidad_usuario, activo)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         
         $passwordHash = AuthHelper::hashPassword($data['password']);
         
@@ -127,6 +127,7 @@ class User
             $data['nombre_completo'],
             $data['empresa'],
             $data['departamento'] ?? null,
+            $data['especialidad_usuario'] ?? 'ambos',
             $data['activo'] ?? 1
         ]);
 
@@ -149,7 +150,7 @@ class User
             if ($key === 'password') {
                 $fields[] = 'password_hash = ?';
                 $values[] = AuthHelper::hashPassword($value);
-            } elseif (in_array($key, ['username', 'email', 'nombre_completo', 'empresa', 'departamento', 'activo'])) {
+            } elseif (in_array($key, ['username', 'email', 'nombre_completo', 'empresa', 'departamento', 'especialidad_usuario', 'activo'])) {
                 $fields[] = "{$key} = ?";
                 $values[] = $value;
             }
@@ -193,12 +194,12 @@ class User
         $where = ['1=1'];
         $params = [];
 
-        if (!empty($filters['empresa'])) {
+        if (!empty($filters['empresa']) && $filters['empresa'] !== 'ambas') {
             $where[] = 'empresa = ?';
             $params[] = $filters['empresa'];
         }
 
-        if (isset($filters['activo'])) {
+        if (isset($filters['activo']) && $filters['activo'] !== '') {
             $where[] = 'activo = ?';
             $params[] = $filters['activo'];
         }
@@ -207,6 +208,19 @@ class User
             $where[] = '(username LIKE ? OR email LIKE ? OR nombre_completo LIKE ?)';
             $search = '%' . $filters['search'] . '%';
             $params = array_merge($params, [$search, $search, $search]);
+        }
+
+        if (!empty($filters['rol'])) {
+            $where[] = 'EXISTS (
+                SELECT 1 FROM usuario_rol ur 
+                WHERE ur.usuario_id = usuarios.id AND ur.rol_id = ?
+            )';
+            $params[] = $filters['rol'];
+        }
+
+        if (!empty($filters['especialidad'])) {
+            $where[] = 'especialidad_usuario = ?';
+            $params[] = $filters['especialidad'];
         }
 
         $whereClause = implode(' AND ', $where);
@@ -218,7 +232,7 @@ class User
 
         // Obtener registros
         $sql = "SELECT id, username, email, nombre_completo, empresa, departamento, 
-                       activo, fecha_creacion, ultimo_login
+                       especialidad_usuario, activo, fecha_creacion, ultimo_login
                 FROM {$this->table} 
                 WHERE {$whereClause}
                 ORDER BY nombre_completo ASC
@@ -398,6 +412,36 @@ class User
                 WHERE id = ?";
         
         $this->db->query($sql, [$hash, $user['id']]);
+        return true;
+    }
+
+    /**
+     * Obtener especialidad del usuario
+     * 
+     * @param int $userId ID del usuario
+     * @return string|null Especialidad del usuario
+     */
+    public function getUserEspecialidad(int $userId): ?string
+    {
+        $sql = "SELECT especialidad_usuario FROM {$this->table} WHERE id = ?";
+        return $this->db->fetchColumn($sql, [$userId]);
+    }
+
+    /**
+     * Actualizar especialidad del usuario
+     * 
+     * @param int $userId ID del usuario
+     * @param string $especialidad Nueva especialidad
+     * @return bool
+     */
+    public function updateEspecialidad(int $userId, string $especialidad): bool
+    {
+        if (!array_key_exists($especialidad, ESPECIALIDADES_USUARIO)) {
+            return false;
+        }
+
+        $sql = "UPDATE {$this->table} SET especialidad_usuario = ? WHERE id = ?";
+        $this->db->query($sql, [$especialidad, $userId]);
         return true;
     }
 }

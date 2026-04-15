@@ -38,6 +38,7 @@
                 </select>
             </div>
             
+            <?php if (!($isConsultaWithEspecialidad ?? false)): ?>
             <div class="w-40">
                 <select name="tipo_factura" class="form-select">
                     <option value="">Todas las facturas</option>
@@ -48,6 +49,16 @@
                     <?php endforeach; ?>
                 </select>
             </div>
+            <?php else: ?>
+            <!-- Filtro deshabilitado para rol Consulta con especialidad -->
+            <div class="w-40">
+                <select name="tipo_factura" class="form-select bg-gray-100 cursor-not-allowed" disabled>
+                    <option value="<?= $filters['tipo_factura'] ?? '' ?>" selected>
+                        <?= htmlspecialchars($userEspecialidadLabel) ?>
+                    </option>
+                </select>
+            </div>
+            <?php endif; ?>
 
             <div class="w-40">
                 <input type="date" name="fecha_desde" value="<?= htmlspecialchars($filters['fecha_desde'] ?? '') ?>" 
@@ -129,10 +140,20 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <?php $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'color' => 'gray']; ?>
-                        <span class="badge badge-<?= $estadoInfo['color'] ?>">
-                            <?= $estadoInfo['label'] ?>
-                        </span>
+                        <div class="flex items-center gap-2">
+                            <?php $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'color' => 'gray']; ?>
+                            <span class="badge badge-<?= $estadoInfo['color'] ?>">
+                                <?= $estadoInfo['label'] ?>
+                            </span>
+                            <?php if (!empty($ticket['rechazado_por_error'] ?? 0)): ?>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-800" title="Rechazado por error">
+                                <svg class="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"/>
+                                </svg>
+                                Error
+                            </span>
+                            <?php endif; ?>
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <?= date('d/m/Y', strtotime($ticket['fecha_creacion'])) ?>
@@ -145,17 +166,6 @@
                            class="text-primary-600 hover:text-primary-700 font-medium text-sm mr-3">
                             Ver detalle →
                         </a>
-                        <?php if ($canVerifySat && in_array($ticket['estado'], ['pendiente', 'en_revision'])): ?>
-                        <button type="button" 
-                                onclick="verifySatStatus(<?= $ticket['id'] ?>)"
-                                class="text-orange-600 hover:text-orange-700 font-medium text-sm"
-                                title="Verificar status en SAT">
-                            <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            Verificar SAT
-                        </button>
-                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

@@ -15,8 +15,8 @@ $user = AuthHelper::getUser();
 
 <div class="max-w-3xl mx-auto">
     <div class="mb-6">
-        <a href="<?= BASE_URL ?>facturas" class="text-primary-600 hover:text-primary-800 inline-flex items-center">
-            <i class="fas fa-arrow-left mr-2"></i>Volver a Facturas
+        <a href="<?= BASE_URL ?>facturas" class="btn btn-secondary inline-flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i> <- Volver a Facturas
         </a>
     </div>
 
@@ -35,22 +35,6 @@ $user = AuthHelper::getUser();
 
         <form action="<?= BASE_URL ?>facturas" method="POST" enctype="multipart/form-data" class="p-6">
             <input type="hidden" name="_csrf_token" value="<?= $_SESSION['_csrf_token'] ?? '' ?>">
-            <!-- Información 
-            <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-info-circle text-blue-500"></i>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-blue-800">Información</h3>
-                        <div class="mt-2 text-sm text-blue-700">
-                            <p>Tu empresa: <strong><?= htmlspecialchars($empresas[$user['empresa']] ?? $user['empresa']) ?></strong></p>
-                            <p class="mt-1">Solo puedes subir facturas de tu empresa. El UUID será validado contra el sistema administrativo.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label for="empresa" class="block text-sm font-medium text-gray-700 mb-1">Empresa <span class="text-red-500">*</span></label>

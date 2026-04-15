@@ -48,6 +48,7 @@ unset($_SESSION['old_input']);
                     </select>
                 </div>
                 <?php endif; ?>
+                <?php if (!($isConsultaWithEspecialidad ?? false)): ?>
                 <div>
                     <label for="tipo_factura" class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
                     <select name="tipo_factura" id="tipo_factura" class="form-select rounded-lg border-gray-300 focus:ring-primary-500 focus:border-primary-500">
@@ -59,6 +60,17 @@ unset($_SESSION['old_input']);
                         <?php endforeach; ?>
                     </select>
                 </div>
+                <?php else: ?>
+                <!-- Filtro deshabilitado para rol Consulta con especialidad -->
+                <div>
+                    <label for="tipo_factura" class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                    <select name="tipo_factura" id="tipo_factura" class="form-select rounded-lg border-gray-300 bg-gray-100 cursor-not-allowed" disabled>
+                        <option value="<?= $filters['tipo_factura'] ?? '' ?>" selected>
+                            <?= htmlspecialchars($userEspecialidadLabel) ?>
+                        </option>
+                    </select>
+                </div>
+                <?php endif; ?>
                 <div>
                     <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
                     <input type="text" name="search" id="search" placeholder="UUID, serie, folio..." 
@@ -76,8 +88,8 @@ unset($_SESSION['old_input']);
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UUID</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Empresa</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inventario</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serie/Folio</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
@@ -97,16 +109,17 @@ unset($_SESSION['old_input']);
                 <?php else: ?>
                 <?php foreach ($facturas as $factura): ?>
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>" class="font-mono text-primary-600 hover:text-primary-900 transition-colors" title="<?= htmlspecialchars($factura['uuid_factura']) ?>">
-                            <?= htmlspecialchars(substr($factura['uuid_factura'], 0, 8)) ?>...
-                        </a>
-                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                            <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 'bg-red-100 text-red-800' ?>">
+                            <?= $factura['empresa'] === 'grupo_motormexa' ? 'bg-blue-100 text-blue-800' : 
+                               ($factura['empresa'] === 'ambas' ? 'bg-purple-100 text-purple-800' : 'bg-red-100 text-red-800') ?>">
                             <?= htmlspecialchars($empresas[$factura['empresa']] ?? $factura['empresa']) ?>
                         </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>" class="font-mono text-primary-600 hover:text-primary-900 transition-colors" title="<?= $factura['inventario'] ?>">
+                            <?= $factura['inventario'] ?>
+                        </a>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <?= htmlspecialchars($tipos_auto[$factura['tipo_factura']] ?? $factura['tipo_factura']) ?>

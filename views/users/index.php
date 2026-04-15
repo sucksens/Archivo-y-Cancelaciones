@@ -19,13 +19,36 @@
                 </select>
             </div>
             
+            <div class="w-40">
+                <select name="especialidad" class="form-select">
+                    <option value="">Todas las especialidades</option>
+                    <?php foreach ($especialidades as $key => $label): ?>
+                    <option value="<?= $key ?>" <?= ($especialidades[$key]['label'] ?? '') === $key ? 'selected' : '' ?>>
+                        <?= $especialidades[$key]['label'] ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="w-40">
+                <select name="rol" class="form-select">
+                    <option value="">Todos los roles</option>
+                    <?php foreach ($roles as $role): ?>
+                    <option value="<?= $role['id'] ?>" <?= ($filters['rol'] ?? '') === $role['id'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($role['nombre']) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
             <div class="w-32">
                 <select name="activo" class="form-select">
-                    <option value="">Todos</option>
+                    <option value="">Todos Estados</option>
                     <option value="1" <?= ($filters['activo'] ?? '') === '1' ? 'selected' : '' ?>>Activos</option>
                     <option value="0" <?= ($filters['activo'] ?? '') === '0' ? 'selected' : '' ?>>Inactivos</option>
                 </select>
             </div>
+            
             
             <div class="flex gap-2">
                 <button type="submit" class="btn btn-primary">

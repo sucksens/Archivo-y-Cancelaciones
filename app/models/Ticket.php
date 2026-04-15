@@ -80,9 +80,9 @@ class Ticket
         $sql = "INSERT INTO {$this->table} 
                 (uuid, usuario_id, empresa_solicitante, tipo_factura, uuid_factura, serie, folio, 
                  inventario, nombre_cliente, total_factura, rfc_receptor, 
-                 tipo_cancelacion, motivo, archivo_autorizacion, estado,
+                 tipo_cancelacion, uuid_factura_nueva, motivo, archivo_autorizacion, estado,
                  fecfac, id_pedido, id_vendedor, id_suc)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?, ?, ?, ?)";
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?, ?, ?, ?)";
         
         $this->db->query($sql, [
             $uuid,
@@ -97,6 +97,7 @@ class Ticket
             $data['total_factura'],
             $data['rfc_receptor'],
             $data['tipo_cancelacion'],
+            $data['uuid_factura_nueva'] ?? null,
             $data['motivo'],
             $data['archivo_autorizacion'],
             $data['fecfac'] ?? null,
@@ -120,9 +121,10 @@ class Ticket
         $allowedFields = [
             'empresa_solicitante', 'tipo_factura', 'uuid_factura', 'serie', 'folio', 'inventario',
             'nombre_cliente', 'total_factura', 'rfc_receptor', 'tipo_cancelacion',
-            'motivo', 'archivo_autorizacion', 'estado', 'fecha_envio_cancelacion',
-            'fecha_cancelacion_sat', 'completado_por', 'fecfac', 'id_pedido', 
-            'id_vendedor', 'id_suc'
+            'uuid_factura_nueva', 'motivo', 'archivo_autorizacion', 'estado', 'fecha_envio_cancelacion',
+            'fecha_cancelacion_sat', 'completado_por', 'fecfac', 'id_pedido',
+            'id_vendedor', 'id_suc',
+            'rechazado_por_error', 'tipo_error_rechazo'
         ];
 
         $fields = [];
@@ -194,10 +196,16 @@ class Ticket
      * @param int $limit Límite
      * @return array
      */
-    public function getAll(array $filters = [], int $page = 1, int $limit = ITEMS_PER_PAGE): array
+    public function getAll(array $filters = [], int $page = 1, int $limit = ITEMS_PER_PAGE, array $baseConditions = []): array
     {
         $where = ['1=1'];
         $params = [];
+        
+        // Aplicar condiciones base (para getByEmpresa)
+        foreach ($baseConditions as $condition => $value) {
+            $where[] = $condition;
+            $params[] = $value;
+        }
 
         if (!empty($filters['usuario_id'])) {
             $where[] = 't.usuario_id = ?';
@@ -205,8 +213,12 @@ class Ticket
         }
 
         if (!empty($filters['empresa'])) {
-            $where[] = 't.empresa_solicitante = ?';
-            $params[] = $filters['empresa'];
+            if ($filters['empresa'] === 'ambas') {
+                // No filtrar por empresa - ver ambas
+            } else {
+                $where[] = 't.empresa_solicitante = ?';
+                $params[] = $filters['empresa'];
+            }
         }
 
         if (!empty($filters['estado'])) {
@@ -292,8 +304,13 @@ class Ticket
      */
     public function getByEmpresa(string $empresa, int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
     {
-        $filters['empresa'] = $empresa;
-        return $this->getAll($filters, $page, $limit);
+        $baseConditions = [];
+        
+        if ($empresa !== 'ambas') {
+            $baseConditions['t.empresa_solicitante = ?'] = $empresa;
+        }
+        
+        return $this->getAll($filters, $page, $limit, $baseConditions);
     }
 
     /**
@@ -357,12 +374,13 @@ class Ticket
                     SUM(CASE WHEN estado = 'proceso_cancelacion' THEN 1 ELSE 0 END) as en_proceso,
                     SUM(CASE WHEN estado = 'cancelado' THEN 1 ELSE 0 END) as cancelados,
                     SUM(CASE WHEN estado = 'rechazado' THEN 1 ELSE 0 END) as rechazados,
-                    SUM(CASE WHEN estado = 'completado' THEN 1 ELSE 0 END) as completados
+                    SUM(CASE WHEN estado = 'completado' THEN 1 ELSE 0 END) as completados,
+                    SUM(CASE WHEN estado = 'liberado' THEN 1 ELSE 0 END) as liberados
                 FROM {$this->table} {$where}";
 
         return $this->db->fetchOne($sql, $params) ?: [
             'total' => 0, 'pendientes' => 0, 'en_revision' => 0,
-            'en_proceso' => 0, 'cancelados' => 0, 'rechazados' => 0, 'completados' => 0
+            'en_proceso' => 0, 'cancelados' => 0, 'rechazados' => 0, 'completados' => 0, 'liberados' => 0
         ];
     }
 

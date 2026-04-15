@@ -38,7 +38,9 @@ class UserController extends BaseController
         $filters = [
             'empresa' => $this->input('empresa'),
             'activo' => $this->input('activo'),
-            'search' => $this->input('search')
+            'search' => $this->input('search'),
+            'rol' => $this->input('rol'),
+            'especialidad' => $this->input('especialidad')
         ];
 
         $result = $this->userModel->getAll($filters, $page);
@@ -48,7 +50,9 @@ class UserController extends BaseController
             'users' => $result['data'],
             'pagination' => $result,
             'filters' => $filters,
-            'empresas' => EMPRESAS
+            'empresas' => EMPRESAS,
+            'especialidades' => ESPECIALIDADES_USUARIO,
+            'roles' => $this->roleModel->getAll()
         ]);
     }
 
@@ -89,7 +93,8 @@ class UserController extends BaseController
                 ->required('password', 'La contraseña es requerida')
                 ->minLength('password', 8)
                 ->required('empresa', 'La empresa es requerida')
-                ->in('empresa', array_keys(EMPRESAS));
+                ->in('empresa', array_keys(EMPRESAS))
+                ->in('especialidad_usuario', array_keys(ESPECIALIDADES_USUARIO), 'Seleccione una especialidad válida');
 
             if ($validator->hasErrors()) {
                 $this->session->flash('error', $validator->getFirstError());
@@ -116,6 +121,7 @@ class UserController extends BaseController
                 'nombre_completo' => ValidationHelper::sanitize($_POST['nombre_completo']),
                 'empresa' => $_POST['empresa'],
                 'departamento' => ValidationHelper::sanitize($_POST['departamento'] ?? ''),
+                'especialidad_usuario' => $_POST['especialidad_usuario'] ?? 'ambos',
                 'activo' => isset($_POST['activo']) ? 1 : 0
             ]);
 
@@ -188,7 +194,8 @@ class UserController extends BaseController
                 ->email('email')
                 ->required('nombre_completo', 'El nombre completo es requerido')
                 ->required('empresa', 'La empresa es requerida')
-                ->in('empresa', array_keys(EMPRESAS));
+                ->in('empresa', array_keys(EMPRESAS))
+                ->in('especialidad_usuario', array_keys(ESPECIALIDADES_USUARIO), 'Seleccione una especialidad válida');
 
             if ($validator->hasErrors()) {
                 $this->session->flash('error', $validator->getFirstError());
@@ -213,6 +220,7 @@ class UserController extends BaseController
                 'nombre_completo' => ValidationHelper::sanitize($_POST['nombre_completo']),
                 'empresa' => $_POST['empresa'],
                 'departamento' => ValidationHelper::sanitize($_POST['departamento'] ?? ''),
+                'especialidad_usuario' => $_POST['especialidad_usuario'] ?? 'ambos',
                 'activo' => isset($_POST['activo']) ? 1 : 0
             ];
 

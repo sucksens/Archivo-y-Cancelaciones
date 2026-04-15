@@ -12,6 +12,7 @@ namespace App\Controllers;
 use App\Core\BaseController;
 use App\Models\Ticket;
 use App\Models\FacturaOperacion;
+use App\Models\ComentarioTicket;
 use App\Helpers\ValidationHelper;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\PermissionHelper;
@@ -21,6 +22,7 @@ class TicketController extends BaseController
 {
     private Ticket $ticketModel;
     private FacturaOperacion $operacionModel;
+    private ComentarioTicket $comentarioModel;
 
     public function __construct()
     {
@@ -28,6 +30,7 @@ class TicketController extends BaseController
         $this->requireAuth();
         $this->ticketModel = new Ticket();
         $this->operacionModel = new FacturaOperacion();
+        $this->comentarioModel = new ComentarioTicket();
     }
 
     /**
@@ -116,6 +119,14 @@ class TicketController extends BaseController
             'search' => $this->input('search')
         ];
 
+        // Aplicar filtro automático para rol Consulta con especialidad
+        if (PermissionHelper::isConsulta()) {
+            $especialidadFilter = PermissionHelper::getConsultaTipoFacturaFilter();
+            if ($especialidadFilter) {
+                $filters['tipo_factura'] = $especialidadFilter;
+            }
+        }
+
         $result = $this->ticketModel->getByEmpresa($empresa, $page, ITEMS_PER_PAGE, $filters);
 
         $canVerifySat = PermissionHelper::hasPermission('tickets.verify_sat');
@@ -128,7 +139,10 @@ class TicketController extends BaseController
             'estados' => TICKET_ESTADOS,
             'tipos' => TIPOS_CANCELACION,
             'tipos_auto' => TIPOS_AUTO,
-            'canVerifySat' => $canVerifySat
+            'canVerifySat' => $canVerifySat,
+            'isConsultaWithEspecialidad' => PermissionHelper::isConsultaWithEspecialidad(),
+            'userEspecialidadLabel' => PermissionHelper::getUserEspecialidad() ? 
+                (ESPECIALIDADES_USUARIO[PermissionHelper::getUserEspecialidad()]['label'] ?? '') : ''
         ]);
     }
 
@@ -157,6 +171,13 @@ class TicketController extends BaseController
     public function store(): void
     {
         $this->requirePermission('tickets.create');
+
+        // Validación: Usuarios con empresa='ambas' no pueden crear tickets
+        $userCompany = \App\Helpers\PermissionHelper::getUserCompany();
+        if ($userCompany === 'ambas') {
+            $this->session->flash('error', 'Usuarios con acceso a ambas empresas no pueden crear tickets');
+            $this->redirect('/tickets/crear');
+        }
 
         $db = \App\Core\Database::getInstance();
         $ticketId = null;
@@ -355,9 +376,11 @@ class TicketController extends BaseController
         }
 
         // Verificar permisos
+        $userCompany = PermissionHelper::getUserCompany();
         $canView = $this->hasPermission('tickets.view.all') 
                 || ($this->hasPermission('tickets.view.own') && $ticket['usuario_id'] === $this->userId())
-                || ($this->hasPermission('tickets.view.empresa') && $ticket['empresa_solicitante'] === PermissionHelper::getUserCompany());
+                || ($this->hasPermission('tickets.view.empresa') && 
+                    ($ticket['empresa_solicitante'] === $userCompany || $userCompany === 'ambas'));
 
 
         if (!$canView) {
@@ -366,15 +389,19 @@ class TicketController extends BaseController
             exit;
         }
 
+        $comentarios = $this->comentarioModel->getByTicket($id);
+
         $this->view('tickets/detalle', [
             'title' => 'Ticket #' . $ticket['id'],
             'ticket' => $ticket,
             'estados' => TICKET_ESTADOS,
             'tipos_operacion' => TIPOS_OPERACION,
             'tipos_auto' => TIPOS_AUTO,
+            'comentarios' => $comentarios,
             'canEdit' => $this->hasPermission('tickets.edit'),
             'canChangeStatus' => $this->hasPermission('tickets.status'),
-            'canProcess' => $this->hasPermission('tickets.process')
+            'canProcess' => $this->hasPermission('tickets.process'),
+            'canVerifySat' => $this->hasPermission('tickets.verify_sat')
         ]);
     }
 
@@ -401,19 +428,84 @@ class TicketController extends BaseController
             }
 
             $estadoAnterior = $ticket['estado'];
-            $this->ticketModel->updateStatus($id, $nuevoEstado, $this->userId());
             
-            // Registrar auditoría
-            $this->ticketModel->audit(
-                $id, 
-                $this->userId(), 
-                'Cambio de estado',
-                'estado',
-                $estadoAnterior,
-                $nuevoEstado
-            );
+            // Si es rechazado, procesar datos adicionales
+            if ($nuevoEstado === 'rechazado') {
+                $rechazadoPorError = $this->input('rechazado_por_error', 0);
+                $tipoError = $this->input('tipo_error_rechazo');
+                $comentario = $this->input('comentario_rechazo');
+                
+                // Validar datos de rechazo
+                if ($rechazadoPorError) {
+                    if (!in_array($tipoError, ['tipo_cancelacion', 'archivo_no_coincide'])) {
+                        $this->json(['error' => 'Tipo de error no válido'], 400);
+                    }
+                } else {
+                    // Si NO es por error, el comentario es obligatorio
+                    if (empty(trim($comentario))) {
+                        $this->json(['error' => 'El comentario es obligatorio para rechazos válidos'], 400);
+                    }
+                }
+                
+                // Actualizar ticket con datos de error
+                $updateData = [
+                    'estado' => $nuevoEstado,
+                    'rechazado_por_error' => $rechazadoPorError,
+                    'tipo_error_rechazo' => $rechazadoPorError ? $tipoError : null
+                ];
+                
+                $this->ticketModel->update($id, $updateData);
+                
+                // Agregar comentario usando el sistema existente si hay uno
+                if (!empty(trim($comentario))) {
+                    $this->comentarioModel->create([
+                        'ticket_id' => $id,
+                        'usuario_id' => $this->userId(),
+                        'comentario' => $comentario
+                    ]);
+                }
+                
+                // Registrar auditoría especial si es por error
+                if ($rechazadoPorError) {
+                    $this->ticketModel->audit(
+                        $id, 
+                        $this->userId(), 
+                        'Ticket rechazado por error',
+                        'tipo_error_rechazo',
+                        null,
+                        $tipoError
+                    );
+                    
+                    $this->log('Ticket rechazado por error', 'tickets', "ID: {$id}, Error: {$tipoError}");
+                } else {
+                    // Auditoría de rechazo normal (con comentario)
+                    $this->ticketModel->audit(
+                        $id, 
+                        $this->userId(), 
+                        'Ticket rechazado',
+                        'estado',
+                        $estadoAnterior,
+                        $nuevoEstado
+                    );
+                    
+                    $this->log('Ticket rechazado', 'tickets', "ID: {$id}, Comentario: {$comentario}");
+                }
+            } else {
+                // Flujo normal para otros estados
+                $this->ticketModel->updateStatus($id, $nuevoEstado, $this->userId());
+                
+                // Registrar auditoría
+                $this->ticketModel->audit(
+                    $id, 
+                    $this->userId(), 
+                    'Cambio de estado',
+                    'estado',
+                    $estadoAnterior,
+                    $nuevoEstado
+                );
 
-            $this->log('Cambio de estado de ticket', 'tickets', "ID: {$id}, {$estadoAnterior} -> {$nuevoEstado}");
+                $this->log('Cambio de estado de ticket', 'tickets', "ID: {$id}, {$estadoAnterior} -> {$nuevoEstado}");
+            }
 
             if ($this->isAjax()) {
                 $this->json([
@@ -432,6 +524,79 @@ class TicketController extends BaseController
                 $this->json(['error' => 'Error al actualizar estado'], 500);
             }
             $this->session->flash('error', 'Error al actualizar estado');
+            $this->redirect('/tickets/' . $id);
+        }
+    }
+
+    /**
+     * Actualizar el UUID de la factura nueva (solo rol Usuario en estado liberado)
+     *
+     * @param int $id ID del ticket
+     */
+    public function updateUuidFacturaNueva(int $id): void
+    {
+        if (!PermissionHelper::isRegularUser()) {
+            if ($this->isAjax()) {
+                $this->json(['error' => 'Solo usuarios pueden ingresar el UUID de factura nueva'], 403);
+            }
+            http_response_code(403);
+            exit('Acceso denegado');
+        }
+
+        $ticket = $this->ticketModel->find($id);
+        if (!$ticket) {
+            $this->json(['error' => 'Ticket no encontrado'], 404);
+        }
+
+        if ($ticket['tipo_cancelacion'] !== 'refacturacion') {
+            $this->json(['error' => 'Este ticket no es de refacturación'], 400);
+        }
+
+        if ($ticket['estado'] !== 'liberado') {
+            $this->json(['error' => 'El ticket debe estar en estado Liberado'], 400);
+        }
+
+        $uuid = trim($this->input('uuid_factura_nueva'));
+        if (empty($uuid)) {
+            $this->json(['error' => 'El UUID es requerido'], 400);
+        }
+
+        if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $uuid)) {
+            $this->json(['error' => 'El UUID no tiene el formato válido'], 400);
+        }
+
+        try {
+            $this->validateCsrf();
+
+            $this->ticketModel->update($id, ['uuid_factura_nueva' => $uuid]);
+
+            $this->ticketModel->audit(
+                $id,
+                $this->userId(),
+                'Ingreso UUID factura nueva',
+                'uuid_factura_nueva',
+                null,
+                $uuid
+            );
+
+            $this->log('UUID de factura nueva actualizado', 'tickets', "ID: {$id}, UUID: {$uuid}");
+
+            if ($this->isAjax()) {
+                $this->json([
+                    'success' => true,
+                    'message' => 'UUID de factura nueva actualizado correctamente',
+                    'uuid_factura_nueva' => $uuid
+                ]);
+            }
+
+            $this->session->flash('success', 'UUID de factura nueva actualizado correctamente');
+            $this->redirect('/tickets/' . $id);
+
+        } catch (\Exception $e) {
+            if ($this->isAjax()) {
+                $this->json(['error' => 'Error al actualizar UUID'], 500);
+            }
+            $this->session->flash('error', 'Error al actualizar UUID');
             $this->redirect('/tickets/' . $id);
         }
     }
@@ -543,7 +708,7 @@ class TicketController extends BaseController
             }
 
             $flag = $this->input('flag');
-            $allowedFlags = ['cancelada', 'cancelado_sistema', 'cancelado_sat'];
+            $allowedFlags = ['solicitada_cancelacion', 'cancelado_sistema', 'cancelado_sat'];
 
             if (!in_array($flag, $allowedFlags)) {
                 $this->json(['error' => 'Bandera no válida'], 400);
@@ -552,16 +717,16 @@ class TicketController extends BaseController
             $nuevoValor = $operacion[$flag] ? 0 : 1;
             $updateData = [$flag => $nuevoValor];
 
-            // Si se marca como cancelado, guardamos la fecha
+            // Si se marca como cancelado, guardamos la fecha (fecha_cancelacion se maneja via trigger)
             if ($nuevoValor === 1) {
-                if ($flag === 'cancelada' || $flag === 'cancelado_sistema') {
+                if ($flag === 'cancelado_sistema') {
                     $updateData['fecha_cancelacion'] = date('Y-m-d H:i:s');
                 } elseif ($flag === 'cancelado_sat') {
                     $updateData['fecha_cancelacion_sat'] = date('Y-m-d H:i:s');
                 }
             } else {
                 // Si se desmarca, podríamos limpiar la fecha, pero mejor dejarla como histórico o limpiarla según regla de negocio
-                if ($flag === 'cancelada' || $flag === 'cancelado_sistema') {
+                if ($flag === 'cancelado_sistema') {
                     $updateData['fecha_cancelacion'] = null;
                 } elseif ($flag === 'cancelado_sat') {
                     $updateData['fecha_cancelacion_sat'] = null;
@@ -666,6 +831,118 @@ class TicketController extends BaseController
     }
 
     /**
+     * Validar estatus de una operación ante el SAT
+     * 
+     * @param int $id ID de la operación
+     */
+    public function validateOperacionSatStatus(int $id): void
+    {
+        $operacion = $this->operacionModel->find($id);
+        if (!$operacion) {
+            $this->json(['error' => 'Operación no encontrada'], 404);
+            return;
+        }
+
+        $ticket = $this->ticketModel->find($operacion['ticket_id']);
+        if (!$ticket) {
+            $this->json(['error' => 'Ticket no encontrado'], 404);
+            return;
+        }
+
+        $this->requirePermission('tickets.verify_sat');
+
+        $rfcEmisor = '';
+        if ($ticket['empresa_solicitante'] === 'grupo_motormexa') {
+            $rfcEmisor = 'GMG090821RT0';
+        } else if ($ticket['empresa_solicitante'] === 'automotriz_motormexa') {
+            $rfcEmisor = 'AMO021114AG5';
+        }
+
+        if (empty($rfcEmisor)) {
+            $this->json(['error' => 'RFC emisor no configurado para esta empresa'], 400);
+            return;
+        }
+
+        $totalParaApi = (strtoupper(substr($operacion['serie'], 0, 1)) === 'C') 
+            ? 0 
+            : (float)$operacion['monto'];
+
+        $data = [
+            'rfc_emisor' => $rfcEmisor,
+            'rfc_receptor' => $ticket['rfc_receptor'],
+            'total' => $totalParaApi,
+            'uuid' => $operacion['uuid_operacion']
+        ];
+
+        $apiUrl = 'http://200.1.1.245:5000/validar_factura/';
+        
+        try {
+            $ch = curl_init($apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Accept: application/json'
+            ]);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($response === false) {
+                $this->json(['error' => 'Error al conectar con el servidor de validación: ' . $error], 500);
+                return;
+            }
+
+            $decodedResponse = json_decode($response, true);
+            
+            if ($httpCode >= 422) {
+                $this->json([
+                    'error' => 'El servidor de validación respondió con un error',
+                    'detail' => $decodedResponse['detail'] ?? $response
+                ], $httpCode);
+                return;
+            }
+
+            $updatedCanceladoSat = false;
+            if (isset($decodedResponse['estado_validacion']) && 
+                (strtolower($decodedResponse['estado_validacion']) === 'cancelado' && 
+                $decodedResponse['procesamiento_exitoso'])) {
+                
+                $this->operacionModel->update($operacion['id'], [
+                    'cancelado_sat' => 1,
+                    'fecha_cancelacion_sat' => date('Y-m-d H:i:s')
+                ]);
+                
+                $this->ticketModel->audit(
+                    $ticket['id'],
+                    $this->userId(),
+                    "Validación SAT para operación #{$operacion['id']} - CANCELADO",
+                    'cancelado_sat',
+                    $operacion['cancelado_sat'] ? 'Sí' : 'No',
+                    'Sí'
+                );
+                
+                $updatedCanceladoSat = true;
+            } else {
+                $estadoValidacion = $decodedResponse['estado_validacion'] ?? 'Desconocido';
+            }
+
+            $this->log("Consultó estatus SAT para operación #{$id}", 'tickets');
+            
+            $this->json(array_merge($decodedResponse, [
+                'updated_cancelado_sat' => $updatedCanceladoSat
+            ]));
+
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Ocurrió un error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Parsear archivo XML para extraer datos (AJAX)
      */
     public function parseXml(): void
@@ -723,6 +1000,247 @@ class TicketController extends BaseController
 
         } catch (\Exception $e) {
             $this->json(['error' => 'Ocurrió un error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Obtener comentarios de un ticket (AJAX)
+     * 
+     * @param int $id ID del ticket
+     */
+    public function getComments(int $id): void
+    {
+        $ticket = $this->ticketModel->find($id);
+        if (!$ticket) {
+            $this->json(['error' => 'Ticket no encontrado'], 404);
+        }
+
+        try {
+            $comentarios = $this->comentarioModel->getByTicket($id);
+            $this->json(['success' => true, 'comentarios' => $comentarios]);
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Error al obtener comentarios: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Agregar comentario a un ticket
+     * 
+     * @param int $id ID del ticket
+     */
+    public function addComment(int $id): void
+    {
+        $this->requirePermission('tickets.comments.add');
+
+        try {
+            $this->validateCsrf();
+
+            $ticket = $this->ticketModel->find($id);
+            if (!$ticket) {
+                $this->json(['error' => 'Ticket no encontrado'], 404);
+            }
+
+            $comentario = trim($this->input('comentario'));
+            if (empty($comentario)) {
+                $this->json(['error' => 'El comentario no puede estar vacío'], 400);
+            }
+
+            if (strlen($comentario) < 5) {
+                $this->json(['error' => 'El comentario debe tener al menos 5 caracteres'], 400);
+            }
+
+            if (strlen($comentario) > 1000) {
+                $this->json(['error' => 'El comentario no puede exceder 1000 caracteres'], 400);
+            }
+
+            $comentarioId = $this->comentarioModel->create([
+                'ticket_id' => $id,
+                'usuario_id' => $this->userId(),
+                'comentario' => $comentario
+            ]);
+
+            if ($comentarioId) {
+                $nuevoComentario = $this->comentarioModel->find($comentarioId);
+                $this->json([
+                    'success' => true,
+                    'message' => 'Comentario agregado correctamente',
+                    'comentario' => $nuevoComentario
+                ]);
+            } else {
+                $this->json(['error' => 'Error al guardar el comentario'], 500);
+            }
+
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Eliminar comentario de un ticket
+     * 
+     * @param int $id ID del ticket
+     * @param int $comentarioId ID del comentario
+     */
+    public function deleteComment(int $id, int $comentarioId): void
+    {
+        try {
+            $this->validateCsrf();
+
+            $comentario = $this->comentarioModel->find($comentarioId);
+            if (!$comentario) {
+                $this->json(['error' => 'Comentario no encontrado'], 404);
+            }
+
+            if ($comentario['ticket_id'] !== $id) {
+                $this->json(['error' => 'El comentario no pertenece a este ticket'], 400);
+            }
+
+            if (!PermissionHelper::isAdmin()) {
+                $this->json(['error' => 'No tienes permisos para eliminar comentarios'], 403);
+            }
+
+            if ($this->comentarioModel->delete($comentarioId)) {
+                $this->json([
+                    'success' => true,
+                    'message' => 'Comentario eliminado correctamente'
+                ]);
+            } else {
+                $this->json(['error' => 'Error al eliminar el comentario'], 500);
+            }
+
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Corregir error de rechazo (solo Supervisor)
+     *
+     * @param int $id ID del ticket
+     */
+    public function correctRejectionError(int $id): void
+    {
+        $this->requirePermission('tickets.correct_rejection_errors');
+
+        try {
+            $this->validateCsrf();
+
+            $ticket = $this->ticketModel->find($id);
+            if (!$ticket) {
+                $this->json(['error' => 'Ticket no encontrado'], 404);
+            }
+
+            if ($ticket['estado'] !== 'rechazado' || !($ticket['rechazado_por_error'] ?? 0)) {
+                $this->json(['error' => 'Este ticket no está rechazado por error'], 400);
+            }
+
+            $accion = $this->input('accion');
+            $updateData = [];
+
+            switch ($accion) {
+                case 'actualizar_tipo':
+                    $nuevoTipo = $this->input('tipo_cancelacion');
+                    if (in_array($nuevoTipo, ['cancelacion_total', 'refacturacion'])) {
+                        $updateData['tipo_cancelacion'] = $nuevoTipo;
+                    } else {
+                        $this->json(['error' => 'Tipo de cancelación no válido'], 400);
+                    }
+                    break;
+
+                case 'subir_archivo':
+                    $fileData = $_FILES['nuevo_archivo'] ?? null;
+                    
+                    if (!$fileData || $fileData['error'] === UPLOAD_ERR_NO_FILE) {
+                        $this->json(['error' => 'El archivo es requerido'], 400);
+                    }
+                    
+                    $uploader = new FileUploadHelper();
+                    $filePath = $uploader->upload($fileData);
+                    
+                    if (!$filePath) {
+                        $errorMsg = $uploader->getFirstError() ?: 'Error al subir el archivo';
+                        $this->json(['error' => $errorMsg], 400);
+                    }
+                    
+                    // Eliminar archivo anterior
+                    if ($ticket['archivo_autorizacion']) {
+                        $uploader->delete($ticket['archivo_autorizacion']);
+                    }
+                    
+                    $updateData['archivo_autorizacion'] = $filePath;
+                    break;
+
+                default:
+                    $this->json(['error' => 'Acción no válida'], 400);
+            }
+
+            if (!empty($updateData)) {
+                $db = \App\Core\Database::getInstance();
+                $db->beginTransaction();
+
+                // Agregar campos para limpiar bandera de error Y cambiar estado en una sola actualización
+                $updateData['rechazado_por_error'] = 0;
+                $updateData['tipo_error_rechazo'] = null;
+                $updateData['estado'] = 'pendiente';
+
+                // Actualizar todo en una sola llamada
+                $this->ticketModel->update($id, $updateData);
+
+                // Auditoría
+                $detalleAccion = $accion === 'actualizar_tipo'
+                    ? 'Tipo de cancelación actualizado'
+                    : 'Archivo de autorización actualizado';
+
+                $campoAnterior = $accion === 'actualizar_tipo' ? 'tipo_cancelacion' : 'archivo_autorizacion';
+                $valorNuevo = $updateData[$accion === 'actualizar_tipo' ? 'tipo_cancelacion' : 'archivo_autorizacion'];
+
+                $this->ticketModel->audit(
+                    $id,
+                    $this->userId(),
+                    'Corrección de error de rechazo',
+                    $accion,
+                    $ticket[$campoAnterior] ?? null,
+                    is_array($valorNuevo) ? basename($valorNuevo['name'] ?? '') : $valorNuevo
+                );
+
+                // Registrar auditoría de cambio de estado
+                $this->ticketModel->audit(
+                    $id,
+                    $this->userId(),
+                    'Cambio de estado',
+                    'estado',
+                    $ticket['estado'],
+                    'pendiente'
+                );
+
+                $db->commit();
+
+                $this->log('Corrección de error de rechazo', 'tickets', "ID: {$id}, Acción: {$accion}");
+
+                if ($this->isAjax()) {
+                    $this->json([
+                        'success' => true,
+                        'message' => 'Error corregido correctamente. El ticket ahora está en estado pendiente.'
+                    ]);
+                }
+
+                $this->session->flash('success', 'Error corregido correctamente');
+                $this->redirect('/tickets/' . $id);
+            } else {
+                $this->json(['error' => 'No se realizaron cambios'], 400);
+            }
+
+        } catch (\Exception $e) {
+            $db = \App\Core\Database::getInstance();
+            if ($db->getConnection()->inTransaction()) {
+                $db->rollBack();
+            }
+
+            if ($this->isAjax()) {
+                $this->json(['error' => 'Error al corregir: ' . $e->getMessage()], 500);
+            }
+            $this->session->flash('error', 'Error al corregir el error');
+            $this->redirect('/tickets/' . $id);
         }
     }
 }
