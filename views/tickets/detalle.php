@@ -86,7 +86,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
         </div>
         
         <!-- Panel de Corrección de Error (solo para tickets rechazados por error) -->
-        <?php if ($ticket['estado'] === 'rechazado' && $ticket['rechazado_por_error'] && \App\Helpers\PermissionHelper::hasPermission('tickets.correct_rejection_errors')): ?>
+        <?php if ($ticket['estado'] === 'rechazado' && ($ticket['rechazado_por_error'] ?? 0) && \App\Helpers\PermissionHelper::hasPermission('tickets.correct_rejection_errors')): ?>
         <section class="bg-orange-50 border-2 border-orange-200 rounded-xl p-5 mb-6 shadow-sm">
             <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
@@ -99,7 +99,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                     <p class="text-sm text-orange-800 mb-4">
                         Este ticket fue marcado como rechazado por error: 
                         <strong class="font-black bg-orange-200 px-2 py-0.5 rounded">
-                            <?= TIPOS_ERROR_RECHAZO[$ticket['tipo_error_rechazo']] ?? $ticket['tipo_error_rechazo'] ?>
+                            <?= TIPOS_ERROR_RECHAZO[($ticket['tipo_error_rechazo'] ?? '')] ?? ($ticket['tipo_error_rechazo'] ?? 'Tipo de error no especificado') ?>
                         </strong>
                     </p>
                     

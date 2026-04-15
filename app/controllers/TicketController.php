@@ -1115,7 +1115,7 @@ class TicketController extends BaseController
 
     /**
      * Corregir error de rechazo (solo Supervisor)
-     * 
+     *
      * @param int $id ID del ticket
      */
     public function correctRejectionError(int $id): void
@@ -1130,7 +1130,7 @@ class TicketController extends BaseController
                 $this->json(['error' => 'Ticket no encontrado'], 404);
             }
 
-            if ($ticket['estado'] !== 'rechazado' || !$ticket['rechazado_por_error']) {
+            if ($ticket['estado'] !== 'rechazado' || !($ticket['rechazado_por_error'] ?? 0)) {
                 $this->json(['error' => 'Este ticket no está rechazado por error'], 400);
             }
 

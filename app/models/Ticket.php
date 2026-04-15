@@ -123,7 +123,8 @@ class Ticket
             'nombre_cliente', 'total_factura', 'rfc_receptor', 'tipo_cancelacion',
             'uuid_factura_nueva', 'motivo', 'archivo_autorizacion', 'estado', 'fecha_envio_cancelacion',
             'fecha_cancelacion_sat', 'completado_por', 'fecfac', 'id_pedido',
-            'id_vendedor', 'id_suc'
+            'id_vendedor', 'id_suc',
+            'rechazado_por_error', 'tipo_error_rechazo'
         ];
 
         $fields = [];
