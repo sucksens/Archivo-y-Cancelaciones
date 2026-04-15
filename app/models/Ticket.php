@@ -53,6 +53,21 @@ class Ticket
     }
 
     /**
+     * Buscar ticket por UUID de factura
+     * 
+     * @param string $uuid UUID de la factura
+     * @return array|null
+     */
+    public function findByFacturaUuid(string $uuid): ?array
+    {
+        $sql = "SELECT t.*, u.nombre_completo as usuario_nombre
+                FROM {$this->table} t
+                LEFT JOIN usuarios u ON t.usuario_id = u.id
+                WHERE t.uuid_factura = ?";
+        return $this->db->fetchOne($sql, [$uuid]);
+    }
+
+    /**
      * Crear nuevo ticket
      * 
      * @param array $data Datos del ticket
@@ -63,16 +78,17 @@ class Ticket
         $uuid = AuthHelper::generateUuid();
         
         $sql = "INSERT INTO {$this->table} 
-                (uuid, usuario_id, empresa_solicitante, uuid_factura, serie, folio, 
+                (uuid, usuario_id, empresa_solicitante, tipo_factura, uuid_factura, serie, folio, 
                  inventario, nombre_cliente, total_factura, rfc_receptor, 
                  tipo_cancelacion, motivo, archivo_autorizacion, estado,
                  fecfac, id_pedido, id_vendedor, id_suc)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?, ?, ?, ?)";
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', ?, ?, ?, ?)";
         
         $this->db->query($sql, [
             $uuid,
             $data['usuario_id'],
             $data['empresa_solicitante'],
+            $data['tipo_factura'],
             $data['uuid_factura'],
             $data['serie'],
             $data['folio'],
@@ -102,7 +118,7 @@ class Ticket
     public function update(int $id, array $data): bool
     {
         $allowedFields = [
-            'empresa_solicitante', 'uuid_factura', 'serie', 'folio', 'inventario',
+            'empresa_solicitante', 'tipo_factura', 'uuid_factura', 'serie', 'folio', 'inventario',
             'nombre_cliente', 'total_factura', 'rfc_receptor', 'tipo_cancelacion',
             'motivo', 'archivo_autorizacion', 'estado', 'fecha_envio_cancelacion',
             'fecha_cancelacion_sat', 'completado_por', 'fecfac', 'id_pedido', 
@@ -203,6 +219,11 @@ class Ticket
             $params[] = $filters['tipo_cancelacion'];
         }
 
+        if (!empty($filters['tipo_factura'])) {
+            $where[] = 't.tipo_factura = ?';
+            $params[] = $filters['tipo_factura'];
+        }
+
         if (!empty($filters['fecha_desde'])) {
             $where[] = 'DATE(t.fecha_creacion) >= ?';
             $params[] = $filters['fecha_desde'];
@@ -251,11 +272,42 @@ class Ticket
      * @param int $userId ID del usuario
      * @param int $page Página
      * @param int $limit Límite
+     * @param array $filters Filtros adicionales
      * @return array
      */
-    public function getByUser(int $userId, int $page = 1, int $limit = ITEMS_PER_PAGE): array
+    public function getByUser(int $userId, int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
     {
-        return $this->getAll(['usuario_id' => $userId], $page, $limit);
+        $filters['usuario_id'] = $userId;
+        return $this->getAll($filters, $page, $limit);
+    }
+
+    /**
+     * Obtener tickets por empresa (para rol Consulta)
+     * 
+     * @param string $empresa Empresa del usuario
+     * @param int $page Página
+     * @param int $limit Límite
+     * @param array $filters Filtros adicionales
+     * @return array
+     */
+    public function getByEmpresa(string $empresa, int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
+    {
+        $filters['empresa'] = $empresa;
+        return $this->getAll($filters, $page, $limit);
+    }
+
+    /**
+     * Verificar si un ticket puede verificar status SAT
+     * Solo puede verificar si está en estado pendiente o en_revision
+     * 
+     * @param int $ticketId ID del ticket
+     * @return bool
+     */
+    public function canVerifySat(int $ticketId): bool
+    {
+        $sql = "SELECT estado FROM {$this->table} WHERE id = ?";
+        $estado = $this->db->fetchColumn($sql, [$ticketId]);
+        return in_array($estado, ['pendiente', 'en_revision']);
     }
 
     /**

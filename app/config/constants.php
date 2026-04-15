@@ -68,6 +68,12 @@ define('TIPOS_OPERACION', [
     'documento_relacionado' => 'Documento Relacionado'
 ]);
 
+// Tipos de factura
+define('TIPOS_AUTO', [
+    'autos_nuevos' => 'Autos Nuevos',
+    'seminuevos' => 'Seminuevos'
+]);
+
 // Configuración de paginación
 define('ITEMS_PER_PAGE', 15);
 

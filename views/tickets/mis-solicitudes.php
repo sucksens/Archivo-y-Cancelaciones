@@ -1,4 +1,4 @@
-<!-- Header -->
+ <!-- Header -->
 <div class="flex items-center justify-between mb-6">
     <div>
         <h2 class="text-xl font-semibold text-gray-900">Mis Solicitudes</h2>
@@ -13,6 +13,72 @@
         Nuevo Ticket
     </a>
     <?php endif; ?>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-6">
+    <div class="card-body">
+        <form method="GET" action="<?= BASE_URL ?>mis-solicitudes" class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[200px]">
+                <input type="text" name="search" value="<?= htmlspecialchars($filters['search'] ?? '') ?>" 
+                       placeholder="Buscar por cliente, RFC, UUID o folio..."
+                       class="form-input">
+            </div>
+            
+            <div class="w-40">
+                <select name="estado" class="form-select">
+                    <option value="">Todos los estados</option>
+                    <?php foreach ($estados as $key => $info): ?>
+                    <option value="<?= $key ?>" <?= ($filters['estado'] ?? '') === $key ? 'selected' : '' ?>>
+                        <?= $info['label'] ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            
+            <div class="w-40">
+                <select name="tipo" class="form-select">
+                    <option value="">Todos los tipos</option>
+                    <?php foreach ($tipos as $key => $label): ?>
+                    <option value="<?= $key ?>" <?= ($filters['tipo_cancelacion'] ?? '') === $key ? 'selected' : '' ?>>
+                        <?= $label ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            
+            <div class="w-40">
+                <select name="tipo_factura" class="form-select">
+                    <option value="">Todas las facturas</option>
+                    <?php foreach ($tipos_auto as $key => $label): ?>
+                    <option value="<?= $key ?>" <?= ($filters['tipo_factura'] ?? '') === $key ? 'selected' : '' ?>>
+                        <?= $label ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="w-40">
+                <input type="date" name="fecha_desde" value="<?= htmlspecialchars($filters['fecha_desde'] ?? '') ?>" 
+                       placeholder="Desde" class="form-input">
+            </div>
+
+            <div class="w-40">
+                <input type="date" name="fecha_hasta" value="<?= htmlspecialchars($filters['fecha_hasta'] ?? '') ?>" 
+                       placeholder="Hasta" class="form-input">
+            </div>
+            
+            <div class="flex gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    Buscar
+                </button>
+                <a href="<?= BASE_URL ?>mis-solicitudes" class="btn btn-secondary">Limpiar</a>
+            </div>
+        </form>
+    </div>
 </div>
 
 <!-- Tabla de tickets -->
@@ -43,7 +109,8 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Cancelación</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Factura</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -68,9 +135,15 @@
                             <?= htmlspecialchars($ticket['serie']) ?>-<?= htmlspecialchars($ticket['folio']) ?>
                         </div>
                     </td>
+
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-medium text-gray-900">
+                            <?= htmlspecialchars($tipos[$ticket['tipo_cancelacion']]) ?>
+                        </div>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm font-medium text-gray-900">
-                            $<?= number_format($ticket['total_factura'], 2) ?>
+                        <span class="text-sm text-gray-700">
+                            <?= $tipos_auto[$ticket['tipo_factura']] ?? $ticket['tipo_factura'] ?>
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -105,14 +178,24 @@
             </div>
             
             <nav class="flex space-x-2">
+                <?php
+                $queryParams = [];
+                if (!empty($filters['search'])) $queryParams[] = 'search=' . urlencode($filters['search']);
+                if (!empty($filters['estado'])) $queryParams[] = 'estado=' . urlencode($filters['estado']);
+                if (!empty($filters['tipo'])) $queryParams[] = 'tipo=' . urlencode($filters['tipo']);
+                if (!empty($filters['fecha_desde'])) $queryParams[] = 'fecha_desde=' . urlencode($filters['fecha_desde']);
+                if (!empty($filters['fecha_hasta'])) $queryParams[] = 'fecha_hasta=' . urlencode($filters['fecha_hasta']);
+                $queryString = !empty($queryParams) ? '&' . implode('&', $queryParams) : '';
+                ?>
+                
                 <?php if ($pagination['page'] > 1): ?>
-                <a href="?page=<?= $pagination['page'] - 1 ?>" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                <a href="?page=<?= $pagination['page'] - 1 ?><?= $queryString ?>" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                     Anterior
                 </a>
                 <?php endif; ?>
                 
                 <?php if ($pagination['page'] < $pagination['pages']): ?>
-                <a href="?page=<?= $pagination['page'] + 1 ?>" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                <a href="?page=<?= $pagination['page'] + 1 ?><?= $queryString ?>" class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                     Siguiente
                 </a>
                 <?php endif; ?>

@@ -54,8 +54,12 @@ class PermissionHelper
         // Obtener permisos de cache o sesión
         $permissions = self::getPermissions($userId);
         
-        // Admin tiene todos los permisos
+        // Admin tiene todos los permisos (por código o por nombre de rol)
         if (in_array('admin.all', $permissions)) {
+            return true;
+        }
+
+        if (self::hasRole('Administrador', $userId)) {
             return true;
         }
         
@@ -186,6 +190,37 @@ class PermissionHelper
     public static function isSupervisor(): bool
     {
         return self::hasRole('Supervisor') || self::isAdmin();
+    }
+
+    /**
+     * Verificar si es rol Consulta
+     * 
+     * @return bool
+     */
+    public static function isConsulta(): bool
+    {
+        return self::hasRole('Consulta');
+    }
+
+    /**
+     * Verificar si es usuario regular (no admin, no supervisor, no consulta)
+     * 
+     * @return bool
+     */
+    public static function isRegularUser(): bool
+    {
+        return !self::isAdmin() && !self::isSupervisor() && !self::isConsulta();
+    }
+
+    /**
+     * Obtener la empresa del usuario de la sesión
+     * 
+     * @return string|null
+     */
+    public static function getUserCompany(): ?string
+    {
+        $user = AuthHelper::getUser();
+        return $user['empresa'] ?? null;
     }
 
     /**

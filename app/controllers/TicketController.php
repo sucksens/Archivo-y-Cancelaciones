@@ -42,6 +42,7 @@ class TicketController extends BaseController
             'empresa' => $this->input('empresa'),
             'estado' => $this->input('estado'),
             'tipo_cancelacion' => $this->input('tipo'),
+            'tipo_factura' => $this->input('tipo_factura'),
             'fecha_desde' => $this->input('fecha_desde'),
             'fecha_hasta' => $this->input('fecha_hasta'),
             'search' => $this->input('search')
@@ -56,7 +57,8 @@ class TicketController extends BaseController
             'filters' => $filters,
             'estados' => TICKET_ESTADOS,
             'empresas' => EMPRESAS,
-            'tipos' => TIPOS_CANCELACION
+            'tipos' => TIPOS_CANCELACION,
+            'tipos_auto' => TIPOS_AUTO
         ]);
     }
 
@@ -68,13 +70,65 @@ class TicketController extends BaseController
         $this->requirePermission('tickets.view.own');
 
         $page = (int) ($this->input('page') ?? 1);
-        $result = $this->ticketModel->getByUser($this->userId(), $page);
+        $filters = [
+            'estado' => $this->input('estado'),
+            'tipo_cancelacion' => $this->input('tipo'),
+            'tipo_factura' => $this->input('tipo_factura'),
+            'fecha_desde' => $this->input('fecha_desde'),
+            'fecha_hasta' => $this->input('fecha_hasta'),
+            'search' => $this->input('search')
+        ];
+
+        $result = $this->ticketModel->getByUser($this->userId(), $page, ITEMS_PER_PAGE, $filters);
 
         $this->view('tickets/mis-solicitudes', [
             'title' => 'Mis Solicitudes',
             'tickets' => $result['data'],
             'pagination' => $result,
-            'estados' => TICKET_ESTADOS
+            'filters' => $filters,
+            'estados' => TICKET_ESTADOS,
+            'tipos' => TIPOS_CANCELACION,
+            'tipos_auto' => TIPOS_AUTO
+        ]);
+    }
+
+    /**
+     * Solicitudes (tickets de la empresa - solo rol Consulta)
+     */
+    public function solicitudes(): void
+    {
+        $this->requirePermission('tickets.view.empresa');
+
+        $empresa = PermissionHelper::getUserCompany();
+        
+        if (!$empresa) {
+            $this->session->flash('error', 'No tienes una empresa asignada');
+            $this->redirect('/dashboard');
+        }
+
+        $page = (int) ($this->input('page') ?? 1);
+        $filters = [
+            'estado' => $this->input('estado'),
+            'tipo_cancelacion' => $this->input('tipo'),
+            'tipo_factura' => $this->input('tipo_factura'),
+            'fecha_desde' => $this->input('fecha_desde'),
+            'fecha_hasta' => $this->input('fecha_hasta'),
+            'search' => $this->input('search')
+        ];
+
+        $result = $this->ticketModel->getByEmpresa($empresa, $page, ITEMS_PER_PAGE, $filters);
+
+        $canVerifySat = PermissionHelper::hasPermission('tickets.verify_sat');
+
+        $this->view('tickets/solicitudes', [
+            'title' => 'Solicitudes',
+            'tickets' => $result['data'],
+            'pagination' => $result,
+            'filters' => $filters,
+            'estados' => TICKET_ESTADOS,
+            'tipos' => TIPOS_CANCELACION,
+            'tipos_auto' => TIPOS_AUTO,
+            'canVerifySat' => $canVerifySat
         ]);
     }
 
@@ -89,7 +143,8 @@ class TicketController extends BaseController
             'title' => 'Nuevo Ticket de Cancelación',
             'empresas' => EMPRESAS,
             'tipos_cancelacion' => TIPOS_CANCELACION,
-            'tipos_operacion' => TIPOS_OPERACION
+            'tipos_operacion' => TIPOS_OPERACION,
+            'tipos_auto' => TIPOS_AUTO
         ]);
     }
 
@@ -114,6 +169,8 @@ class TicketController extends BaseController
             $validator
                 ->required('empresa_solicitante', 'La empresa es requerida')
                 ->in('empresa_solicitante', array_keys(EMPRESAS))
+                ->required('tipo_factura', 'El tipo de factura es requerido')
+                ->in('tipo_factura', array_keys(TIPOS_AUTO))
                 ->required('uuid_factura', 'El UUID de factura es requerido')
                 ->uuid('uuid_factura')
                 ->required('serie', 'La serie es requerida')
@@ -159,7 +216,31 @@ class TicketController extends BaseController
 
             // --- CONSULTA A BBJ PARA VALIDAR FACTURA ---
             $empresaSolicitante = $_POST['empresa_solicitante'];
-            $DbName = ($empresaSolicitante === 'grupo_motormexa') ? "01AN_AUTOSNUEVOS" : "02AN_AUTOSNUEVOS";
+            $tipoFactura = $_POST['tipo_factura'];
+            
+            // Determinar la base de datos según empresa y tipo de factura
+            $dbMapping = [
+                'grupo_motormexa' => [
+                    'autos_nuevos' => '01AN_AUTOSNUEVOS',
+                    'seminuevos' => '01AU_SEMINUEVOS'
+                ],
+                'automotriz_motormexa' => [
+                    'autos_nuevos' => '02AN_AUTOSNUEVOS',
+                    'seminuevos' => '02AU_SEMINUEVOS'
+                ]
+            ];
+
+            //Revision de si la factura ya tiene un ticket
+            $ticket = $this->ticketModel->findByFacturaUuid(ValidationHelper::cleanUuid($_POST['uuid_factura']));
+            
+            if ($ticket) {
+                $this->session->flash('error', "La factura con UUID {$_POST['uuid_factura']} ya tiene un ticket.");
+                $this->session->set('old_input', $_POST);
+                $this->redirect('/tickets/crear');
+            }
+           
+            //Cargar la base de datos correcta para la empresa y tipo de factura
+            $DbName = $dbMapping[$empresaSolicitante][$tipoFactura] ?? '01AN_AUTOSNUEVOS';
             
             $facturaBridge = new FacturasBridge($DbName);
             $uuidLimpio = ValidationHelper::cleanUuid($_POST['uuid_factura']);
@@ -173,9 +254,6 @@ class TicketController extends BaseController
                 $this->redirect('/tickets/crear');
             }
 
-            // TODO: Validar que la factura pertenezca a la empresa si BBj devuelve ID_EMP
-            // if ($factura['ID_EMP'] != $expectedEmp) { ... }
-
             // --- INICIO DE TRANSACCIÓN ---
             $db->beginTransaction();
 
@@ -183,6 +261,7 @@ class TicketController extends BaseController
             $ticketId = $this->ticketModel->create([
                 'usuario_id' => $this->userId(),
                 'empresa_solicitante' => $empresaSolicitante,
+                'tipo_factura' => $tipoFactura,
                 'uuid_factura' => $uuidLimpio,
                 'serie' => ValidationHelper::sanitize($_POST['serie']),
                 'folio' => ValidationHelper::sanitize($_POST['folio']),
@@ -277,7 +356,9 @@ class TicketController extends BaseController
 
         // Verificar permisos
         $canView = $this->hasPermission('tickets.view.all') 
-                || ($this->hasPermission('tickets.view.own') && $ticket['usuario_id'] === $this->userId());
+                || ($this->hasPermission('tickets.view.own') && $ticket['usuario_id'] === $this->userId())
+                || ($this->hasPermission('tickets.view.empresa') && $ticket['empresa_solicitante'] === PermissionHelper::getUserCompany());
+
 
         if (!$canView) {
             http_response_code(403);
@@ -290,6 +371,7 @@ class TicketController extends BaseController
             'ticket' => $ticket,
             'estados' => TICKET_ESTADOS,
             'tipos_operacion' => TIPOS_OPERACION,
+            'tipos_auto' => TIPOS_AUTO,
             'canEdit' => $this->hasPermission('tickets.edit'),
             'canChangeStatus' => $this->hasPermission('tickets.status'),
             'canProcess' => $this->hasPermission('tickets.process')

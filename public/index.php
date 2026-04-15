@@ -55,6 +55,7 @@ $router->post('/tickets/parse-xml', 'TicketController@parseXml', [$authMiddlewar
 $router->get('/tickets/{id}/archivo', 'TicketController@downloadFile', [$authMiddleware]);
 
 $router->get('/mis-solicitudes', 'TicketController@misSolicitudes', [$authMiddleware]);
+$router->get('/solicitudes', 'TicketController@solicitudes', [$authMiddleware]);
 
 $router->get('/perfil', 'AuthController@profile', [$authMiddleware]);
 $router->post('/perfil', 'AuthController@updateProfile', [$authMiddleware]);
@@ -74,5 +75,15 @@ $router->post('/admin/roles/{id}', 'RoleController@update', [$authMiddleware]);
 $router->post('/admin/roles/{id}/eliminar', 'RoleController@destroy', [$authMiddleware]);
 $router->get('/admin/roles/{id}/permisos', 'RoleController@getRolePermissions', [$authMiddleware]);
 $router->get('/admin/permisos', 'RoleController@getAllPermissions', [$authMiddleware]);
+
+$router->get('/admin/logs', 'LogController@index', [$authMiddleware]);
+
+$router->get('/facturas', 'FacturaArchivoController@index', [$authMiddleware]);
+$router->get('/facturas/subir', 'FacturaArchivoController@create', [$authMiddleware]);
+$router->post('/facturas', 'FacturaArchivoController@store', [$authMiddleware]);
+$router->get('/facturas/{id}', 'FacturaArchivoController@show', [$authMiddleware]);
+$router->get('/facturas/{id}/descargar/{tipo}', 'FacturaArchivoController@download', [$authMiddleware]);
+$router->post('/facturas/{id}/eliminar', 'FacturaArchivoController@destroy', [$authMiddleware]);
+$router->post('/facturas/parse-xml', 'FacturaArchivoController@parseXml', [$authMiddleware]);
 
 $router->dispatch();

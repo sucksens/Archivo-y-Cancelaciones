@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS tickets_cancelacion (
     uuid CHAR(36) NOT NULL,
     usuario_id INT NOT NULL,
     empresa_solicitante ENUM('grupo_motormexa', 'automotriz_motormexa') NOT NULL,
+    tipo_factura ENUM('autos_nuevos', 'seminuevos') NOT NULL,
     uuid_factura CHAR(36) NOT NULL,
     serie VARCHAR(20) NOT NULL,
     folio VARCHAR(20) NOT NULL,
@@ -132,6 +133,7 @@ CREATE TABLE IF NOT EXISTS tickets_cancelacion (
     INDEX idx_usuario (usuario_id),
     INDEX idx_estado (estado),
     INDEX idx_empresa (empresa_solicitante),
+    INDEX idx_tipo_factura (tipo_factura),
     INDEX idx_fecha_creacion (fecha_creacion),
     INDEX idx_uuid_factura (uuid_factura),
     INDEX idx_id_pedido (id_pedido),
@@ -265,6 +267,37 @@ CREATE TABLE IF NOT EXISTS sesiones (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
+-- TABLA: facturas_archivo
+-- ============================================
+CREATE TABLE IF NOT EXISTS facturas_archivo (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    usuario_id INT NOT NULL,
+    empresa ENUM('grupo_motormexa', 'automotriz_motormexa') NOT NULL,
+    tipo_factura ENUM('autos_nuevos', 'seminuevos') NOT NULL,
+    uuid_factura CHAR(36) NOT NULL UNIQUE,
+    archivo_xml VARCHAR(255) NOT NULL,
+    archivo_pdf VARCHAR(255) NULL,
+    serie VARCHAR(20) NULL,
+    folio VARCHAR(20) NULL,
+    total DECIMAL(15,2) NULL,
+    fecha_emision DATE NULL,
+    rfc_emisor VARCHAR(13) NULL,
+    rfc_receptor VARCHAR(13) NULL,
+    id_suc VARCHAR(10) NULL,
+    fecfac DATE NULL,
+    inventario VARCHAR(50) NULL,
+    id_vendedor VARCHAR(10) NULL,
+    datos_extra JSON NULL,
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    estado ENUM('activo', 'eliminado') DEFAULT 'activo',
+    INDEX idx_usuario (usuario_id),
+    INDEX idx_empresa (empresa),
+    INDEX idx_tipo (tipo_factura),
+    INDEX idx_uuid (uuid_factura),
+    CONSTRAINT fk_fa_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
 -- DATOS INICIALES: Roles
 -- ============================================
 INSERT INTO roles (nombre, descripcion, nivel) VALUES
@@ -290,17 +323,27 @@ INSERT INTO permisos (nombre, codigo, descripcion, modulo) VALUES
 INSERT INTO permisos (nombre, codigo, descripcion, modulo) VALUES
 ('Crear Tickets', 'tickets.create', 'Crear nuevos tickets de cancelación', 'tickets'),
 ('Ver Tickets Propios', 'tickets.view.own', 'Ver tickets creados por el usuario', 'tickets'),
+('Ver Tickets de Empresa', 'tickets.view.empresa', 'Ver tickets de la empresa del usuario', 'tickets'),
 ('Ver Todos los Tickets', 'tickets.view.all', 'Ver todos los tickets del sistema', 'tickets'),
 ('Editar Tickets', 'tickets.edit', 'Editar tickets de cancelación', 'tickets'),
 ('Cambiar Estado', 'tickets.status', 'Cambiar el estado de los tickets', 'tickets'),
 ('Eliminar Tickets', 'tickets.delete', 'Eliminar tickets de cancelación', 'tickets'),
-('Procesar Cancelación', 'tickets.process', 'Procesar la cancelación ante el SAT', 'tickets');
+('Procesar Cancelación', 'tickets.process', 'Procesar la cancelación ante el SAT', 'tickets'),
+('Verificar Status SAT', 'tickets.verify_sat', 'Verificar el estatus de factura ante el SAT', 'tickets');
 
 -- Permisos de reportes
 INSERT INTO permisos (nombre, codigo, descripcion, modulo) VALUES
 ('Ver Dashboard', 'reports.dashboard', 'Ver el dashboard con estadísticas', 'reports'),
 ('Exportar Reportes', 'reports.export', 'Exportar reportes a Excel/PDF', 'reports'),
 ('Ver Logs', 'reports.logs', 'Ver logs del sistema', 'reports');
+
+-- Permisos de facturas
+INSERT INTO permisos (nombre, codigo, descripcion, modulo) VALUES
+('Subir Facturas', 'facturas.upload', 'Subir archivos de facturas XML y PDF', 'facturas'),
+('Ver Facturas Propias', 'facturas.view.own', 'Ver facturas creadas por el usuario', 'facturas'),
+('Ver Facturas de Empresa', 'facturas.view.empresa', 'Ver facturas de la empresa del usuario', 'facturas'),
+('Descargar Facturas', 'facturas.download', 'Descargar archivos XML y PDF de facturas', 'facturas'),
+('Eliminar Facturas', 'facturas.delete', 'Eliminar facturas del sistema', 'facturas');
 
 -- ============================================
 -- ASIGNAR PERMISOS A ROLES
@@ -316,11 +359,11 @@ SELECT 2, id FROM permisos WHERE modulo IN ('tickets', 'reports');
 
 -- Usuario: crear y ver propios tickets
 INSERT INTO rol_permiso (rol_id, permiso_id)
-SELECT 3, id FROM permisos WHERE codigo IN ('tickets.create', 'tickets.view.own', 'reports.dashboard');
+SELECT 3, id FROM permisos WHERE codigo IN ('tickets.create', 'tickets.view.own', 'reports.dashboard', 'facturas.upload', 'facturas.view.own', 'facturas.download');
 
--- Consulta: solo ver
+-- Consulta: solo ver y verificar SAT
 INSERT INTO rol_permiso (rol_id, permiso_id)
-SELECT 4, id FROM permisos WHERE codigo IN ('tickets.view.own', 'reports.dashboard');
+SELECT 4, id FROM permisos WHERE codigo IN ('tickets.view.own', 'tickets.view.empresa', 'tickets.verify_sat', 'reports.dashboard', 'facturas.view.empresa', 'facturas.download');
 
 -- ============================================
 -- USUARIO ADMINISTRADOR POR DEFECTO

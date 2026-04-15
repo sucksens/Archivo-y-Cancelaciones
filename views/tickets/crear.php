@@ -62,6 +62,18 @@ $session->remove('old_input');
                         </select>
                     </div>
                     
+                    <!-- Tipo de Factura -->
+                    <div>
+                        <label for="tipo_factura" class="form-label">Tipo de Factura <span class="text-red-500">*</span></label>
+                        <select name="tipo_factura" id="tipo_factura" class="form-select" required>
+                            <?php foreach ($tipos_auto as $key => $label): ?>
+                            <option value="<?= $key ?>" <?= ($oldInput['tipo_factura'] ?? 'autos_nuevos') === $key ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($label) ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
                     <!-- UUID Factura -->
                     <div>
                         <label for="uuid_factura" class="form-label">UUID de Factura <span class="text-red-500">*</span></label>
@@ -90,13 +102,14 @@ $session->remove('old_input');
                                required>
                     </div>
                     
-                    <!-- Inventario -->
+                    <!-- Inventario 
                     <div>
                         <label for="inventario" class="form-label">Inventario</label>
                         <input type="text" name="inventario" id="inventario" class="form-input"
                                maxlength="50"
                                value="<?= htmlspecialchars($oldInput['inventario'] ?? '') ?>">
                     </div>
+                    -->
                     
     <!-- Total Factura -->
                     <div>

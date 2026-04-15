@@ -48,12 +48,21 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         <?php endif; ?>
         
         <?php if (PermissionHelper::hasPermission('tickets.view.own')): ?>
+        <?php if (PermissionHelper::isConsulta()): ?>
+        <a href="<?= BASE_URL ?>solicitudes" class="sidebar-link <?= strpos($currentPath, '/solicitudes') !== false ? 'active' : '' ?>">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            Solicitudes
+        </a>
+        <?php else: ?>
         <a href="<?= BASE_URL ?>mis-solicitudes" class="sidebar-link <?= strpos($currentPath, '/mis-solicitudes') !== false ? 'active' : '' ?>">
             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
             Mis Solicitudes
         </a>
+        <?php endif; ?>
         <?php endif; ?>
         
         <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
@@ -64,7 +73,30 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
             Todos los Tickets
         </a>
         <?php endif; ?>
-        
+
+        <!-- Facturas Section -->
+        <?php if (PermissionHelper::hasAnyPermission(['facturas.view.own', 'facturas.view.empresa', 'facturas.view.all', 'facturas.upload'])): ?>
+        <div class="pt-4">
+            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Facturas</p>
+        </div>
+
+        <?php if (PermissionHelper::hasPermission('facturas.upload')): ?>
+        <a href="<?= BASE_URL ?>facturas/subir" class="sidebar-link <?= strpos($currentPath, '/facturas/subir') !== false ? 'active' : '' ?>">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+            </svg>
+            Subir Factura
+        </a>
+        <?php endif; ?>
+
+        <a href="<?= BASE_URL ?>facturas" class="sidebar-link <?= strpos($currentPath, '/facturas') !== false && strpos($currentPath, '/facturas/subir') === false ? 'active' : '' ?>">
+            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Facturas
+        </a>
+        <?php endif; ?>
+
         <!-- Administración Section -->
         <?php if (PermissionHelper::isAdmin()): ?>
         <div class="pt-6">
