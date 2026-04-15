@@ -948,7 +948,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 const result = await response.json();
 
-                if (response.ok && result.success) {
+                if (result.success) {
                     showToast('Comentario publicado correctamente', 'success');
 
                     if (result.comentario) {
@@ -1015,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Función para agregar comentario al DOM
 function addComentarioToUI(comentario) {
-    const lista = document.getElementById('listaComentarios');
+    const lista = document.getElementById('listaActividades');
     const emptyState = lista.querySelector('.text-center');
     if (emptyState) {
         emptyState.remove();
