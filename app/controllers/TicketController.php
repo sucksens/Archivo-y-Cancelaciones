@@ -1178,26 +1178,39 @@ class TicketController extends BaseController
                 $db = \App\Core\Database::getInstance();
                 $db->beginTransaction();
 
-                // Actualizar ticket
+                // Agregar campos para limpiar bandera de error Y cambiar estado en una sola actualización
                 $updateData['rechazado_por_error'] = 0;
                 $updateData['tipo_error_rechazo'] = null;
+                $updateData['estado'] = 'pendiente';
+
+                // Actualizar todo en una sola llamada
                 $this->ticketModel->update($id, $updateData);
 
-                // Cambiar estado a pendiente para reprocesar
-                $this->ticketModel->updateStatus($id, 'pendiente', $this->userId());
-
                 // Auditoría
-                $detalleAccion = $accion === 'actualizar_tipo' 
-                    ? 'Tipo de cancelación actualizado' 
+                $detalleAccion = $accion === 'actualizar_tipo'
+                    ? 'Tipo de cancelación actualizado'
                     : 'Archivo de autorización actualizado';
-                    
+
+                $campoAnterior = $accion === 'actualizar_tipo' ? 'tipo_cancelacion' : 'archivo_autorizacion';
+                $valorNuevo = $updateData[$accion === 'actualizar_tipo' ? 'tipo_cancelacion' : 'archivo_autorizacion'];
+
                 $this->ticketModel->audit(
-                    $id, 
-                    $this->userId(), 
+                    $id,
+                    $this->userId(),
                     'Corrección de error de rechazo',
                     $accion,
-                    $ticket[$accion === 'actualizar_tipo' ? 'tipo_cancelacion' : 'archivo_autorizacion'],
-                    $updateData[$accion === 'actualizar_tipo' ? 'tipo_cancelacion' : 'archivo_autorizacion']
+                    $ticket[$campoAnterior] ?? null,
+                    is_array($valorNuevo) ? basename($valorNuevo['name'] ?? '') : $valorNuevo
+                );
+
+                // Registrar auditoría de cambio de estado
+                $this->ticketModel->audit(
+                    $id,
+                    $this->userId(),
+                    'Cambio de estado',
+                    'estado',
+                    $ticket['estado'],
+                    'pendiente'
                 );
 
                 $db->commit();

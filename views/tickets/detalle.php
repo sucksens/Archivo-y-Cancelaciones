@@ -86,7 +86,10 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
         </div>
         
         <!-- Panel de Corrección de Error (solo para tickets rechazados por error) -->
-        <?php if ($ticket['estado'] === 'rechazado' && ($ticket['rechazado_por_error'] ?? 0) && \App\Helpers\PermissionHelper::hasPermission('tickets.correct_rejection_errors')): ?>
+        <?php
+        $tipoError = $ticket['tipo_error_rechazo'] ?? '';
+        if ($ticket['estado'] === 'rechazado' && ($ticket['rechazado_por_error'] ?? 0) && \App\Helpers\PermissionHelper::hasPermission('tickets.correct_rejection_errors')):
+        ?>
         <section class="bg-orange-50 border-2 border-orange-200 rounded-xl p-5 mb-6 shadow-sm">
             <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
@@ -97,63 +100,65 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                 <div class="flex-1">
                     <h4 class="font-bold text-orange-900 mb-2">Corrección de Error de Rechazo</h4>
                     <p class="text-sm text-orange-800 mb-4">
-                        Este ticket fue marcado como rechazado por error: 
+                        Este ticket fue marcado como rechazado por error:
                         <strong class="font-black bg-orange-200 px-2 py-0.5 rounded">
-                            <?= TIPOS_ERROR_RECHAZO[($ticket['tipo_error_rechazo'] ?? '')] ?? ($ticket['tipo_error_rechazo'] ?? 'Tipo de error no especificado') ?>
+                            <?= TIPOS_ERROR_RECHAZO[$tipoError] ?? ($tipoError ?: 'Tipo de error no especificado') ?>
                         </strong>
                     </p>
-                    
+
                     <div class="flex flex-col lg:flex-row gap-4">
-                        <!-- Formulario: Actualizar tipo de cancelación -->
-                        <form id="formActualizarTipo" class="flex-1 bg-white rounded-lg p-4 border border-orange-200">
-                            <?= \App\Helpers\AuthHelper::getCsrfField() ?>
-                            <input type="hidden" name="accion" value="actualizar_tipo">
-                            
-                            <label class="block text-xs font-bold text-orange-900 uppercase tracking-wider mb-2">
-                                Corregir Tipo de Cancelación
-                            </label>
-                            
-                            <select name="tipo_cancelacion" 
-                                    class="w-full px-3 py-2 border border-orange-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 mb-3">
-                                <?php foreach (TIPOS_CANCELACION as $key => $label): ?>
-                                <option value="<?= $key ?>" <?= $ticket['tipo_cancelacion'] === $key ? '' : '' ?>>
-                                    <?= $label ?>
-                                </option>
-                                <?php endforeach; ?>
-                            </select>
-                            
-                            <button type="submit" 
-                                    class="w-full bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                                </svg>
-                                Actualizar Tipo
-                            </button>
-                        </form>
-                        
-                        <!-- Formulario: Subir nuevo archivo -->
-                        <form id="formSubirArchivo" class="flex-1 bg-white rounded-lg p-4 border border-orange-200">
-                            <?= \App\Helpers\AuthHelper::getCsrfField() ?>
-                            <input type="hidden" name="accion" value="subir_archivo">
-                            
-                            <label class="block text-xs font-bold text-orange-900 uppercase tracking-wider mb-2">
-                                Subir Archivo Correcto
-                            </label>
-                            
-                            <input type="file" 
-                                   name="nuevo_archivo" 
-                                   accept=".pdf,.xml" 
-                                   class="w-full px-3 py-2 border border-orange-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 mb-3"
-                                   required>
-                            
-                            <button type="submit" 
-                                    class="w-full bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                                </svg>
-                                Subir Archivo
-                            </button>
-                        </form>
+                        <?php if ($tipoError === 'tipo_cancelacion'): ?>
+                            <!-- Solo mostrar formulario para corregir tipo de cancelación -->
+                            <form id="formActualizarTipo" class="flex-1 bg-white rounded-lg p-4 border border-orange-200">
+                                <?= \App\Helpers\AuthHelper::getCsrfField() ?>
+                                <input type="hidden" name="accion" value="actualizar_tipo">
+
+                                <label class="block text-xs font-bold text-orange-900 uppercase tracking-wider mb-2">
+                                    Corregir Tipo de Cancelación
+                                </label>
+
+                                <select name="tipo_cancelacion"
+                                        class="w-full px-3 py-2 border border-orange-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 mb-3">
+                                    <?php foreach (TIPOS_CANCELACION as $key => $label): ?>
+                                    <option value="<?= $key ?>" <?= $ticket['tipo_cancelacion'] === $key ? '' : '' ?>>
+                                        <?= $label ?>
+                                    </option>
+                                    <?php endforeach; ?>
+                                </select>
+
+                                <button type="submit"
+                                        class="w-full bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    Actualizar Tipo
+                                </button>
+                            </form>
+                        <?php elseif ($tipoError === 'archivo_no_coincide'): ?>
+                            <!-- Solo mostrar formulario para subir nuevo archivo -->
+                            <form id="formSubirArchivo" class="flex-1 bg-white rounded-lg p-4 border border-orange-200">
+                                <?= \App\Helpers\AuthHelper::getCsrfField() ?>
+                                <input type="hidden" name="accion" value="subir_archivo">
+
+                                <label class="block text-xs font-bold text-orange-900 uppercase tracking-wider mb-2">
+                                    Subir Archivo Correcto
+                                </label>
+
+                                <input type="file"
+                                       name="nuevo_archivo"
+                                       accept=".pdf,.xml"
+                                       class="w-full px-3 py-2 border border-orange-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 mb-3"
+                                       required>
+
+                                <button type="submit"
+                                        class="w-full bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                                    </svg>
+                                    Subir Archivo
+                                </button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
