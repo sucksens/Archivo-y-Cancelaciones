@@ -4,23 +4,6 @@ use App\Helpers\PermissionHelper;
 
 <!-- Stats Cards -->
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
-    <!-- Total Tickets -->
-    <div class="card">
-        <div class="card-body">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-500">Total Tickets</p>
-                    <p class="text-2xl font-bold text-gray-900"><?= $stats['total'] ?? 0 ?></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Pendientes -->
     <div class="card">
         <div class="card-body">
@@ -38,6 +21,23 @@ use App\Helpers\PermissionHelper;
         </div>
     </div>
     
+    <!-- En Revision -->
+    <div class="card">
+        <div class="card-body">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">En Revision</p>
+                    <p class="text-2xl font-bold text-gray-900"><?= $stats['en_revision'] ?? 0?></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- En Proceso -->
     <div class="card">
         <div class="card-body">
@@ -49,12 +49,47 @@ use App\Helpers\PermissionHelper;
                 </div>
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">En Proceso</p>
-                    <p class="text-2xl font-bold text-warning-600"><?= ($stats['en_revision'] ?? 0) + ($stats['en_proceso'] ?? 0) ?></p>
+                    <p class="text-2xl font-bold text-warning-600"><?=$stats['en_proceso'] ?? 0?></p>
                 </div>
             </div>
         </div>
     </div>
     
+
+    <!-- Liberados -->
+    <div class="card">
+        <div class="card-body">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.67 13 l 0 -6 m 0 9 l 0 0 m 9 -4 a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Liberados</p>
+                    <p class="text-2xl font-bold text-purple-600"><?= $stats['liberados'] ?? 0 ?></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Rechazados -->
+    <div class="card">
+        <div class="card-body">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.67 9 l 6 6 m -6 0 l 6 -6 m 0 9 m 6 -6 a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Rechazados</p>
+                    <p class="text-2xl font-bold text-red-600"><?= $stats['rechazados'] ?? 0 ?></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Cancelados -->
     <div class="card">
         <div class="card-body">
@@ -67,38 +102,6 @@ use App\Helpers\PermissionHelper;
                 <div class="ml-4">
                     <p class="text-sm font-medium text-gray-500">Completados</p>
                     <p class="text-2xl font-bold text-success-600"><?= ($stats['completados'] ?? 0) + ($stats['cancelados'] ?? 0) ?></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Rechazados -->
-    <div class="card">
-        <div class="card-body">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11 l 6 6 m -6 0 l 6 -6 m 0 9 m 6 -6 a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-500">Rechazados</p>
-                    <p class="text-2xl font-bold text-red-900"><?= $stats['rechazados'] ?? 0 ?></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Liberados -->
-    <div class="card">
-        <div class="card-body">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 15 l 0 -6 m 0 9 l 0 0 m 9 -4 a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-500">Liberados</p>
-                    <p class="text-2xl font-bold text-success-900"><?= $stats['liberados'] ?? 0 ?></p>
                 </div>
             </div>
         </div>
