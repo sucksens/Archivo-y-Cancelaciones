@@ -2,6 +2,11 @@
 use App\Helpers\PermissionHelper;
 ?>
 
+<!-- Encabezado de Tickets Totales -->
+ <div class = "header">
+    <h2 class = "text-2x1 font-bold text-gray-900">Tickets Totales: <?= $stats['total'] ?? 0?></h2>
+</div>
+
 <!-- Stats Cards -->
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
     <!-- Pendientes -->
