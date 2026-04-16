@@ -10,7 +10,12 @@ use App\Helpers\PermissionHelper;
 <!-- Stats Cards -->
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
     <!-- Pendientes -->
-    <a href = "https://www.google.com">    
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=pendiente">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=pendiente">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=pendiente">   
         <div class="card">
             <div class="card-body">
                 <div class="flex items-center">
@@ -26,7 +31,9 @@ use App\Helpers\PermissionHelper;
                 </div>
             </div>
         </div>
-</a>
+    </a>
+    </a>
+    </a>
     
     <!-- En Revision -->
     <div class="card">
