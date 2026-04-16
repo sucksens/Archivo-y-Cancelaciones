@@ -4,7 +4,7 @@ use App\Helpers\PermissionHelper;
 
 <!-- Encabezado de Tickets Totales -->
  <div class = "header">
-    <h2 class = "text-2x1 font-bold text-gray-900">Tickets Totales: <?= $stats['total'] ?? 0?></h2>
+    <h1 class = "text-2x1 font-bold text-gray-900">Tickets Totales: <?= $stats['total'] ?? 0?><br><br></h1>
 </div>
 
 <!-- Stats Cards -->
