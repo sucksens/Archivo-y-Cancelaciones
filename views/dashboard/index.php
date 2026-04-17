@@ -215,11 +215,11 @@ use App\Helpers\PermissionHelper;
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             <?php foreach ($recentTickets as $ticket): ?>
-                            <a href="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>">
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-6 py-4">
                                     <div class="text-sm font-medium text-gray-900">
@@ -241,9 +241,11 @@ use App\Helpers\PermissionHelper;
                                     <?= date('d/m/Y H:i', strtotime($ticket['fecha_creacion'])) ?>
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    </td>
-                                </tr>
-                            </a>
+                                    <a href="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                                        Ver detalle
+                                    </a>
+                                </td>
+                            </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
