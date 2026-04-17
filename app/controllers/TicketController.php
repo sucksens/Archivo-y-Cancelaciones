@@ -706,7 +706,6 @@ class TicketController extends BaseController
             if (!$operacion) {
                 $this->json(['error' => 'Operación no encontrada'], 404);
             }
-            $ticket = $this->ticketModel->find($operacion['ticket_id']);
             $flag = $this->input('flag');
             $allowedFlags = ['solicitada_cancelacion', 'cancelado_sistema', 'cancelado_sat'];
 
@@ -734,7 +733,12 @@ class TicketController extends BaseController
             }
 
             $this->operacionModel->update($id, $updateData);
-            $this->operacionModel->updateBbj($id, $ticket['empresa_solicitante'], $ticket['tipo_factura']);
+            
+            // validacion de que bandera se esta marcando para poder cancelar en bbj
+            if($flag === 'cancelado_sistema'){
+                $ticket = $this->ticketModel->find($operacion['ticket_id']);
+                $this->operacionModel->CancelarBbjNotas($id, $ticket['empresa_solicitante'], $ticket['tipo_factura']);
+            }
 
             // Registrar auditoría en el ticket relacionado
             $this->ticketModel->audit(

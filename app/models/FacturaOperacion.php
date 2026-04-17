@@ -117,7 +117,16 @@ class FacturaOperacion
         return true;
     }
 
-    public function updateBbj(int $id, string $empresa, string $contexto ): bool
+
+    /**
+     * Actualizar operación en BBj
+     * 
+     * @param int $id ID de la operación de la factura
+     * @param string $empresa Empresa
+     * @param string $contexto Contexto
+     * @return bool
+     */
+    public function CancelarBbjNotas(int $id, string $empresa, string $contexto ): bool
     {
         $sql = "SELECT serie, id_compago FROM {$this->table} WHERE id = ?";
         $data = $this->db->fetchOne($sql, [$id]);
@@ -133,12 +142,13 @@ class FacturaOperacion
             ]
         ];
         $dbname = $dbMapping[$empresa][$contexto];
+
         $dbBBj = DatabaseBbj::getInstance($dbname);
-        if((substr($data['serie'], 0, 2)) == "NF"){
+        if(substr($data['serie'], 0, 2) == "NF"){
             $sql = "UPDATE NCANTICIPOS SET STATUS = CASE
             WHEN STATUS = '0' THEN '1' ELSE '0' END
             WHERE SERIENC = ? AND ID_NOTA = ?";
-        }elseif((substr($data['serie'], 0, 2)) == "NA"){
+        }elseif(substr($data['serie'], 0, 2) == "NA"){
             $sql = "UPDATE NCREDITO SET STATUS = CASE
             WHEN STATUS = '0' THEN '1' ELSE '0' END
             WHERE SERIENC = ? AND ID_NOTA = ?";
