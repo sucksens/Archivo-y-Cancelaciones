@@ -15,7 +15,8 @@ use App\Helpers\PermissionHelper;
     <?php elseif (PermissionHelper::isConsulta()): ?>
     <a href="<?= BASE_URL ?>solicitudes?estado=pendiente">
     <?php else: ?>
-    <a href="<?= BASE_URL ?>mis-solicitudes?estado=pendiente">   
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=pendiente">
+    <?php endif; ?>   
         <div class="card">
             <div class="card-body">
                 <div class="flex items-center">
