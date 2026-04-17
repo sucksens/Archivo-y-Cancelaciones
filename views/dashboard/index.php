@@ -15,7 +15,8 @@ use App\Helpers\PermissionHelper;
     <?php elseif (PermissionHelper::isConsulta()): ?>
     <a href="<?= BASE_URL ?>solicitudes?estado=pendiente">
     <?php else: ?>
-    <a href="<?= BASE_URL ?>mis-solicitudes?estado=pendiente">   
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=pendiente">
+    <?php endif; ?>   
         <div class="card">
             <div class="card-body">
                 <div class="flex items-center">
@@ -36,6 +37,13 @@ use App\Helpers\PermissionHelper;
     </a>
     
     <!-- En Revision -->
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=en_revision">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=en_revision">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=en_revision">
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
@@ -51,8 +59,18 @@ use App\Helpers\PermissionHelper;
             </div>
         </div>
     </div>
+    </a>
+    </a>
+    </a>
     
     <!-- En Proceso -->
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=proceso_cancelacion">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=proceso_cancelacion">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=proceso_cancelacion">
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
@@ -68,9 +86,19 @@ use App\Helpers\PermissionHelper;
             </div>
         </div>
     </div>
+    </a>
+    </a>
+    </a>
     
 
     <!-- Liberados -->
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=liberado">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=liberado">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=liberado">
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
@@ -86,8 +114,18 @@ use App\Helpers\PermissionHelper;
             </div>
         </div>
     </div>
+    </a>
+    </a>
+    </a>
     
     <!-- Rechazados -->
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=rechazado">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=rechazado">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=rechazado">
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
@@ -103,8 +141,18 @@ use App\Helpers\PermissionHelper;
             </div>
         </div>
     </div>
+    </a>
+    </a>
+    </a>
 
     <!-- Cancelados -->
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=cancelado">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=cancelado">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=cancelado">
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
@@ -120,6 +168,9 @@ use App\Helpers\PermissionHelper;
             </div>
         </div>
     </div>
+    </a>
+    </a>
+    </a>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
