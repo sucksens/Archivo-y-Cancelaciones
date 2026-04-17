@@ -37,6 +37,13 @@ use App\Helpers\PermissionHelper;
     </a>
     
     <!-- En Revision -->
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=en_revision">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=en_revision">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=en_revision">
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
@@ -52,8 +59,18 @@ use App\Helpers\PermissionHelper;
             </div>
         </div>
     </div>
+    </a>
+    </a>
+    </a>
     
     <!-- En Proceso -->
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=proceso_cancelacion">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=proceso_cancelacion">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=proceso_cancelacion">
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
@@ -69,9 +86,19 @@ use App\Helpers\PermissionHelper;
             </div>
         </div>
     </div>
+    </a>
+    </a>
+    </a>
     
 
     <!-- Liberados -->
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=liberado">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=liberado">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=liberado">
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
@@ -87,8 +114,18 @@ use App\Helpers\PermissionHelper;
             </div>
         </div>
     </div>
+    </a>
+    </a>
+    </a>
     
     <!-- Rechazados -->
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=rechazado">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=rechazado">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=rechazado">
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
@@ -104,8 +141,18 @@ use App\Helpers\PermissionHelper;
             </div>
         </div>
     </div>
+    </a>
+    </a>
+    </a>
 
     <!-- Cancelados -->
+    <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
+    <a href="<?= BASE_URL ?>tickets?estado=cancelado">
+    <?php elseif (PermissionHelper::isConsulta()): ?>
+    <a href="<?= BASE_URL ?>solicitudes?estado=cancelado">
+    <?php else: ?>
+    <a href="<?= BASE_URL ?>mis-solicitudes?estado=cancelado">
+    <?php endif; ?>
     <div class="card">
         <div class="card-body">
             <div class="flex items-center">
@@ -121,6 +168,9 @@ use App\Helpers\PermissionHelper;
             </div>
         </div>
     </div>
+    </a>
+    </a>
+    </a>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -165,11 +215,11 @@ use App\Helpers\PermissionHelper;
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             <?php foreach ($recentTickets as $ticket): ?>
+                            <a href="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>">
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-6 py-4">
                                     <div class="text-sm font-medium text-gray-900">
@@ -191,11 +241,9 @@ use App\Helpers\PermissionHelper;
                                     <?= date('d/m/Y H:i', strtotime($ticket['fecha_creacion'])) ?>
                                 </td>
                                 <td class="px-6 py-4 text-right">
-                                    <a href="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>" class="text-primary-600 hover:text-primary-700 text-sm font-medium">
-                                        Ver detalle
-                                    </a>
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            </a>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
