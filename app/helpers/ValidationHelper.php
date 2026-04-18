@@ -82,7 +82,9 @@ class ValidationHelper
             $rfc = strtoupper(trim($this->data[$field]));
             
             // Patrón RFC mexicano (persona física o moral)
-            $pattern = '/^[A-ZÑ&]{3,4}\d{6}[A-V1-9][0-9A-Z]?[0-9A-Z]$/';
+            //$pattern = '/^[A-ZÑ&]{3,4}\d{6}[A-V1-9][0-9A-Z]?[0-9A-Z]$/';
+            $pattern = '/^([A-ZÑ&]{3,4}\d{6}[A-V1-9][0-9A-Z]?[0-9A-Z]|XAXX010101000|XEXX010101000)$/';
+
             
             if (!preg_match($pattern, $rfc)) {
                 $this->errors[$field] = $message ?? "El RFC no tiene un formato válido";
