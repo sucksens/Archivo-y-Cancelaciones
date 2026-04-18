@@ -468,7 +468,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                             <td class="px-4 py-2">
                                 <div class="flex items-center justify-center gap-2 <?= !$op['requiere_cancelacion'] ? 'opacity-25' : '' ?>">
                                     <button type="button" 
-                                            class="btn-toggle-flag p-1 text-primary-500 hover:text-primary-700 transition-colors <?= $op['requiere_cancelacion'] && !$op['solicitada_cancelacion'] ? 'opacity-25' : '' ?>"
+                                            class="btn-toggle-flag p-1 text-primary-500 hover:text-primary-700 transition-colors <?= $op['requiere_cancelacion'] && !$op['solicitada_cancelacion'] ? '' : 'opacity-25' ?>"
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="solicitada_cancelacion"
                                             title="Solicitada Cancelación"
@@ -478,7 +478,7 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                                         </svg>
                                     </button>
                                     <button type="button" 
-                                            class="btn-toggle-flag p-1 text-update-500 hover:text-update-700 transition-colors <?= $op['requiere_cancelacion'] && !$op['cancelado_sistema'] ? 'opacity-25' : '' ?>"
+                                            class="btn-toggle-flag p-1 text-update-500 hover:text-update-700 transition-colors <?= $op['requiere_cancelacion'] && !$op['cancelado_sistema'] ? '' : 'opacity-25' ?>"
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="cancelado_sistema"
                                             title="Cancelado Sistema"
