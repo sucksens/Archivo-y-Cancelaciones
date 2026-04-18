@@ -472,17 +472,17 @@ $userInitials = strtoupper(substr($ticket['usuario_nombre'] ?? 'U', 0, 2));
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="solicitada_cancelacion"
                                             title="Solicitada Cancelación"
-                                            <?= $op['requiere_cancelacion'] && !$op['solicitada_cancelacion'] ? '' : 'disabled'; 'opacity-25' ?>>
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                        </svg>
-                                    </button>
-                                    <button type="button" 
-                                            class="btn-toggle-flag p-1 text-update-500 hover:text-update-700 transition-colors"
-                                            data-op-id="<?= $op['id'] ?>"
-                                            data-flag="cancelado_sistema"
-                                            title="Cancelado Sistema"
-                                            <?= $op['requiere_cancelacion'] && !$op['cancelado_sistema'] ? '' : 'disabled'; 'opacity-25' ?>>
+                                            class="<?= ($op['requiere_cancelacion'] && !$op['solicitada_cancelacion']) ? '' : 'opacity-25" disabled="' ?>">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                            </svg>
+                                        </button>
+                                        <button type="button" 
+                                        class="btn-toggle-flag p-1 text-update-500 hover:text-update-700 transition-colors"
+                                        data-op-id="<?= $op['id'] ?>"
+                                        data-flag="cancelado_sistema"
+                                        title="Cancelado Sistema"
+                                        class="<?= ($op['requiere_cancelacion'] && !$op['cancelado_sistema']) ? '' : 'opacity-25" disabled="' ?>">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                         </svg>
