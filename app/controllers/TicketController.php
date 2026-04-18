@@ -729,7 +729,7 @@ class TicketController extends BaseController
             // validacion de que bandera se esta marcando para poder cancelar en bbj
             if($flag === 'cancelado_sistema'){
                 $ticket = $this->ticketModel->find($operacion['ticket_id']);
-                $this->operacionModel->CancelarBbjNotas($id, $ticket['empresa_solicitante'], $ticket['tipo_factura']);
+                $this->operacionModel->CancelarBbj($id, $ticket['empresa_solicitante'], $ticket['tipo_factura']);
             }
 
             // Registrar auditoría en el ticket relacionado

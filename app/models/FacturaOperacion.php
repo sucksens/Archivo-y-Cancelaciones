@@ -126,7 +126,7 @@ class FacturaOperacion
      * @param string $contexto Contexto
      * @return bool
      */
-    public function CancelarBbjNotas(int $id, string $empresa, string $contexto ): bool
+    public function CancelarBbj(int $id, string $empresa, string $contexto ): bool
     {
         $sql = "SELECT serie, id_compago FROM {$this->table} WHERE id = ?";
         $data = $this->db->fetchOne($sql, [$id]);
@@ -143,17 +143,24 @@ class FacturaOperacion
         ];
         $dbname = $dbMapping[$empresa][$contexto];
 
+        $serie = str_replace(' ', '', $data['serie']);
         $dbBBj = DatabaseBbj::getInstance($dbname);
-        if(substr($data['serie'], 0, 2) == "NF"){
-            $sql = "UPDATE NCANTICIPOS SET STATUS = CASE
-            WHEN STATUS = '0' THEN '1' ELSE '0' END
-            WHERE SERIENC = ? AND ID_NOTA = ?";
-        }elseif(substr($data['serie'], 0, 2) == "NA"){
-            $sql = "UPDATE NCREDITO SET STATUS = CASE
-            WHEN STATUS = '0' THEN '1' ELSE '0' END
-            WHERE SERIENC = ? AND ID_NOTA = ?";
+
+        if(($serie[0]) == "N"){
+            if($serie[1] == "F"){
+                $sql = "UPDATE NCANTICIPOS SET STATUS = 1 WHERE SERIENC = ? AND ID_NOTA = ?";
+            }elseif($serie[1] == "A"){
+                $sql = "UPDATE NCREDITO SET STATUS = 1 WHERE SERIENC = ? AND ID_NOTA = ?";
+            }
+            $dbBBj->query($sql, [$data['serie'], $data['id_compago']]);
+            }
+        else if(($serie[0] == "C") && ($serie[1] != "X")){
+            $dbBBj1 = DatabaseBbj::getInstance("11_TESORERIA");
+            $sql = "UPDATE COMPAGOS SET STATUS = 1 WHERE SERIECP = ? AND ID_COMPAGO = ?";
+            $dbBBj1->query($sql, [$data['serie'], $data['id_compago']]);
+            $sql = "DELETE FROM PEDCOMPAGOS WHERE SERIECP = ? AND ID_COMPAGO = ?";
+            $dbBBj->query($sql, [$data['serie'], $data['id_compago']]);
         }
-        $dbBBj->query($sql, [$data['serie'], $data['id_compago']]);
 
         return true;
     }
