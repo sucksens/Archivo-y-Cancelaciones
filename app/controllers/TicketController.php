@@ -391,6 +391,8 @@ class TicketController extends BaseController
 
         $comentarios = $this->comentarioModel->getByTicket($id);
 
+        $this->log('Leído ticket', 'tickets', "ID: {$id}");
+
         $this->view('tickets/detalle', [
             'title' => 'Ticket #' . $ticket['id'],
             'ticket' => $ticket,
@@ -681,6 +683,8 @@ class TicketController extends BaseController
 
         $filename = basename($ticket['archivo_autorizacion']);
         $mimeType = mime_content_type($filePath);
+
+        $this->log('Descargado archivo de autorización', 'tickets', "ID: {$id}, Archivo: {$filename}");
 
         header('Content-Type: ' . $mimeType);
         header('Content-Disposition: attachment; filename="' . $filename . '"');
@@ -993,6 +997,8 @@ class TicketController extends BaseController
                 ], $httpCode);
             }
 
+            $this->log('Parseado XML de ticket', 'tickets', "Archivo: {$fileData['name']}");
+
             $this->json($decodedResponse);
 
         } catch (\Exception $e) {
@@ -1057,6 +1063,8 @@ class TicketController extends BaseController
             ]);
 
             if ($comentarioId) {
+                $this->log('Agregado comentario a ticket', 'tickets', "ID: {$id}, Comentario: {$comentario}");
+
                 $nuevoComentario = $this->comentarioModel->find($comentarioId);
                 $this->json([
                     'success' => true,
@@ -1097,6 +1105,8 @@ class TicketController extends BaseController
             }
 
             if ($this->comentarioModel->delete($comentarioId)) {
+                $this->log('Eliminado comentario de ticket', 'tickets', "ID: {$id}, Comentario ID: {$comentarioId}");
+
                 $this->json([
                     'success' => true,
                     'message' => 'Comentario eliminado correctamente'
