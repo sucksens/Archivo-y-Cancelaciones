@@ -131,6 +131,11 @@ class FacturaOperacion
         $sql = "SELECT serie, id_compago FROM {$this->table} WHERE id = ?";
         $data = $this->db->fetchOne($sql, [$id]);
 
+        //revisar que data o serie no sea nula
+        if($data['serie'] == null || $data['id_compago'] == null){
+            return false;
+        }
+
         $dbMapping = [
             'grupo_motormexa' => [
                 'autos_nuevos' => '01AN_AUTOSNUEVOS',
@@ -143,21 +148,28 @@ class FacturaOperacion
         ];
         $dbname = $dbMapping[$empresa][$contexto];
 
+        //limpiar espacios en blanco de la serie
         $serie = str_replace(' ', '', $data['serie']);
         $dbBBj = DatabaseBbj::getInstance($dbname);
 
+        //Logica de las unicas operaciones que se pueden cancelar
         if(($serie[0]) == "N"){
+            //Actualizar STATUS Nota de Credito o Nota de Aplicacion
             if($serie[1] == "F"){
                 $sql = "UPDATE NCANTICIPOS SET STATUS = 1 WHERE SERIENC = ? AND ID_NOTA = ?";
             }elseif($serie[1] == "A"){
                 $sql = "UPDATE NCREDITO SET STATUS = 1 WHERE SERIENC = ? AND ID_NOTA = ?";
             }
+
             $dbBBj->query($sql, [$data['serie'], $data['id_compago']]);
-            }
-        else if(($serie[0] == "C") && ($serie[1] != "X")){
+
+        }else if(($serie[0] == "C") && ($serie[1] != "X")){
+            //Actualizar STATUS Compago
             $dbBBj1 = DatabaseBbj::getInstance("11_TESORERIA");
             $sql = "UPDATE COMPAGOS SET STATUS = 1 WHERE SERIECP = ? AND ID_COMPAGO = ?";
             $dbBBj1->query($sql, [$data['serie'], $data['id_compago']]);
+
+            //Eliminar registros de PEDCOMPAGOS 
             $sql = "DELETE FROM PEDCOMPAGOS WHERE SERIECP = ? AND ID_COMPAGO = ?";
             $dbBBj->query($sql, [$data['serie'], $data['id_compago']]);
         }
