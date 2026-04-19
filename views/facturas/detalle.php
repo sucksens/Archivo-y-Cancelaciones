@@ -183,13 +183,13 @@ $canDelete = $canDelete ?? false;
                         
                         if (!userVendedor) {
                             e.preventDefault();
-                            alert('No tienes un vendedor asignado. Contacta al administrador.');
+                            mostrarError('No tienes un vendedor asignado. Contacta al administrador.');
                             return false;
                         }
                         
                         if (facturaVendedor !== userVendedor) {
                             e.preventDefault();
-                            alert('No tienes permiso para descargar facturas de este vendedor.\n\nVendedor de la factura: ' + facturaVendedor + '\nTu vendedor asignado: ' + userVendedor);
+                            mostrarError('No tienes permiso para descargar facturas de este vendedor.<br><br><strong>Vendedor de la factura:</strong> ' + facturaVendedor + '<br><strong>Tu vendedor asignado:</strong> ' + userVendedor);
                             return false;
                         }
                         
@@ -198,10 +198,49 @@ $canDelete = $canDelete ?? false;
                     
                     // Si no tiene ningún permiso de descarga
                     e.preventDefault();
-                    alert('No tienes permiso para descargar archivos.');
+                    mostrarError('No tienes permiso para descargar archivos.');
                     return false;
                 });
             });
+            
+            // Función para mostrar mensajes de error en el frontend
+            function mostrarError(mensaje) {
+                // Eliminar mensaje anterior si existe
+                const mensajeAnterior = document.getElementById('error-descarga-mensaje');
+                if (mensajeAnterior) {
+                    mensajeAnterior.remove();
+                }
+                
+                // Crear elemento de mensaje
+                const mensajeDiv = document.createElement('div');
+                mensajeDiv.id = 'error-descarga-mensaje';
+                mensajeDiv.className = 'mb-4 p-4 rounded-lg bg-red-100 text-red-800 border border-red-300';
+                mensajeDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <div>
+                            <p class="font-semibold">Error de permiso</p>
+                            <p class="text-sm mt-1">${mensaje}</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Insertar el mensaje después del contenedor principal
+                const mainContainer = document.querySelector('.max-w-5xl');
+                if (mainContainer) {
+                    mainContainer.insertBefore(mensajeDiv, mainContainer.firstChild);
+                }
+                
+                // Scroll hacia arriba para mostrar el mensaje
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Eliminar el mensaje después de 5 segundos
+                setTimeout(() => {
+                    if (mensajeDiv) {
+                        mensajeDiv.remove();
+                    }
+                }, 5000);
+            }
             </script>
 
             <div class="mt-8 pt-6 border-t border-gray-200">
