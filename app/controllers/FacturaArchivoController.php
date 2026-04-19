@@ -313,8 +313,13 @@ class FacturaArchivoController extends BaseController
             exit;
         }
 
-        $canDownload = PermissionHelper::hasPermission('facturas.download');
+        $canDownloadAll = PermissionHelper::hasPermission('facturas.download');
+        $canDownloadVendedor = PermissionHelper::hasPermission('facturas.download.vendedor');
+        $canDownload = $canDownloadAll || $canDownloadVendedor;
         $canDelete = PermissionHelper::isAdmin();
+
+        // Obtener el vendedor del usuario para validación en el cliente
+        $userVendedor = PermissionHelper::getUserVendedor();
 
         $this->view('facturas/detalle', [
             'title' => 'Factura #' . $id,
@@ -322,6 +327,9 @@ class FacturaArchivoController extends BaseController
             'empresas' => EMPRESAS,
             'tipos_auto' => TIPOS_AUTO,
             'canDownload' => $canDownload,
+            'canDownloadAll' => $canDownloadAll,
+            'canDownloadVendedor' => $canDownloadVendedor,
+            'userVendedor' => $userVendedor,
             'canDelete' => $canDelete
         ]);
     }
@@ -341,10 +349,27 @@ class FacturaArchivoController extends BaseController
             exit('Factura no encontrada');
         }
 
-        $canDownload = PermissionHelper::hasPermission('facturas.download');
-        if (!$canDownload) {
+        $canDownloadAll = PermissionHelper::hasPermission('facturas.download');
+        $canDownloadVendedor = PermissionHelper::hasPermission('facturas.download.vendedor');
+
+        if (!$canDownloadAll && !$canDownloadVendedor) {
             http_response_code(403);
             exit('Acceso denegado');
+        }
+
+        // Si solo tiene permiso de vendedor, verificar que el id_vendedor coincida
+        if (!$canDownloadAll && $canDownloadVendedor) {
+            $userVendedor = PermissionHelper::getUserVendedor();
+            
+            if (!$userVendedor) {
+                http_response_code(403);
+                exit('No tienes un vendedor asignado');
+            }
+            
+            if ($factura['id_vendedor'] !== $userVendedor) {
+                http_response_code(403);
+                exit('No tienes permiso para descargar facturas de este vendedor');
+            }
         }
 
         $filePath = null;
