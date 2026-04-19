@@ -65,6 +65,13 @@ class FacturaArchivoController extends BaseController
             $result = $this->facturaModel->getByUser($this->userId(), $page, ITEMS_PER_PAGE, $filters);
         }
 
+        // Registrar log de la acción
+        $this->log(
+            'Listar facturas',
+            'facturas',
+            'Filtros: ' . json_encode($filters) . ', Página: ' . $page . ', Total: ' . $result['total']
+        );
+
         $this->view('facturas/index', [
             'title' => 'Archivos de Facturas',
             'facturas' => $result['data'],
@@ -84,6 +91,13 @@ class FacturaArchivoController extends BaseController
     public function create(): void
     {
         $this->requirePermission('facturas.upload');
+
+        // Registrar log de la acción
+        $this->log(
+            'Acceso a formulario de subida',
+            'facturas',
+            'Usuario accedió al formulario para subir nueva factura'
+        );
 
         $this->view('facturas/subir', [
             'title' => 'Subir Factura',
@@ -276,7 +290,15 @@ class FacturaArchivoController extends BaseController
                 'datos_extra' => json_encode($cfdi)
             ]);
 
-            $this->log('Factura subida', 'facturas', "ID: {$facturaId}, UUID: {$uuidLimpio},".json_encode($cfdi)," ");
+            // Registrar log mejorado de la acción
+            $this->log(
+                'Factura subida',
+                'facturas',
+                "ID: {$facturaId}, UUID: {$uuidLimpio}, Empresa: {$empresa}, Tipo: {$tipoFactura}, " .
+                "Serie: {$cfdi['serie']}, Folio: {$cfdi['folio']}, Total: {$cfdi['total']}, " .
+                "RFC Emisor: {$cfdi['emisor']['rfc']}, RFC Receptor: {$cfdi['receptor']['rfc']}, " .
+                "ID Vendedor: {$facturaBbj['ID_VENDEDOR']}, Inventario: {$facturaBbj['INVENTARIO']}"
+            );
             $this->session->flash('success', 'Factura subida correctamente');
             $this->redirect('/facturas/' . $facturaId);
 
@@ -320,6 +342,14 @@ class FacturaArchivoController extends BaseController
 
         // Obtener el vendedor del usuario para validación en el cliente
         $userVendedor = PermissionHelper::getUserVendedor();
+
+        // Registrar log de la acción
+        $this->log(
+            'Ver detalle de factura',
+            'facturas',
+            "ID: {$id}, UUID: {$factura['uuid_factura']}, Empresa: {$factura['empresa']}, " .
+            "Inventario: {$factura['inventario']}, Tipo: {$factura['tipo_factura']}"
+        );
 
         $this->view('facturas/detalle', [
             'title' => 'Factura #' . $id,
@@ -393,6 +423,15 @@ class FacturaArchivoController extends BaseController
             exit('Archivo no encontrado');
         }
 
+        // Registrar log de la acción
+        $this->log(
+            'Descargar archivo de factura',
+            'facturas',
+            "ID: {$id}, Tipo: {$tipo}, UUID: {$factura['uuid_factura']}, " .
+            "Empresa: {$factura['empresa']}, Inventario: {$factura['inventario']}, " .
+            "Archivo: {$filename}"
+        );
+
         $mimeType = mime_content_type($filePath);
 
         header('Content-Type: ' . $mimeType);
@@ -435,7 +474,14 @@ class FacturaArchivoController extends BaseController
 
             $this->facturaModel->delete($id);
 
-            $this->log('Factura eliminada', 'facturas', "ID: {$id}, UUID: {$factura['uuid_factura']}");
+            // Registrar log mejorado de la acción
+            $this->log(
+                'Factura eliminada',
+                'facturas',
+                "ID: {$id}, UUID: {$factura['uuid_factura']}, Empresa: {$factura['empresa']}, " .
+                "Tipo: {$factura['tipo_factura']}, Inventario: {$factura['inventario']}, " .
+                "Usuario que subió: {$factura['usuario_nombre']}"
+            );
 
             if ($this->isAjax()) {
                 $this->json(['success' => true, 'message' => 'Factura eliminada correctamente']);
@@ -526,6 +572,15 @@ class FacturaArchivoController extends BaseController
             }
 
             error_log("parseXml success. Data keys: " . implode(', ', array_keys($data)));
+
+            // Registrar log de la acción
+            $uuidExtraido = $data['tfd11'][0]['uuid'] ?? ($data['tfd10'][0]['uuid'] ?? 'N/A');
+            $this->log(
+                'Parsear XML exitoso',
+                'facturas',
+                "Archivo: {$xmlFile['name']}, Tamaño: {$xmlFile['size']} bytes, " .
+                "UUID extraído: {$uuidExtraido}"
+            );
 
             $this->json([
                 'exito' => true,
