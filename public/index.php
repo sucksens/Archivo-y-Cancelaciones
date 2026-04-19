@@ -91,5 +91,14 @@ $router->get('/facturas/{id}', 'FacturaArchivoController@show', [$authMiddleware
 $router->get('/facturas/{id}/descargar/{tipo}', 'FacturaArchivoController@download', [$authMiddleware]);
 $router->post('/facturas/{id}/eliminar', 'FacturaArchivoController@destroy', [$authMiddleware]);
 $router->post('/facturas/parse-xml', 'FacturaArchivoController@parseXml', [$authMiddleware]);
+$router->post('/facturas/{id}/email', 'FacturaArchivoController@sendEmail', [$authMiddleware]);
+
+// Configuración de Email (whitelist / blacklist)
+$router->get('/admin/email-config', 'EmailConfigController@index', [$authMiddleware]);
+$router->post('/admin/email-config/whitelist', 'EmailConfigController@storeWhitelist', [$authMiddleware]);
+$router->post('/admin/email-config/whitelist/{id}/toggle', 'EmailConfigController@toggleWhitelist', [$authMiddleware]);
+$router->post('/admin/email-config/whitelist/{id}/eliminar', 'EmailConfigController@destroyWhitelist', [$authMiddleware]);
+$router->post('/admin/email-config/blacklist', 'EmailConfigController@storeBlacklist', [$authMiddleware]);
+$router->post('/admin/email-config/blacklist/{id}/eliminar', 'EmailConfigController@destroyBlacklist', [$authMiddleware]);
 
 $router->dispatch();
