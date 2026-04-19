@@ -351,16 +351,16 @@ $enviosEmail = $enviosEmail ?? [];
                 </div>
                 <div class="flex-shrink-0">
                     <?php
-                    $badgeClass = match($envio['resultado']) {
-                        'enviado'  => 'bg-green-100 text-green-800',
-                        'bloqueado'=> 'bg-yellow-100 text-yellow-800',
-                        default    => 'bg-red-100 text-red-800',
-                    };
-                    $icon = match($envio['resultado']) {
-                        'enviado'  => 'check-circle',
-                        'bloqueado'=> 'ban',
-                        default    => 'exclamation-circle',
-                    };
+                    $badgeClasses = [
+                        'enviado'   => 'bg-green-100 text-green-800',
+                        'bloqueado' => 'bg-yellow-100 text-yellow-800',
+                    ];
+                    $badgeClass = $badgeClasses[$envio['resultado']] ?? 'bg-red-100 text-red-800';
+                    $icons = [
+                        'enviado'   => 'check-circle',
+                        'bloqueado' => 'ban',
+                    ];
+                    $icon = $icons[$envio['resultado']] ?? 'exclamation-circle';
                     ?>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <?= $badgeClass ?>">
                         <i class="fas fa-<?= $icon ?> mr-1"></i><?= ucfirst($envio['resultado']) ?>
