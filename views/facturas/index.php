@@ -155,7 +155,13 @@ unset($_SESSION['old_input']);
                         <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>" class="text-primary-600 hover:text-primary-900 font-medium mr-3">
                             Ver detalle
                         </a>
-                        <?php if (PermissionHelper::hasPermission('facturas.download')): ?>
+                        <?php 
+                        $canDownloadThis = $canDownloadAll || 
+                                           ($canDownloadVendedor && $userVendedor && $factura['id_vendedor'] === $userVendedor) ||
+                                           ($canDownloadNR && PermissionHelper::isFacturaNR($factura));
+                        
+                        if ($canDownloadThis): 
+                        ?>
                         <?php if ($factura['archivo_xml']): ?>
                         <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/xml" class="text-red-600 hover:text-red-900 mr-3" title="Descargar XML">
                             <i class="fas fa-file-code"></i>

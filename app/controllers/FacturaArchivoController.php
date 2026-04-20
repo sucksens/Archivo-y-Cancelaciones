@@ -83,7 +83,11 @@ class FacturaArchivoController extends BaseController
             'tipos_auto' => TIPOS_AUTO,
             'isConsultaWithEspecialidad' => PermissionHelper::isConsultaWithEspecialidad(),
             'userEspecialidadLabel' => PermissionHelper::getUserEspecialidad() ? 
-                (ESPECIALIDADES_USUARIO[PermissionHelper::getUserEspecialidad()]['label'] ?? '') : ''
+                (ESPECIALIDADES_USUARIO[PermissionHelper::getUserEspecialidad()]['label'] ?? '') : '',
+            'canDownloadAll' => PermissionHelper::hasPermission('facturas.download'),
+            'canDownloadVendedor' => PermissionHelper::hasPermission('facturas.download.vendedor'),
+            'canDownloadNR' => PermissionHelper::canDownloadNR(),
+            'userVendedor' => PermissionHelper::getUserVendedor()
         ]);
     }
 

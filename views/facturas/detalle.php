@@ -146,23 +146,25 @@ $enviosEmail = $enviosEmail ?? [];
                     <div class="space-y-3">
                         <?php if ($factura['archivo_xml']): ?>
                         <div>
-                            <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/xml"
-                               class="download-btn w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-                               data-tipo="xml"
-                               data-id-vendedor="<?= htmlspecialchars($factura['id_vendedor'] ?? '') ?>">
-                                <i class="fas fa-file-code mr-2"></i> Descargar XML
-                            </a>
+                             <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/xml"
+                                class="download-btn w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+                                data-tipo="xml"
+                                data-id-vendedor="<?= htmlspecialchars($factura['id_vendedor'] ?? '') ?>"
+                                data-rfc-receptor="<?= htmlspecialchars($factura['rfc_receptor'] ?? '') ?>">
+                                 <i class="fas fa-file-code mr-2"></i> Descargar XML
+                             </a>
                         </div>
                         <?php endif; ?>
                         
                         <?php if ($factura['archivo_pdf']): ?>
                         <div>
-                            <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/pdf"
-                               class="download-btn w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
-                               data-tipo="pdf"
-                               data-id-vendedor="<?= htmlspecialchars($factura['id_vendedor'] ?? '') ?>">
-                                <i class="fas fa-file-pdf mr-2"></i> Descargar PDF
-                            </a>
+                             <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/pdf"
+                                class="download-btn w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
+                                data-tipo="pdf"
+                                data-id-vendedor="<?= htmlspecialchars($factura['id_vendedor'] ?? '') ?>"
+                                data-rfc-receptor="<?= htmlspecialchars($factura['rfc_receptor'] ?? '') ?>">
+                                 <i class="fas fa-file-pdf mr-2"></i> Descargar PDF
+                             </a>
                         </div>
                         <?php else: ?>
                         <p class="text-sm text-gray-500 italic">No hay PDF disponible</p>
@@ -173,9 +175,11 @@ $enviosEmail = $enviosEmail ?? [];
             
             <script>
             // Configuración de permisos desde PHP
-            const canDownloadAll = <?= $canDownloadAll ? 'true' : 'false' ?>;
-            const canDownloadVendedor = <?= $canDownloadVendedor ? 'true' : 'false' ?>;
-            const userVendedor = <?= json_encode($userVendedor) ?>;
+             const canDownloadAll = <?= $canDownloadAll ? 'true' : 'false' ?>;
+             const canDownloadVendedor = <?= $canDownloadVendedor ? 'true' : 'false' ?>;
+             const canDownloadNR = <?= $canDownloadNR ? 'true' : 'false' ?>;
+             const userVendedor = <?= json_encode($userVendedor) ?>;
+             const rfcNR = <?= json_encode($rfcNR) ?>;
             
             // Validar descarga antes de navegar
             document.querySelectorAll('.download-btn').forEach(btn => {
@@ -185,24 +189,39 @@ $enviosEmail = $enviosEmail ?? [];
                         return true;
                     }
                     
-                    // Si tiene permiso de vendedor, verificar el id_vendedor de la factura
-                    if (canDownloadVendedor) {
-                        const facturaVendedor = this.getAttribute('data-id-vendedor');
-                        
-                        if (!userVendedor) {
-                            e.preventDefault();
-                            mostrarError('No tienes un vendedor asignado. Contacta al administrador.');
-                            return false;
-                        }
-                        
-                        if (facturaVendedor !== userVendedor) {
-                            e.preventDefault();
-                            mostrarError('No tienes permiso para descargar facturas de este vendedor.<br><br><strong>Vendedor de la factura:</strong> ' + facturaVendedor + '<br><strong>Tu vendedor asignado:</strong> ' + userVendedor);
-                            return false;
-                        }
-                        
-                        return true;
-                    }
+                     // Si tiene permiso de vendedor, verificar el id_vendedor de la factura
+                     if (canDownloadVendedor) {
+                         const facturaVendedor = this.getAttribute('data-id-vendedor');
+                         
+                         if (userVendedor && facturaVendedor === userVendedor) {
+                             return true;
+                         }
+                         
+                         // Si NO tiene permiso de NR, mostrar error aquí
+                         if (!canDownloadNR) {
+                             e.preventDefault();
+                             if (!userVendedor) {
+                                 mostrarError('No tienes un vendedor asignado. Contacta al administrador.');
+                             } else {
+                                 mostrarError('No tienes permiso para descargar facturas de este vendedor.<br><br><strong>Vendedor de la factura:</strong> ' + facturaVendedor + '<br><strong>Tu vendedor asignado:</strong> ' + userVendedor);
+                             }
+                             return false;
+                         }
+                     }
+
+                     // Si tiene permiso de NR, verificar el RFC receptor
+                     if (canDownloadNR) {
+                         const facturaRfc = this.getAttribute('data-rfc-receptor');
+                         
+                         if (facturaRfc === rfcNR) {
+                             return true;
+                         }
+                         
+                         // Si ya pasó por vendedor y falló, o si solo tiene NR
+                         e.preventDefault();
+                         mostrarError('No tienes permiso para descargar esta factura.<br><br>Solo puedes descargar facturas de <strong>NR Finance</strong> o de tu vendedor asignado.');
+                         return false;
+                     }
                     
                     // Si no tiene ningún permiso de descarga
                     e.preventDefault();
