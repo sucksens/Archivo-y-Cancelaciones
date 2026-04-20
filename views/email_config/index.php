@@ -91,8 +91,9 @@ use App\Helpers\PermissionHelper;
                         <form action="<?= BASE_URL ?>admin/email-config/whitelist/<?= $entry['id'] ?>/toggle" method="POST" style="display:inline">
                             <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                             <button type="submit" title="<?= $entry['activo'] ? 'Desactivar' : 'Activar' ?>"
-                                    class="text-xs px-2 py-1 border rounded <?= $entry['activo'] ? 'border-yellow-400 text-yellow-600 hover:bg-yellow-50' : 'border-green-400 text-green-600 hover:bg-green-50' ?> transition-colors">
-                                <i class="fas fa-<?= $entry['activo'] ? 'pause' : 'play' ?>"></i>
+                                    class="text-xs px-2 py-1 flex items-center gap-1 border rounded <?= $entry['activo'] ? 'border-yellow-400 text-yellow-600 hover:bg-yellow-50' : 'border-green-400 text-green-600 hover:bg-green-50' ?> transition-colors">
+                                <i class="<?= $entry['activo'] ? 'fas fa-times-circle' : 'fas fa-check-circle' ?>"></i>
+                                <?= $entry['activo'] ? 'Desactivar' : 'Activar' ?>
                             </button>
                         </form>
 
@@ -100,8 +101,8 @@ use App\Helpers\PermissionHelper;
                               onsubmit="return confirm('¿Eliminar <?= htmlspecialchars($entry['email']) ?> de la whitelist?')">
                             <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                             <button type="submit" title="Eliminar"
-                                    class="text-xs px-2 py-1 border border-red-300 text-red-500 hover:bg-red-50 rounded transition-colors">
-                                <i class="fas fa-trash"></i>
+                                    class="text-xs px-2 py-1 flex items-center gap-1 border border-red-300 text-red-500 hover:bg-red-50 rounded transition-colors">
+                                <i class="fas fa-trash-alt"></i> Borrar
                             </button>
                         </form>
                     </div>
@@ -174,8 +175,8 @@ use App\Helpers\PermissionHelper;
                           onsubmit="return confirm('¿Desbloquear el dominio @<?= htmlspecialchars($entry['dominio']) ?>?')">
                         <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
                         <button type="submit" title="Eliminar de blacklist"
-                                class="text-xs px-2 py-1 border border-red-300 text-red-500 hover:bg-red-50 rounded transition-colors">
-                            <i class="fas fa-trash"></i>
+                                class="text-xs px-2 py-1 flex items-center gap-1 border border-red-300 text-red-500 hover:bg-red-50 rounded transition-colors">
+                            <i class="fas fa-trash-alt"></i> Borrar
                         </button>
                     </form>
                 </div>
