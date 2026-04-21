@@ -33,47 +33,6 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
             Dashboard
         </a>
         
-        <!-- Tickets Section -->
-        <?php if (PermissionHelper::hasPermission('tickets.create')): ?>
-        <div class="pt-4">
-            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Tickets</p>
-        </div>
-        
-        <a href="<?= BASE_URL ?>tickets/crear" class="sidebar-link <?= strpos($currentPath, '/tickets/crear') !== false ? 'active' : '' ?>">
-            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Nuevo Ticket
-        </a>
-        <?php endif; ?>
-        
-        <?php if (PermissionHelper::hasPermission('tickets.view.own')): ?>
-        <?php if (PermissionHelper::isConsulta()): ?>
-        <a href="<?= BASE_URL ?>solicitudes" class="sidebar-link <?= strpos($currentPath, '/solicitudes') !== false ? 'active' : '' ?>">
-            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
-            Solicitudes
-        </a>
-        <?php else: ?>
-        <a href="<?= BASE_URL ?>mis-solicitudes" class="sidebar-link <?= strpos($currentPath, '/mis-solicitudes') !== false ? 'active' : '' ?>">
-            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
-            Mis Solicitudes
-        </a>
-        <?php endif; ?>
-        <?php endif; ?>
-        
-        <?php if (PermissionHelper::hasPermission('tickets.view.all')): ?>
-        <a href="<?= BASE_URL ?>tickets" class="sidebar-link <?= $currentPath === '/tickets' ? 'active' : '' ?>">
-            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
-            </svg>
-            Todos los Tickets
-        </a>
-        <?php endif; ?>
-
         <!-- Facturas Section -->
         <?php if (PermissionHelper::hasAnyPermission(['facturas.view.own', 'facturas.view.empresa', 'facturas.view.all', 'facturas.upload'])): ?>
         <div class="pt-4">

@@ -265,7 +265,7 @@ class FacturaArchivo
      */
     public function getStats(?int $userId = null): array
     {
-        $where = $userId ? 'WHERE usuario_id = ?' : '';
+        $userFilter = $userId ? ' AND usuario_id = ?' : '';
         $params = $userId ? [$userId] : [];
 
         $sql = "SELECT
@@ -273,11 +273,34 @@ class FacturaArchivo
                     SUM(CASE WHEN archivo_pdf IS NOT NULL THEN 1 ELSE 0 END) as con_pdf
                 FROM {$this->table}
                 WHERE estado = 'activo'
-                {$where}";
+                {$userFilter}";
 
-        return $this->db->fetchOne($sql, $params) ?: [
-            'total' => 0, 'con_pdf' => 0
-        ];
+        $basicStats = $this->db->fetchOne($sql, $params) ?: ['total' => 0, 'con_pdf' => 0];
+        $basicStats['activas'] = $basicStats['total'];
+
+        $empresaSql = "SELECT empresa, COUNT(*) as cantidad
+                       FROM {$this->table}
+                       WHERE estado = 'activo'
+                       {$userFilter}
+                       GROUP BY empresa";
+        $empresaData = $this->db->fetchAll($empresaSql, $params);
+        $basicStats['por_empresa'] = [];
+        foreach ($empresaData as $row) {
+            $basicStats['por_empresa'][$row['empresa']] = (int) $row['cantidad'];
+        }
+
+        $tipoSql = "SELECT tipo_factura, COUNT(*) as cantidad
+                    FROM {$this->table}
+                    WHERE estado = 'activo'
+                    {$userFilter}
+                    GROUP BY tipo_factura";
+        $tipoData = $this->db->fetchAll($tipoSql, $params);
+        $basicStats['por_tipo'] = [];
+        foreach ($tipoData as $row) {
+            $basicStats['por_tipo'][$row['tipo_factura']] = (int) $row['cantidad'];
+        }
+
+        return $basicStats;
     }
 
     /**

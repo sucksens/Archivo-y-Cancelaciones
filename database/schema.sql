@@ -1,5 +1,5 @@
 -- ============================================
--- Script SQL para Sistema de Tickets de Cancelación
+-- Script SQL para Sistema de Archivo de Facturas
 -- Base de datos: cancelaciones
 -- MySQL 5.7+
 -- ============================================
@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS rol_permiso (
 
 -- ============================================
 -- TABLA: tickets_cancelacion
+-- NOTA: Esta tabla pertenece al modulo de cancelaciones que se integrara posteriormente.
 -- ============================================
 CREATE TABLE IF NOT EXISTS tickets_cancelacion (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -145,6 +146,7 @@ CREATE TABLE IF NOT EXISTS tickets_cancelacion (
 
 -- ============================================
 -- TABLA: factura_operaciones
+-- NOTA: Esta tabla pertenece al modulo de cancelaciones que se integrara posteriormente.
 -- ============================================
 CREATE TABLE IF NOT EXISTS factura_operaciones (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -205,6 +207,7 @@ CREATE TABLE IF NOT EXISTS logs_sistema (
 
 -- ============================================
 -- TABLA: auditoria_tickets
+-- NOTA: Esta tabla pertenece al modulo de cancelaciones que se integrara posteriormente.
 -- ============================================
 CREATE TABLE IF NOT EXISTS auditoria_tickets (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -319,6 +322,7 @@ INSERT INTO permisos (nombre, codigo, descripcion, modulo) VALUES
 ('Editar Configuración', 'admin.config.edit', 'Modificar configuración del sistema', 'admin');
 
 -- Permisos de tickets
+-- NOTA: Estos permisos pertenecen al modulo de cancelaciones que se integrara posteriormente.
 INSERT INTO permisos (nombre, codigo, descripcion, modulo) VALUES
 ('Crear Tickets', 'tickets.create', 'Crear nuevos tickets de cancelación', 'tickets'),
 ('Ver Tickets Propios', 'tickets.view.own', 'Ver tickets creados por el usuario', 'tickets'),
