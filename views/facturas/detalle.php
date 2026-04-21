@@ -72,42 +72,42 @@ $enviosEmail = $enviosEmail ?? [];
             <!-- Column 1: Informacion de la Factura -->
             <div class="lg:col-span-2 space-y-6">
                 <div>
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center">
                         <span class="w-8 h-px bg-slate-200 mr-3"></span>
                         Información de la Factura
                     </h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Empresa</label>
-                            <p class="mt-1 text-sm font-semibold inline-flex px-2 py-0.5 rounded <?= $factura['empresa'] === 'grupo_motormexa' ? 'text-blue-700 bg-blue-50' : ($factura['empresa'] === 'ambas' ? 'text-purple-700 bg-purple-50' : 'text-red-700 bg-red-50') ?>">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-tight">Empresa</label>
+                            <p class="mt-1 text-base font-semibold inline-flex px-2 py-0.5 rounded <?= $factura['empresa'] === 'grupo_motormexa' ? 'text-blue-700 bg-blue-50' : ($factura['empresa'] === 'ambas' ? 'text-purple-700 bg-purple-50' : 'text-red-700 bg-red-50') ?>">
                                 <?= htmlspecialchars($empresas[$factura['empresa']] ?? $factura['empresa']) ?>
                             </p>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Tipo</label>
-                            <p class="mt-1 text-sm font-medium text-slate-700"><?= htmlspecialchars($tipos_auto[$factura['tipo_factura']] ?? $factura['tipo_factura']) ?></p>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-tight">Tipo</label>
+                            <p class="mt-1 text-base font-medium text-slate-700"><?= htmlspecialchars($tipos_auto[$factura['tipo_factura']] ?? $factura['tipo_factura']) ?></p>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Serie / Folio</label>
-                            <p class="mt-1 text-sm font-medium text-slate-700"><?= htmlspecialchars($factura['serie'] ?? '-') ?> <?= $factura['folio'] ? ' / ' . htmlspecialchars($factura['folio']) : '' ?></p>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-tight">Serie / Folio</label>
+                            <p class="mt-1 text-base font-medium text-slate-700"><?= htmlspecialchars($factura['serie'] ?? '-') ?> <?= $factura['folio'] ? ' / ' . htmlspecialchars($factura['folio']) : '' ?></p>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Fecha de Emisión</label>
-                            <p class="mt-1 text-sm font-medium text-slate-700"><?= $factura['fecha_emision'] ? date('d/m/Y', strtotime($factura['fecha_emision'])) : '-' ?></p>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-tight">Fecha de Emisión</label>
+                            <p class="mt-1 text-base font-medium text-slate-700"><?= $factura['fecha_emision'] ? date('d/m/Y', strtotime($factura['fecha_emision'])) : '-' ?></p>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">RFC Emisor</label>
-                            <p class="mt-1 text-sm font-mono text-slate-600"><?= htmlspecialchars($factura['rfc_emisor'] ?? '-') ?></p>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-tight">RFC Emisor</label>
+                            <p class="mt-1 text-base font-mono text-slate-600"><?= htmlspecialchars($factura['rfc_emisor'] ?? '-') ?></p>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">RFC Receptor</label>
-                            <p class="mt-1 text-sm font-mono text-slate-600"><?= htmlspecialchars($factura['rfc_receptor'] ?? '-') ?></p>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-tight">RFC Receptor</label>
+                            <p class="mt-1 text-base font-mono text-slate-600"><?= htmlspecialchars($factura['rfc_receptor'] ?? '-') ?></p>
                         </div>
                     </div>
                 </div>
                 <div class="bg-slate-50 rounded-xl p-5 border border-slate-100 flex items-center justify-between">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Facturado</label>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">Total Facturado</label>
                         <?php if ($factura['total']): ?>
                         <p class="text-3xl font-black text-slate-900 mt-1">$<?= number_format($factura['total'], 2) ?></p>
                         <?php else: ?>
@@ -116,7 +116,7 @@ $enviosEmail = $enviosEmail ?? [];
                     </div>
                     <?php if ($factura['total']): ?>
                     <div class="text-right hidden sm:block">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Moneda</span>
+                        <span class="text-xs font-bold text-slate-400 uppercase block mb-1">Moneda</span>
                         <span class="px-2 py-1 bg-white border border-slate-200 rounded text-xs font-bold text-slate-600">MXN</span>
                     </div>
                     <?php endif; ?>
@@ -125,14 +125,14 @@ $enviosEmail = $enviosEmail ?? [];
             <!-- Column 2: Datos BBj & Archivos -->
             <div class="space-y-8 lg:border-l lg:pl-8 border-slate-100">
                 <div>
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center">
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center">
                         <span class="w-8 h-px bg-slate-200 mr-3"></span>
                         Datos de Sistema (BBj)
                     </h3>
                     <div class="grid grid-cols-2 gap-y-4 gap-x-2">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Sucursal</label>
-                            <p class="text-sm font-medium text-slate-700">
+                            <label class="block text-xs font-bold text-slate-400 uppercase">Sucursal</label>
+                            <p class="text-base font-medium text-slate-700">
                                 <?php 
                                     $sucursales = [
                                         '01' => 'Vallarta',
@@ -144,21 +144,21 @@ $enviosEmail = $enviosEmail ?? [];
                             </p>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Vendedor</label>
-                            <p class="text-sm font-medium text-slate-700"><?= htmlspecialchars($factura['id_vendedor'] ?? '-') ?></p>
+                            <label class="block text-xs font-bold text-slate-400 uppercase">Vendedor</label>
+                            <p class="text-base font-medium text-slate-700"><?= htmlspecialchars($factura['id_vendedor'] ?? '-') ?></p>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Inventario</label>
-                            <p class="text-sm font-medium text-slate-700"><?= htmlspecialchars($factura['inventario'] ?? '-') ?></p>
+                            <label class="block text-xs font-bold text-slate-400 uppercase">Inventario</label>
+                            <p class="text-base font-medium text-slate-700"><?= htmlspecialchars($factura['inventario'] ?? '-') ?></p>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Fecha FAC</label>
-                            <p class="text-sm font-medium text-slate-700"><?= $factura['fecfac'] ? date('d/m/Y', strtotime($factura['fecfac'])) : '-' ?></p>
+                            <label class="block text-xs font-bold text-slate-400 uppercase">Fecha FAC</label>
+                            <p class="text-base font-medium text-slate-700"><?= $factura['fecfac'] ? date('d/m/Y', strtotime($factura['fecfac'])) : '-' ?></p>
                         </div>
                     </div>
                 </div>
                 <div class="pt-2">
-                    <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Archivos Disponibles</h3>
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4">Archivos Disponibles</h3>
                     <div class="grid grid-cols-1 gap-3">
                         <?php if ($factura['archivo_xml']): ?>
                         <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/xml"
@@ -172,8 +172,8 @@ $enviosEmail = $enviosEmail ?? [];
                                 </svg>
                             </div>
                             <div class="text-left">
-                                <p class="text-sm font-bold text-slate-700">Factura XML</p>
-                                <p class="text-[10px] text-slate-400 uppercase">Descargar comprobante</p>
+                                <p class="text-base font-bold text-slate-700">Factura XML</p>
+                                <p class="text-xs text-slate-400 uppercase">Descargar comprobante</p>
                             </div>
                         </a>
                         <?php endif; ?>
@@ -190,8 +190,8 @@ $enviosEmail = $enviosEmail ?? [];
                                 </svg>
                             </div>
                             <div class="text-left">
-                                <p class="text-sm font-bold text-slate-700">Factura PDF</p>
-                                <p class="text-[10px] text-slate-400 uppercase">Vista de impresión</p>
+                                <p class="text-base font-bold text-slate-700">Factura PDF</p>
+                                <p class="text-xs text-slate-400 uppercase">Vista de impresión</p>
                             </div>
                         </a>
                         <?php endif; ?>
@@ -209,11 +209,11 @@ $enviosEmail = $enviosEmail ?? [];
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 uppercase">Usuario</label>
-                    <p class="text-sm font-medium text-slate-700"><?= htmlspecialchars($factura['usuario_nombre'] ?? 'Desconocido') ?></p>
+                    <p class="text-base font-medium text-slate-700"><?= htmlspecialchars($factura['usuario_nombre'] ?? 'Desconocido') ?></p>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 uppercase">Fecha de Subida</label>
-                    <p class="text-sm font-medium text-slate-700"><?= $factura['fecha_subida'] ? date('d/m/Y H:i', strtotime($factura['fecha_subida'])) : '-' ?></p>
+                    <p class="text-base font-medium text-slate-700"><?= $factura['fecha_subida'] ? date('d/m/Y H:i', strtotime($factura['fecha_subida'])) : '-' ?></p>
                 </div>
             </div>
         </div>
@@ -226,17 +226,17 @@ $enviosEmail = $enviosEmail ?? [];
         <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
             <div>
                 <h3 class="text-sm font-bold uppercase tracking-widest text-slate-600">Historial de Envíos por Email</h3>
-                <p class="text-xs text-slate-400 mt-1">Registro detallado de notificaciones enviadas a clientes</p>
+                <p class="text-sm text-slate-400 mt-1">Registro detallado de notificaciones enviadas a clientes</p>
             </div>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left">
                 <thead class="bg-slate-50/50 border-b border-slate-100">
                     <tr>
-                        <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Destinatario</th>
-                        <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fecha y Hora</th>
-                        <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Estado</th>
-                        <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Detalle / ID</th>
+                        <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Destinatario</th>
+                        <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Fecha y Hora</th>
+                        <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Estado</th>
+                        <th class="px-6 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Detalle / ID</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -245,13 +245,13 @@ $enviosEmail = $enviosEmail ?? [];
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex flex-col">
                                 <span class="text-sm font-semibold text-slate-700"><?= htmlspecialchars($envio['email_destino']) ?></span>
-                                <span class="text-[10px] text-slate-400">Asunto: <?= htmlspecialchars($envio['asunto']) ?></span>
+                                <span class="text-xs text-slate-400">Asunto: <?= htmlspecialchars($envio['asunto']) ?></span>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex flex-col">
-                                <span class="text-sm text-slate-600"><?= date('d/m/Y', strtotime($envio['enviado_en'])) ?></span>
-                                <span class="text-[10px] text-slate-400"><?= date('h:i A', strtotime($envio['enviado_en'])) ?></span>
+                                <span class="text-base text-slate-600"><?= date('d/m/Y', strtotime($envio['enviado_en'])) ?></span>
+                                <span class="text-xs text-slate-400"><?= date('h:i A', strtotime($envio['enviado_en'])) ?></span>
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -267,19 +267,19 @@ $enviosEmail = $enviosEmail ?? [];
                             ];
                             $dotClass = $dotClasses[$envio['resultado']] ?? 'bg-red-500';
                             ?>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase tracking-tighter <?= $badgeClass ?>">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-sm font-bold uppercase tracking-tighter <?= $badgeClass ?>">
                                 <span class="w-1.5 h-1.5 rounded-full mr-1.5 <?= $dotClass ?>"></span>
                                 <?= ucfirst($envio['resultado']) ?>
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right">
                             <?php if ($envio['id_operacion_api']): ?>
-                            <span class="font-mono text-[10px] text-slate-400 bg-slate-50 px-2 py-1 rounded border border-slate-100" title="<?= htmlspecialchars($envio['id_operacion_api']) ?>">
+                            <span class="font-mono text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded border border-slate-100" title="<?= htmlspecialchars($envio['id_operacion_api']) ?>">
                                 <?= htmlspecialchars(substr($envio['id_operacion_api'], 0, 8) . '...') ?>
                             </span>
                             <?php endif; ?>
                             <?php if ($envio['detalle']): ?>
-                            <span class="text-[10px] text-slate-400 block mt-1" title="<?= htmlspecialchars($envio['detalle']) ?>">
+                            <span class="text-xs text-slate-400 block mt-1" title="<?= htmlspecialchars($envio['detalle']) ?>">
                                 <?= htmlspecialchars((strlen($envio['detalle']) > 30) ? substr($envio['detalle'], 0, 30) . '...' : $envio['detalle']) ?>
                             </span>
                             <?php endif; ?>
@@ -414,22 +414,22 @@ function mostrarError(mensaje) {
             <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($_SESSION['_csrf_token'] ?? '') ?>">
 
             <div>
-                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Correo destinatario <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-bold text-slate-500 uppercase tracking-wide mb-1">Correo destinatario <span class="text-red-500">*</span></label>
                 <input type="email" name="email_destino" required
                        placeholder="cliente@empresa.com"
                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow">
-                <p class="text-[10px] text-slate-400 mt-1">Solo correos en la whitelist autorizada pueden recibir facturas.</p>
+                <p class="text-xs text-slate-400 mt-1">Solo correos en la whitelist autorizada pueden recibir facturas.</p>
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Asunto</label>
+                <label class="block text-sm font-bold text-slate-500 uppercase tracking-wide mb-1">Asunto</label>
                 <input type="text" name="asunto"
                        value="Factura <?= htmlspecialchars(($factura['serie'] ?? '') . '-' . ($factura['folio'] ?? '')) ?>"
                        class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow">
             </div>
 
             <div>
-                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wide mb-1">Mensaje (opcional)</label>
+                <label class="block text-sm font-bold text-slate-500 uppercase tracking-wide mb-1">Mensaje (opcional)</label>
                 <textarea name="mensaje_cuerpo" rows="3"
                           placeholder="Se adjuntan los archivos de la factura."
                           class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow resize-none"></textarea>
