@@ -73,7 +73,7 @@ class FacturasBridge{
       */
       public function getDatosInventario(string $inventario): ?array
       {
-            $sql = "SELECT * FROM INV_VENDIDOS WHERE INVENTARIO = ?";
+            $sql = "SELECT ID_MARCA,ANOMOD,DESCCOLEXT,SERIE,PEDIMENTO FROM INV_VENDIDOS WHERE INVENTARIO = ?";
             return $this->db->fetchOne($sql, [$inventario]);
       }
 
