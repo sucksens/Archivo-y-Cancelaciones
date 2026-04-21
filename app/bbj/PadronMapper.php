@@ -19,7 +19,7 @@ class PadronMapper
         return !empty($rfc) ? $rfc : null;
     }
 
-    public static function mapToPdfForm(array $facturaBbj, array $inventarioBbj, array $clienteBbj, array $operacionBbj): array
+    public static function mapToPdfForm(array $facturaBbj, array $inventarioBbj, array $clienteBbj, array $operacionBbj, string $empresa, string $tipo_factura, ?string $motor = null): array
     {
         $formData = [];
 
@@ -31,7 +31,7 @@ class PadronMapper
         }
 
         if (!empty($inventarioBbj['ANOMOD'])) {
-            $formData['anio'] = $inventarioBbj['ANOMOD'];
+            $formData['modelo'] = $inventarioBbj['ANOMOD'];
         }
 
         if (!empty($inventarioBbj['ID_MARCA'])) {
@@ -48,6 +48,16 @@ class PadronMapper
 
         if (!empty($facturaBbj['FOLIOFISCAL'])) {
             $formData['folio_fiscal'] = $facturaBbj['FOLIOFISCAL'];
+        }
+
+        // Número de motor - usar valor precalculado del controlador
+        // El controlador determina el origen según empresa y tipo_factura:
+        // - automotriz_motormexa seminuevos: inventarioBbj['MOTOR']
+        // - automotriz_motormexa nuevos: inventarioBbj['NOMOTOR']
+        // - grupo_motormexa seminuevos: inventarioBbj['MOTOR']
+        // - grupo_motormexa nuevos: getMotorGrupo(ID_MODELO) -> texto de procedencia
+        if ($motor !== null) {
+            $formData['no_motor'] = $motor;
         }
 
         //DATOS IDENTIFICACION

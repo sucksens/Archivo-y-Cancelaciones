@@ -97,7 +97,30 @@ class PadronController extends BaseController
                 $operacionBbj = $facturaBridge->getDatosOperacion($facturaBbj['ID_PEDIDO'], $facturaBbj['ID_VENDEDOR']) ?? [];
             }
 
-            $formData = PadronMapper::mapToPdfForm($facturaBbj, $inventarioBbj, $clienteBbj, $operacionBbj);
+            // Obtener el número de motor según empresa y tipo de factura
+            $motor = "";
+            if ($factura['empresa'] == 'automotriz_motormexa') {
+                // Mitsubishi
+                if ($factura['tipo_factura'] == 'seminuevos') {
+                    $motor = $inventarioBbj['MOTOR'] ?? '';
+                } else {
+                    // nuevos
+                    $motor = $inventarioBbj['NOMOTOR'] ?? '';
+                }
+            } else {
+                // Grupo
+                if ($factura['tipo_factura'] == 'seminuevos') {
+                    $motor = $inventarioBbj['MOTOR'] ?? '';
+                } else {
+                    // nuevos grupo - consultar MODELOGRAL para obtener texto de procedencia
+                    if (!empty($inventarioBbj['ID_MODELO'])) {
+                        $motor = $facturaBridge->getMotorGrupo($inventarioBbj['ID_MODELO']);
+                    }
+                }
+            }
+
+
+            $formData = PadronMapper::mapToPdfForm($facturaBbj, $inventarioBbj, $clienteBbj, $operacionBbj, $factura['empresa'], $factura['tipo_factura'], $motor);
 
             // Logging detallado de datos enviados para depuración
             $this->log('Datos enviados a API de padrón', 'padron', implode("\n", [
