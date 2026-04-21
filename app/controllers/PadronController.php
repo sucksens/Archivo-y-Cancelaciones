@@ -99,6 +99,17 @@ class PadronController extends BaseController
 
             $formData = PadronMapper::mapToPdfForm($facturaBbj, $inventarioBbj, $clienteBbj, $operacionBbj);
 
+            // Logging detallado de datos enviados para depuración
+            $this->log('Datos enviados a API de padrón', 'padron', [
+                "ID Factura: {$id}",
+                'URL API: http://200.1.1.245:5000/llenar_padron/',
+                'FormData: ' . json_encode($formData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
+                'Factura BBj: ' . json_encode($facturaBbj, JSON_UNESCAPED_UNICODE),
+                'Inventario BBj: ' . json_encode($inventarioBbj, JSON_UNESCAPED_UNICODE),
+                'Cliente BBj: ' . json_encode($clienteBbj, JSON_UNESCAPED_UNICODE),
+                'Operacion BBj: ' . json_encode($operacionBbj, JSON_UNESCAPED_UNICODE)
+            ]);
+
             $apiUrl = 'http://200.1.1.245:5000/llenar_padron/';
             
             $ch = curl_init($apiUrl);
@@ -131,7 +142,24 @@ class PadronController extends BaseController
                 if ($response) {
                     $decoded = json_decode($response, true);
                     if ($decoded && isset($decoded['detail'])) {
-                        $errorMsg .= ': ' . $decoded['detail'];
+                        // Manejar errores de validación422 donde detail puede ser array
+                        if (is_array($decoded['detail'])) {
+                            // Formato FastAPI: array de objetos con "msg", "loc", "type"
+                            $messages = [];
+                            foreach ($decoded['detail'] as $error) {
+                                if (isset($error['msg'])) {
+                                    $field = isset($error['loc']) && is_array($error['loc'])
+                                        ? implode('.', array_slice($error['loc'], 1))
+                                        : '';
+                                    $messages[] = $field ? "{$field}: {$error['msg']}" : $error['msg'];
+                                } else {
+                                    $messages[] = json_encode($error, JSON_UNESCAPED_UNICODE);
+                                }
+                            }
+                            $errorMsg .= ': ' . implode('; ', $messages);
+                        } else {
+                            $errorMsg .= ': ' . $decoded['detail'];
+                        }
                     } else {
                         $errorMsg .= ': ' . substr($response, 0, 200);
                     }
