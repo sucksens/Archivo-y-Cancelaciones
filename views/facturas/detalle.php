@@ -11,6 +11,7 @@ $factura = $factura ?? [];
 $canDownload = $canDownload ?? false;
 $canDownloadAll = $canDownloadAll ?? false;
 $canDownloadVendedor = $canDownloadVendedor ?? false;
+$canDownloadPdfOnly = $canDownloadPdfOnly ?? false;
 $userVendedor = $userVendedor ?? null;
 $canDelete = $canDelete ?? false;
 $canSendEmail = $canSendEmail ?? false;
@@ -300,14 +301,23 @@ $enviosEmail = $enviosEmail ?? [];
 const canDownloadAll = <?= $canDownloadAll ? 'true' : 'false' ?>;
 const canDownloadVendedor = <?= $canDownloadVendedor ? 'true' : 'false' ?>;
 const canDownloadNR = <?= $canDownloadNR ? 'true' : 'false' ?>;
+const canDownloadPdfOnly = <?= $canDownloadPdfOnly ? 'true' : 'false' ?>;
 const userVendedor = <?= json_encode($userVendedor) ?>;
 const rfcNR = <?= json_encode($rfcNR ?? null) ?>;
 
 // Validar descarga antes de navegar
 document.querySelectorAll('.download-btn').forEach(btn => {
     btn.addEventListener('click', function(e) {
-        // Si tiene permiso de descargar todas las facturas, permitir
-        if (canDownloadAll) {
+        // Enforce canDownloadPdfOnly exclusively targeting XML
+        const tipoArchivo = this.getAttribute('data-tipo');
+        if (canDownloadPdfOnly && tipoArchivo === 'xml' && !canDownloadAll && !canDownloadVendedor && !canDownloadNR) {
+            e.preventDefault();
+            mostrarError('Solo tienes permiso para descargar archivos PDF.');
+            return false;
+        }
+
+        // Si tiene permiso de descargar todas las facturas, o de descargar solo PDF y pide PDF
+        if (canDownloadAll || (canDownloadPdfOnly && tipoArchivo === 'pdf')) {
             return true;
         }
         

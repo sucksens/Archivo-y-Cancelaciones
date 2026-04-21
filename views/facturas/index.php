@@ -156,18 +156,19 @@ unset($_SESSION['old_input']);
                             Ver detalle
                         </a>
                         <?php 
-                        $canDownloadThis = $canDownloadAll || 
-                                           ($canDownloadVendedor && $userVendedor && $factura['id_vendedor'] === $userVendedor) ||
-                                           ($canDownloadNR && PermissionHelper::isFacturaNR($factura));
+                        $canDownloadXml = $canDownloadAll || 
+                                          ($canDownloadVendedor && $userVendedor && $factura['id_vendedor'] === $userVendedor) ||
+                                          ($canDownloadNR && PermissionHelper::isFacturaNR($factura));
+                        $canDownloadPdf = $canDownloadXml || $canDownloadPdfOnly;
                         
-                        if ($canDownloadThis): 
+                        if ($canDownloadPdf): 
                         ?>
-                        <?php if ($factura['archivo_xml']): ?>
+                        <?php if ($factura['archivo_xml'] && $canDownloadXml): ?>
                         <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/xml" class="text-red-600 hover:text-red-900 mr-3" title="Descargar XML">
                             <i class="fas fa-file-code"></i>
                         </a>
                         <?php endif; ?>
-                        <?php if ($factura['archivo_pdf']): ?>
+                        <?php if ($factura['archivo_pdf'] && $canDownloadPdf): ?>
                         <a href="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/descargar/pdf" class="text-blue-600 hover:text-blue-900" title="Descargar PDF">
                             <i class="fas fa-file-pdf"></i>
                         </a>

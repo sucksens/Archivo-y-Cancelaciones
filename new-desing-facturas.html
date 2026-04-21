@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Detalle de Factura #721</title>
+    <!-- Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Google Fonts: Inter for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <style data-purpose="typography">
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+    <style data-purpose="custom-styling">
+        /* Subtle background for the page */
+        body {
+            background-color: #f8fafc;
+        }
+
+        /* Specific brand colors if needed beyond Tailwind */
+        .brand-dark-blue {
+            background-color: #1e3a5f;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800">
+    <!-- BEGIN: MainHeader -->
+    <header class="brand-dark-blue text-white px-6 py-4 flex justify-between items-center shadow-md">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-xl font-bold tracking-tight">Factura #721</h1>
+        </div>
+        <!-- User Profile Section -->
+        <div class="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity">
+            <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center text-blue-900 font-bold text-sm">
+                A
+            </div>
+            <span class="text-sm font-medium">Administrador del Sistema</span>
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+        </div>
+    </header>
+    <!-- END: MainHeader -->
+    <!-- BEGIN: MainContent -->
+    <main class="max-w-6xl mx-auto p-6 md:p-8">
+        <!-- Navigation Actions -->
+        <div class="mb-6">
+            <button
+                class="inline-flex items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors shadow-sm">
+                <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewbox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2"></path>
+                </svg>
+                Volver a Facturas
+            </button>
+        </div>
+        <!-- BEGIN: InvoiceDetailsCard -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8"
+            data-purpose="invoice-main-card">
+            <!-- Card Header -->
+            <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Detalle de Factura</h2>
+                    <p class="text-sm text-slate-500 mt-1">UUID: <span
+                            class="font-mono text-xs">763f8e9d-a30f-4e23-ae85-7c25c0be2262</span></p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-all">
+                        Enviar por Email
+                    </button>
+                    <button
+                        class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow-sm transition-all">
+                        Eliminar Factura
+                    </button>
+                </div>
+            </div>
+            <!-- Card Body Content -->
+            <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-8"><!-- Column 1: Informacion de la Factura -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center">
+                            <span class="w-8 h-px bg-slate-200 mr-3"></span>
+                            Información de la Factura
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Empresa</label>
+                                <p
+                                    class="mt-1 text-sm font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded inline-block">
+                                    Grupo Motormexa</p>
+                            </div>
+                            <div>
+                                <label
+                                    class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Tipo</label>
+                                <p class="mt-1 text-sm font-medium text-slate-700">Autos Nuevos</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Serie
+                                    / Folio</label>
+                                <p class="mt-1 text-sm font-medium text-slate-700">AV - 0024459</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Fecha
+                                    de Emisión</label>
+                                <p class="mt-1 text-sm font-medium text-slate-700">05/03/2026</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">RFC
+                                    Emisor</label>
+                                <p class="mt-1 text-sm font-mono text-slate-600">GMG090821RT0</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">RFC
+                                    Receptor</label>
+                                <p class="mt-1 text-sm font-mono text-slate-600">AS0890921LZ1</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-5 border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total
+                                Facturado</label>
+                            <p class="text-3xl font-black text-slate-900 mt-1">$1,179,327.04</p>
+                        </div>
+                        <div class="text-right hidden sm:block">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Moneda</span>
+                            <span
+                                class="px-2 py-1 bg-white border border-slate-200 rounded text-xs font-bold text-slate-600">MXN</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Column 2: Datos BBj & Archivos -->
+                <div class="space-y-8 lg:border-l lg:pl-8 border-slate-100">
+                    <div>
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-6 flex items-center">
+                            <span class="w-8 h-px bg-slate-200 mr-3"></span>
+                            Datos de Sistema (BBj)
+                        </h3>
+                        <div class="grid grid-cols-2 gap-y-4 gap-x-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase">Sucursal</label>
+                                <p class="text-sm font-medium text-slate-700">Vallarta</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase">Vendedor</label>
+                                <p class="text-sm font-medium text-slate-700">CDIS</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase">Inventario</label>
+                                <p class="text-sm font-medium text-slate-700">2190-25</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-400 uppercase">Fecha FAC</label>
+                                <p class="text-sm font-medium text-slate-700">05/03/2026</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Archivos Disponibles
+                        </h3>
+                        <div class="grid grid-cols-1 gap-3">
+                            <button
+                                class="group flex items-center p-3 bg-white border border-blue-100 rounded-lg hover:bg-blue-50 transition-all shadow-sm">
+                                <div
+                                    class="w-10 h-10 rounded bg-blue-100 text-blue-600 flex items-center justify-center mr-3 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                                        <path
+                                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                    </svg>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-bold text-slate-700">Factura XML</p>
+                                    <p class="text-[10px] text-slate-400 uppercase">Descargar comprobante</p>
+                                </div>
+                            </button>
+                            <button
+                                class="group flex items-center p-3 bg-white border border-red-100 rounded-lg hover:bg-red-50 transition-all shadow-sm">
+                                <div
+                                    class="w-10 h-10 rounded bg-red-100 text-red-600 flex items-center justify-center mr-3 group-hover:bg-red-600 group-hover:text-white transition-colors">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                                        <path
+                                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                    </svg>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-sm font-bold text-slate-700">Factura PDF</p>
+                                    <p class="text-[10px] text-slate-400 uppercase">Vista de impresión</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card Footer Section: Upload Info -->
+            <div class="p-6 bg-slate-50 border-t border-slate-200">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Información de Subida</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase">Usuario</label>
+                        <p class="text-sm font-medium text-slate-700">Ramiro Villa</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase">Fecha de Subida</label>
+                        <p class="text-sm font-medium text-slate-700">06/03/2026 16:42</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- END: InvoiceDetailsCard -->
+        <!-- BEGIN: EmailHistory -->
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
+            data-purpose="email-history-section">
+            <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+                <div>
+                    <h3 class="text-sm font-bold uppercase tracking-widest text-slate-600">Historial de Envíos por Email
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1">Registro detallado de notificaciones enviadas a clientes</p>
+                </div>
+                <button
+                    class="text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors uppercase tracking-tight">Ver
+                    todo el log</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50/50 border-b border-slate-100">
+                        <tr>
+                            <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                Destinatario</th>
+                            <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fecha y
+                                Hora</th>
+                            <th class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Estado
+                            </th>
+                            <th
+                                class="px-6 py-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">
+                                ID Transacción</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex flex-col">
+                                    <span
+                                        class="text-sm font-semibold text-slate-700">ernesto.valdivia@grupomotormexa.com</span>
+                                    <span class="text-[10px] text-slate-400">Referencia: Factura AV-0024459</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex flex-col">
+                                    <span class="text-sm text-slate-600">07/03/2026</span>
+                                    <span class="text-[10px] text-slate-400">12:04 PM</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-green-100 text-green-700 uppercase tracking-tighter">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></span>
+                                    Enviado
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <span
+                                    class="font-mono text-[10px] text-slate-400 bg-slate-50 px-2 py-1 rounded border border-slate-100">b98c2c53-b4df-4fe5-9899-c34005ffe522</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/20">
+                <p class="text-[10px] text-slate-400 italic">Nota: El historial solo muestra los envíos realizados a
+                    través de la plataforma oficial.</p>
+            </div>
+        </section>
+        <!-- END: EmailHistory -->
+    </main>
+    <!-- END: MainContent -->
+    <footer class="mt-12 py-8 text-center text-slate-400 text-xs">
+        © 2026 Grupo Motormexa. Todos los derechos reservados.
+    </footer>
+</body>
+
+</html>
