@@ -19,7 +19,7 @@ class PadronMapper
         return !empty($rfc) ? $rfc : null;
     }
 
-    public static function mapToPdfForm(array $facturaBbj, array $inventarioBbj, array $clienteBbj, array $operacionBbj, string $empresa, string $tipo_factura, ?string $motor = null): array
+    public static function mapToPdfForm(array $facturaBbj, array $inventarioBbj, array $clienteBbj, array $operacionBbj, string $empresa, string $tipo_factura, string $motor, string $marca): array
     {
         $formData = [];
 
@@ -34,8 +34,8 @@ class PadronMapper
             $formData['modelo'] = $inventarioBbj['ANOMOD'];
         }
 
-        if (!empty($inventarioBbj['ID_MARCA'])) {
-            $formData['marca'] = $inventarioBbj['ID_MARCA'];
+        if (!empty($marca)) {
+            $formData['marca'] = $marca;
         }
 
         if (!empty($inventarioBbj['DESCCOLEXT'])) {

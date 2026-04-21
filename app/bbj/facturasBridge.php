@@ -135,17 +135,29 @@ class FacturasBridge{
             'USA' => 'HECHO EN U.S.A.',
       ];
 
+      private const MARCAS = [
+            'CRS' => 'CHRYSLER',
+            'DDG' => 'DODGE',
+            'FIA' => 'FIAT',
+            'FIC' => 'FIAT',
+            'JEP' => 'JEEP',
+            'MIT' => 'MITSUBISHI',
+            'PEC' => 'PEUGEOT',
+            'PEU' => 'PEUGEOT',
+            'RAM' => 'RAM',
+            'USA' => 'SEMINUEVOS',
+      ];
       /**
        * Obtiene el modelo del vehículo
        *
        * @param string $idmodelo
        * @return string
        */
-      public function getModelo(string $idmodelo): string
+      public function getMarca(string $idmodelo): string
       {
-            $sql = "SELECT * FROM MODELOGRAL WHERE ID_MODELO = ?";
+            $sql = "SELECT ID_MARCA FROM MODELOGRAL WHERE ID_MODELO = ?";
             $datos = $this->db->fetchOne($sql, [$idmodelo]);
-            return $datos['DESCRIPCION'] ?? '';
+            return self::MARCAS[$datos['ID_MARCA']] ?? '';
       }
 
 

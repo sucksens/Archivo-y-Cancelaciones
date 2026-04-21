@@ -119,8 +119,13 @@ class PadronController extends BaseController
                 }
             }
 
+            $marca = "";
+            if (!empty($inventarioBbj['ID_MODELO'])) {
+                $marca = $facturaBridge->getMarca($inventarioBbj['ID_MODELO']);
+            }
 
-            $formData = PadronMapper::mapToPdfForm($facturaBbj, $inventarioBbj, $clienteBbj, $operacionBbj, $factura['empresa'], $factura['tipo_factura'], $motor);
+
+            $formData = PadronMapper::mapToPdfForm($facturaBbj, $inventarioBbj, $clienteBbj, $operacionBbj, $factura['empresa'], $factura['tipo_factura'], $motor, $marca);
 
             // Logging detallado de datos enviados para depuración
             $this->log('Datos enviados a API de padrón', 'padron', implode("\n", [
