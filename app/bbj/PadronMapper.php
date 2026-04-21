@@ -111,7 +111,7 @@ class PadronMapper
         }
 
         if (!empty($clienteBbj['CP'])) {
-            $formData['cp'] = $clienteBbj['CP'];
+            $formData['postal'] = $clienteBbj['CP'];
         }
 
         if (!empty($clienteBbj['CEL'])) {
