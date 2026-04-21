@@ -127,17 +127,6 @@ class PadronController extends BaseController
 
             $formData = PadronMapper::mapToPdfForm($facturaBbj, $inventarioBbj, $clienteBbj, $operacionBbj, $factura['empresa'], $factura['tipo_factura'], $motor, $marca);
 
-            // Logging detallado de datos enviados para depuración
-            $this->log('Datos enviados a API de padrón', 'padron', implode("\n", [
-                "ID Factura: {$id}",
-                'URL API: http://200.1.1.245:5000/llenar_padron/',
-                'FormData: ' . json_encode($formData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
-                'Factura BBj: ' . json_encode($facturaBbj, JSON_UNESCAPED_UNICODE),
-                'Inventario BBj: ' . json_encode($inventarioBbj, JSON_UNESCAPED_UNICODE),
-                'Cliente BBj: ' . json_encode($clienteBbj, JSON_UNESCAPED_UNICODE),
-                'Operacion BBj: ' . json_encode($operacionBbj, JSON_UNESCAPED_UNICODE)
-            ]));
-
             $apiUrl = 'http://200.1.1.245:5000/llenar_padron/';
             
             $ch = curl_init($apiUrl);
