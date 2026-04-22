@@ -188,7 +188,7 @@ El sistema utiliza dos bases de datos:
 
 ## Licencia
 
-MIT License - Ver archivo LICENSE
+GPL 3 - Ver archivo LICENSE
 
 ## Autor
 
