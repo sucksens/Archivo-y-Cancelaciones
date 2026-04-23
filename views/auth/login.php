@@ -81,7 +81,7 @@
                 </svg>
             </div>
             <h1 class="text-3xl font-bold text-white"><?= APP_NAME ?></h1>
-            <p class="text-primary-100 mt-2 font-light">Gestión de Archivo y Canciones</p>
+            <p class="text-primary-100 mt-2 font-light">Gestión de Archivo y Cancelaciones</p>
         </div>
         
         <!-- Card de login -->
