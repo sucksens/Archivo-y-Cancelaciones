@@ -70,6 +70,18 @@ $session->remove('old_input');
                         <input type="text" name="departamento" id="departamento" class="form-input" 
                                value="<?= htmlspecialchars($oldInput['departamento'] ?? '') ?>">
                     </div>
+                    
+                    <div>
+                        <label for="especialidad_usuario" class="form-label">Especialidad</label>
+                        <select name="especialidad_usuario" id="especialidad_usuario" class="form-select">
+                            <?php foreach (ESPECIALIDADES_USUARIO as $key => $data): ?>
+                            <option value="<?= $key ?>" <?= ($oldInput['especialidad_usuario'] ?? 'ambos') === $key ? 'selected' : '' ?>>
+                                <?= $data['label'] ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">Para rol Consulta: define qué tipo de facturas puede ver</p>
+                    </div>
                 </div>
             </div>
             

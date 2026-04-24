@@ -224,6 +224,63 @@ class PermissionHelper
     }
 
     /**
+     * Obtener la especialidad del usuario de la sesión
+     * 
+     * @return string|null
+     */
+    public static function getUserEspecialidad(): ?string
+    {
+        $user = AuthHelper::getUser();
+        return $user['especialidad_usuario'] ?? null;
+    }
+
+    /**
+     * Obtener la especialidad del usuario por ID
+     * 
+     * @param int $userId ID del usuario
+     * @return string|null
+     */
+    public static function getUserEspecialidadById(int $userId): ?string
+    {
+        $userModel = new \App\Models\User();
+        return $userModel->getUserEspecialidad($userId);
+    }
+
+    /**
+     * Verificar si el usuario de rol Consulta tiene especialidad específica
+     * 
+     * @return bool
+     */
+    public static function isConsultaWithEspecialidad(): bool
+    {
+        if (!self::isConsulta()) {
+            return false;
+        }
+
+        $especialidad = self::getUserEspecialidad();
+        return $especialidad && $especialidad !== 'ambos';
+    }
+
+    /**
+     * Obtener el filtro de tipo de factura para rol Consulta
+     * 
+     * @return string|null
+     */
+    public static function getConsultaTipoFacturaFilter(): ?string
+    {
+        if (!self::isConsulta()) {
+            return null;
+        }
+
+        $especialidad = self::getUserEspecialidad();
+        if (!$especialidad || $especialidad === 'ambos') {
+            return null;
+        }
+
+        return $especialidad;
+    }
+
+    /**
      * Limpiar cache de permisos
      */
     public static function clearCache(): void

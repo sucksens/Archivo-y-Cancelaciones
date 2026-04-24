@@ -38,6 +38,7 @@
                 </select>
             </div>
             
+            <?php if (!($isConsultaWithEspecialidad ?? false)): ?>
             <div class="w-40">
                 <select name="tipo_factura" class="form-select">
                     <option value="">Todas las facturas</option>
@@ -48,6 +49,16 @@
                     <?php endforeach; ?>
                 </select>
             </div>
+            <?php else: ?>
+            <!-- Filtro deshabilitado para rol Consulta con especialidad -->
+            <div class="w-40">
+                <select name="tipo_factura" class="form-select bg-gray-100 cursor-not-allowed" disabled>
+                    <option value="<?= $filters['tipo_factura'] ?? '' ?>" selected>
+                        <?= htmlspecialchars($userEspecialidadLabel) ?>
+                    </option>
+                </select>
+            </div>
+            <?php endif; ?>
 
             <div class="w-40">
                 <input type="date" name="fecha_desde" value="<?= htmlspecialchars($filters['fecha_desde'] ?? '') ?>" 

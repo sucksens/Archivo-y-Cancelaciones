@@ -74,6 +74,13 @@ define('TIPOS_AUTO', [
     'seminuevos' => 'Seminuevos'
 ]);
 
+// Especialidades de usuario
+define('ESPECIALIDADES_USUARIO', [
+    'ambos' => ['label' => 'Ambos', 'color' => 'gray', 'icon' => 'globe'],
+    'autos_nuevos' => ['label' => 'Autos Nuevos', 'color' => 'blue', 'icon' => 'car'],
+    'seminuevos' => ['label' => 'Seminuevos', 'color' => 'green', 'icon' => 'refresh-cw']
+]);
+
 // Configuración de paginación
 define('ITEMS_PER_PAGE', 15);
 

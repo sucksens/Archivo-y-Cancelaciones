@@ -48,6 +48,7 @@ unset($_SESSION['old_input']);
                     </select>
                 </div>
                 <?php endif; ?>
+                <?php if (!($isConsultaWithEspecialidad ?? false)): ?>
                 <div>
                     <label for="tipo_factura" class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
                     <select name="tipo_factura" id="tipo_factura" class="form-select rounded-lg border-gray-300 focus:ring-primary-500 focus:border-primary-500">
@@ -59,6 +60,17 @@ unset($_SESSION['old_input']);
                         <?php endforeach; ?>
                     </select>
                 </div>
+                <?php else: ?>
+                <!-- Filtro deshabilitado para rol Consulta con especialidad -->
+                <div>
+                    <label for="tipo_factura" class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                    <select name="tipo_factura" id="tipo_factura" class="form-select rounded-lg border-gray-300 bg-gray-100 cursor-not-allowed" disabled>
+                        <option value="<?= $filters['tipo_factura'] ?? '' ?>" selected>
+                            <?= htmlspecialchars($userEspecialidadLabel) ?>
+                        </option>
+                    </select>
+                </div>
+                <?php endif; ?>
                 <div>
                     <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
                     <input type="text" name="search" id="search" placeholder="UUID, serie, folio..." 

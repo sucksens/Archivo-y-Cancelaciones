@@ -116,6 +116,14 @@ class TicketController extends BaseController
             'search' => $this->input('search')
         ];
 
+        // Aplicar filtro automático para rol Consulta con especialidad
+        if (PermissionHelper::isConsulta()) {
+            $especialidadFilter = PermissionHelper::getConsultaTipoFacturaFilter();
+            if ($especialidadFilter) {
+                $filters['tipo_factura'] = $especialidadFilter;
+            }
+        }
+
         $result = $this->ticketModel->getByEmpresa($empresa, $page, ITEMS_PER_PAGE, $filters);
 
         $canVerifySat = PermissionHelper::hasPermission('tickets.verify_sat');
@@ -128,7 +136,10 @@ class TicketController extends BaseController
             'estados' => TICKET_ESTADOS,
             'tipos' => TIPOS_CANCELACION,
             'tipos_auto' => TIPOS_AUTO,
-            'canVerifySat' => $canVerifySat
+            'canVerifySat' => $canVerifySat,
+            'isConsultaWithEspecialidad' => PermissionHelper::isConsultaWithEspecialidad(),
+            'userEspecialidadLabel' => PermissionHelper::getUserEspecialidad() ? 
+                (ESPECIALIDADES_USUARIO[PermissionHelper::getUserEspecialidad()]['label'] ?? '') : ''
         ]);
     }
 
