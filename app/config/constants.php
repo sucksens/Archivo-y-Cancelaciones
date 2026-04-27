@@ -41,7 +41,8 @@ define('ALLOWED_EXTENSIONS', ['pdf', 'xml']);
 // Empresas disponibles
 define('EMPRESAS', [
     'grupo_motormexa' => 'Grupo Motormexa',
-    'automotriz_motormexa' => 'Automotriz Motormexa'
+    'automotriz_motormexa' => 'Automotriz Motormexa',
+    'ambas' => 'Ambas Empresas'
 ]);
 
 // Estados de tickets

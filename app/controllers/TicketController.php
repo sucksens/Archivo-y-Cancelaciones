@@ -169,6 +169,13 @@ class TicketController extends BaseController
     {
         $this->requirePermission('tickets.create');
 
+        // Validación: Usuarios con empresa='ambas' no pueden crear tickets
+        $userCompany = \App\Helpers\PermissionHelper::getUserCompany();
+        if ($userCompany === 'ambas') {
+            $this->session->flash('error', 'Usuarios con acceso a ambas empresas no pueden crear tickets');
+            $this->redirect('/tickets/crear');
+        }
+
         $db = \App\Core\Database::getInstance();
         $ticketId = null;
 
@@ -366,9 +373,11 @@ class TicketController extends BaseController
         }
 
         // Verificar permisos
+        $userCompany = PermissionHelper::getUserCompany();
         $canView = $this->hasPermission('tickets.view.all') 
                 || ($this->hasPermission('tickets.view.own') && $ticket['usuario_id'] === $this->userId())
-                || ($this->hasPermission('tickets.view.empresa') && $ticket['empresa_solicitante'] === PermissionHelper::getUserCompany());
+                || ($this->hasPermission('tickets.view.empresa') && 
+                    ($ticket['empresa_solicitante'] === $userCompany || $userCompany === 'ambas'));
 
 
         if (!$canView) {
@@ -554,7 +563,7 @@ class TicketController extends BaseController
             }
 
             $flag = $this->input('flag');
-            $allowedFlags = ['cancelada', 'cancelado_sistema', 'cancelado_sat'];
+            $allowedFlags = ['solicitada_cancelacion', 'cancelado_sistema', 'cancelado_sat'];
 
             if (!in_array($flag, $allowedFlags)) {
                 $this->json(['error' => 'Bandera no válida'], 400);
@@ -563,16 +572,16 @@ class TicketController extends BaseController
             $nuevoValor = $operacion[$flag] ? 0 : 1;
             $updateData = [$flag => $nuevoValor];
 
-            // Si se marca como cancelado, guardamos la fecha
+            // Si se marca como cancelado, guardamos la fecha (fecha_cancelacion se maneja via trigger)
             if ($nuevoValor === 1) {
-                if ($flag === 'cancelada' || $flag === 'cancelado_sistema') {
+                if ($flag === 'cancelado_sistema') {
                     $updateData['fecha_cancelacion'] = date('Y-m-d H:i:s');
                 } elseif ($flag === 'cancelado_sat') {
                     $updateData['fecha_cancelacion_sat'] = date('Y-m-d H:i:s');
                 }
             } else {
                 // Si se desmarca, podríamos limpiar la fecha, pero mejor dejarla como histórico o limpiarla según regla de negocio
-                if ($flag === 'cancelada' || $flag === 'cancelado_sistema') {
+                if ($flag === 'cancelado_sistema') {
                     $updateData['fecha_cancelacion'] = null;
                 } elseif ($flag === 'cancelado_sat') {
                     $updateData['fecha_cancelacion_sat'] = null;

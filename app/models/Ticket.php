@@ -194,10 +194,16 @@ class Ticket
      * @param int $limit Límite
      * @return array
      */
-    public function getAll(array $filters = [], int $page = 1, int $limit = ITEMS_PER_PAGE): array
+    public function getAll(array $filters = [], int $page = 1, int $limit = ITEMS_PER_PAGE, array $baseConditions = []): array
     {
         $where = ['1=1'];
         $params = [];
+        
+        // Aplicar condiciones base (para getByEmpresa)
+        foreach ($baseConditions as $condition => $value) {
+            $where[] = $condition;
+            $params[] = $value;
+        }
 
         if (!empty($filters['usuario_id'])) {
             $where[] = 't.usuario_id = ?';
@@ -205,8 +211,12 @@ class Ticket
         }
 
         if (!empty($filters['empresa'])) {
-            $where[] = 't.empresa_solicitante = ?';
-            $params[] = $filters['empresa'];
+            if ($filters['empresa'] === 'ambas') {
+                // No filtrar por empresa - ver ambas
+            } else {
+                $where[] = 't.empresa_solicitante = ?';
+                $params[] = $filters['empresa'];
+            }
         }
 
         if (!empty($filters['estado'])) {
@@ -292,8 +302,13 @@ class Ticket
      */
     public function getByEmpresa(string $empresa, int $page = 1, int $limit = ITEMS_PER_PAGE, array $filters = []): array
     {
-        $filters['empresa'] = $empresa;
-        return $this->getAll($filters, $page, $limit);
+        $baseConditions = [];
+        
+        if ($empresa !== 'ambas') {
+            $baseConditions['t.empresa_solicitante = ?'] = $empresa;
+        }
+        
+        return $this->getAll($filters, $page, $limit, $baseConditions);
     }
 
     /**

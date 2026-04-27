@@ -99,6 +99,12 @@ class FacturaArchivoController extends BaseController
     {
         $this->requirePermission('facturas.upload');
 
+        // Validación: Usuarios con empresa='ambas' no pueden subir facturas
+        $userCompany = \App\Helpers\PermissionHelper::getUserCompany();
+        if ($userCompany === 'ambas') {
+            throw new \Exception('Usuarios con acceso a ambas empresas no pueden subir facturas');
+        }
+
         try {
             $this->validateCsrf();
 
@@ -295,9 +301,11 @@ class FacturaArchivoController extends BaseController
             $this->redirect('/facturas');
         }
 
+        $userCompany = PermissionHelper::getUserCompany();
         $canView = PermissionHelper::hasPermission('facturas.view.all')
                 || (PermissionHelper::hasPermission('facturas.view.own') && $factura['usuario_id'] === $this->userId())
-                || (PermissionHelper::hasPermission('facturas.view.empresa') && $factura['empresa'] === PermissionHelper::getUserCompany());
+                || (PermissionHelper::hasPermission('facturas.view.empresa') && 
+                    ($factura['empresa'] === $userCompany || $userCompany === 'ambas'));
 
         if (!$canView) {
             http_response_code(403);

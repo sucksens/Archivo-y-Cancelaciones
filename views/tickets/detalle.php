@@ -7,7 +7,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     
     <!-- Información Principal -->
-    <div class="lg:col-span-2 space-y-6">
+    <div class="lg:col-span-2 space-y-6 min-w-0">
         
         <!-- Datos del Ticket -->
         <div class="card card-accent-top card-accent-blue">
@@ -73,7 +73,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                 <!-- Motivo -->
                 <div class="mt-6 pt-6 border-t border-gray-200">
                     <label class="text-sm font-medium text-gray-500">Motivo de Cancelación</label>
-                    <p class="text-gray-900 mt-2 whitespace-pre-line"><?= htmlspecialchars($ticket['motivo']) ?></p>
+                    <p class="text-gray-900 mt-2 whitespace-pre-line break-words"><?= htmlspecialchars($ticket['motivo']) ?></p>
                 </div>
                 
                 <!-- Archivo -->
@@ -94,23 +94,23 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
         </div>
         
         <!-- Operaciones Relacionadas -->
+        <?php if (!empty($ticket['operaciones'])): ?>
         <div class="card">
             <div class="card-header grid grid-2">
                 <h3 class="text-lg font-semibold text-gray-900 grid-span-1">Operaciones Relacionadas</h3>
             </div>
-            <?php if (!empty($ticket['operaciones'])): ?>
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Factura</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">UUID</th>
+                            <!--<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">UUID</th>-->
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Monto</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Requiere Canc.</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Can. Completo</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Can. Sistema</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Can. SAT</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Solicitada Cancelación</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Cancelado Sistema</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Cancelado SAT</th>
                             <?php if ($canChangeStatus): ?>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
                             <?php endif; ?>
@@ -122,9 +122,11 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                             <td class="px-6 py-4 text-sm text-gray-900">
                                 <?= $op['serie'] .'-'. $op['id_compago'] ?>
                             </td>
+                            <!--
                             <td class="px-6 py-4 text-xs font-mono text-gray-500">
                                 <?= htmlspecialchars(substr($op['uuid_operacion'], 0, 18)) ?>...
                             </td>
+                        -->
                             <td class="px-6 py-4 text-sm text-gray-700">
                                 <?= htmlspecialchars($tipos_operacion[$op['tipo_operacion']] ?? $op['tipo_operacion']) ?>
                             </td>
@@ -139,9 +141,9 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                 <?php endif; ?>
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <span class="flag-badge" data-flag="cancelada">
-                                    <?php if ($op['cancelada']): ?>
-                                    <span class="badge badge-green">Sí</span>
+                                <span class="flag-badge" data-flag="solicitada_cancelacion">
+                                    <?php if ($op['solicitada_cancelacion']): ?>
+                                    <span class="badge badge-blue">Sí</span>
                                     <?php else: ?>
                                     <span class="badge badge-gray">No</span>
                                     <?php endif; ?>
@@ -171,18 +173,18 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                     <button type="button" 
                                             class="btn-toggle-flag p-1 text-blue-600 hover:text-blue-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
                                             data-op-id="<?= $op['id'] ?>"
-                                            data-flag="cancelada"
-                                            title=" Cancelado Completo"
+                                            data-flag="solicitada_cancelacion"
+                                            title="Solicitada Cancelación"
                                             <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
                                     </button>
                                     <button type="button" 
                                             class="btn-toggle-flag p-1 text-green-600 hover:text-green-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="cancelado_sistema"
-                                            title="Cancelar Sistema"
+                                            title="Cancelado Sistema"
                                             <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -192,7 +194,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                                             class="btn-toggle-flag p-1 text-purple-600 hover:text-purple-800 transition-colors <?= !$op['requiere_cancelacion'] ? 'opacity-25 cursor-not-allowed' : '' ?>"
                                             data-op-id="<?= $op['id'] ?>"
                                             data-flag="cancelado_sat"
-                                            title="Cancelar SAT"
+                                            title="Cancelado SAT"
                                             <?= !$op['requiere_cancelacion'] ? 'disabled' : '' ?>>
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
@@ -211,7 +213,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
     </div>
     
     <!-- Panel Lateral -->
-    <div class="space-y-6">
+    <div class="space-y-6 min-w-0">
         
         <!-- Cambiar Estado -->
         <?php if ($canChangeStatus): ?>
@@ -296,7 +298,7 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                 <div class="divide-y divide-gray-100">
                     <?php foreach (array_slice($ticket['auditoria'], 0, 5) as $audit): ?>
                     <div class="p-4">
-                        <p class="text-sm font-medium text-gray-900"><?= htmlspecialchars($audit['accion']) ?></p>
+                        <p class="text-sm font-medium text-gray-900 break-words"><?= htmlspecialchars($audit['accion']) .' a '. htmlspecialchars($audit['valor_nuevo']) ?></p>
                         <p class="text-xs text-gray-500 mt-1">
                             <?= htmlspecialchars($audit['usuario_nombre']) ?> · 
                             <?= date('d/m/Y H:i', strtotime($audit['fecha'])) ?>
