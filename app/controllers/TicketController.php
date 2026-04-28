@@ -394,7 +394,8 @@ class TicketController extends BaseController
             'tipos_auto' => TIPOS_AUTO,
             'canEdit' => $this->hasPermission('tickets.edit'),
             'canChangeStatus' => $this->hasPermission('tickets.status'),
-            'canProcess' => $this->hasPermission('tickets.process')
+            'canProcess' => $this->hasPermission('tickets.process'),
+            'canVerifySat' => $this->hasPermission('tickets.verify_sat')
         ]);
     }
 
@@ -679,6 +680,123 @@ class TicketController extends BaseController
 
             $this->log("Consultó estatus SAT para ticket #{$id}", 'tickets');
             $this->json($decodedResponse);
+
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Ocurrió un error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Validar estatus de una operación ante el SAT
+     * 
+     * @param int $id ID de la operación
+     */
+    public function validateOperacionSatStatus(int $id): void
+    {
+        $operacion = $this->operacionModel->find($id);
+        if (!$operacion) {
+            $this->json(['error' => 'Operación no encontrada'], 404);
+            return;
+        }
+
+        $ticket = $this->ticketModel->find($operacion['ticket_id']);
+        if (!$ticket) {
+            $this->json(['error' => 'Ticket no encontrado'], 404);
+            return;
+        }
+
+        $this->requirePermission('tickets.verify_sat');
+
+        $rfcEmisor = '';
+        if ($ticket['empresa_solicitante'] === 'grupo_motormexa') {
+            $rfcEmisor = 'GMG090821RT0';
+        } else if ($ticket['empresa_solicitante'] === 'automotriz_motormexa') {
+            $rfcEmisor = 'AMO021114AG5';
+        }
+
+        if (empty($rfcEmisor)) {
+            $this->json(['error' => 'RFC emisor no configurado para esta empresa'], 400);
+            return;
+        }
+
+        $totalParaApi = (strtoupper(substr($operacion['serie'], 0, 1)) === 'C') 
+            ? 0 
+            : (float)$operacion['monto'];
+
+        $data = [
+            'rfc_emisor' => $rfcEmisor,
+            'rfc_receptor' => $ticket['rfc_receptor'],
+            'total' => $totalParaApi,
+            'uuid' => $operacion['uuid_operacion']
+        ];
+
+        $apiUrl = 'http://200.1.1.245:5000/validar_factura/';
+        
+        try {
+            $ch = curl_init($apiUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Accept: application/json'
+            ]);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            if ($response === false) {
+                $this->json(['error' => 'Error al conectar con el servidor de validación: ' . $error], 500);
+                return;
+            }
+
+            $decodedResponse = json_decode($response, true);
+            
+            if ($httpCode >= 400) {
+                $this->json([
+                    'error' => 'El servidor de validación respondió con un error',
+                    'detail' => $decodedResponse['detail'] ?? $response
+                ], $httpCode);
+                return;
+            }
+
+            $updatedCanceladoSat = false;
+            if (isset($decodedResponse['estatus_cancelacion']) && 
+                (strtolower($decodedResponse['estatus_cancelacion']) === 'cancelado' ||
+                 $decodedResponse['procesamiento_exitoso'])) {
+                
+                $this->operacionModel->update($operacion['id'], [
+                    'cancelado_sat' => 1,
+                    'fecha_cancelacion_sat' => date('Y-m-d H:i:s')
+                ]);
+                
+                $this->ticketModel->audit(
+                    $ticket['id'],
+                    $this->userId(),
+                    "Validación SAT para operación #{$operacion['id']} - CANCELADO",
+                    'cancelado_sat',
+                    $operacion['cancelado_sat'] ? 'Sí' : 'No',
+                    'Sí'
+                );
+                
+                $updatedCanceladoSat = true;
+            } else {
+                $estadoValidacion = $decodedResponse['estado_validacion'] ?? 'Desconocido';
+                $this->ticketModel->audit(
+                    $ticket['id'],
+                    $this->userId(),
+                    "Validación SAT para operación #{$operacion['id']} - Estado: {$estadoValidacion}"
+                );
+            }
+
+            $this->log("Consultó estatus SAT para operación #{$id}", 'tickets');
+            
+            $this->json(array_merge($decodedResponse, [
+                'updated_cancelado_sat' => $updatedCanceladoSat
+            ]));
 
         } catch (\Exception $e) {
             $this->json(['error' => 'Ocurrió un error inesperado: ' . $e->getMessage()], 500);

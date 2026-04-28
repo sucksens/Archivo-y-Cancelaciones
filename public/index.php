@@ -51,6 +51,7 @@ $router->post('/tickets/{id}/estado', 'TicketController@updateStatus', [$authMid
 $router->post('/tickets/{id}/eliminar', 'TicketController@destroy', [$authMiddleware]);
 $router->post('/tickets/operacion/{id}/toggle', 'TicketController@toggleOperacionFlag', [$authMiddleware]);
 $router->post('/tickets/{id}/validar-sat', 'TicketController@validateSatStatus', [$authMiddleware]);
+$router->post('/tickets/operacion/{id}/validar-sat', 'TicketController@validateOperacionSatStatus', [$authMiddleware]);
 $router->post('/tickets/parse-xml', 'TicketController@parseXml', [$authMiddleware]);
 $router->get('/tickets/{id}/archivo', 'TicketController@downloadFile', [$authMiddleware]);
 
