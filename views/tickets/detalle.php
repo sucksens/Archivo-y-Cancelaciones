@@ -68,6 +68,16 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                         <label class="text-sm font-medium text-gray-500">Tipo de Cancelación</label>
                         <p class="text-gray-900"><?= TIPOS_CANCELACION[$ticket['tipo_cancelacion']] ?? $ticket['tipo_cancelacion'] ?></p>
                     </div>
+
+                    <!-- UUID de Factura Nueva (solo para refacturaciones) -->
+                    <?php if ($ticket['tipo_cancelacion'] === 'refacturacion' && !empty($ticket['uuid_factura_nueva'])): ?>
+                    <div class="col-span-2 md:col-span-1">
+                        <label class="text-sm font-medium text-gray-500">UUID de Factura Nueva</label>
+                        <p class="text-sm text-gray-900 font-mono break-all mt-1">
+                            <?= htmlspecialchars($ticket['uuid_factura_nueva']) ?>
+                        </p>
+                    </div>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Motivo -->
@@ -317,6 +327,88 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                 Verificar Status SAT
             </button>
         </div>
+
+        <!-- Ingresar UUID Factura Nueva (solo rol Usuario, estado liberado, refacturación) -->
+        <?php
+        $canIngresarUuid = PermissionHelper::isRegularUser()
+            && $ticket['tipo_cancelacion'] === 'refacturacion'
+            && $ticket['estado'] === 'liberado'
+            && empty($ticket['uuid_factura_nueva']);
+        ?>
+
+        <?php if ($canIngresarUuid): ?>
+        <div class="card mt-4 border-l-4 border-l-purple-500">
+            <div class="card-header bg-purple-50">
+                <h3 class="text-lg font-semibold text-purple-900">Ingresar UUID de Factura Nueva</h3>
+                <p class="text-sm text-purple-700 mt-1">
+                    Ingrese el UUID de la factura nueva emitida para poder proceder con la cancelación con relación.
+                </p>
+            </div>
+            <div class="card-body">
+                <form action="<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/uuid-nueva" method="POST" id="uuidForm">
+                    <?= \App\Helpers\AuthHelper::getCsrfField() ?>
+
+                    <div class="mb-4">
+                        <label for="uuid_factura_nueva" class="form-label">
+                            UUID de la Factura Nueva <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text"
+                               name="uuid_factura_nueva"
+                               id="uuid_factura_nueva"
+                               class="form-input font-mono text-sm"
+                               placeholder="Ej: 123e4567-e89b-12d3-a456-426614174000"
+                               pattern="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+                               title="Formato: 123e4567-e89b-12d3-a456-426614174000"
+                               required
+                               maxlength="36">
+                        <p class="text-xs text-gray-500 mt-1">
+                            Ingrese el UUID de la factura nueva emitida en la refacturación.
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full" id="btnGuardarUuid">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Guardar UUID de Factura Nueva
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+        document.getElementById('uuidForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('btnGuardarUuid');
+            btn.disabled = true;
+            btn.innerHTML = '<svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Guardando...';
+
+            try {
+                const formData = new FormData(this);
+                const response = await fetch('<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/uuid-nueva', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    window.location.reload();
+                } else {
+                    alert(result.error || 'Error al guardar el UUID');
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
+                }
+            } catch (error) {
+                alert('Error de conexión. Intente de nuevo.');
+                btn.disabled = false;
+                btn.innerHTML = '<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar UUID de Factura Nueva';
+            }
+        });
+        </script>
+        <?php endif; ?>
+
         <!-- Información del Usuario -->
         <div class="card">
             <div class="card-header">
