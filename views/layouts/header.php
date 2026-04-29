@@ -292,6 +292,7 @@
         .badge-red { @apply bg-red-100 text-red-500; }
         .badge-gray { @apply bg-gray-100 text-gray-700; }
         .badge-green { @apply bg-success-50 text-success-600; }
+        .badge-purple { @apply bg-purple-100 text-purple-700; }
         .badge-new { @apply bg-update-50 text-update-600; }
         .badge-used { @apply bg-gray-200 text-gray-700; }
         .badge-offer { @apply bg-gold-500 text-white; }
