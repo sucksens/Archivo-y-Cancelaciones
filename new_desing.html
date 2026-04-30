@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Ticket Dashboard - Detailed Header &amp; Activity</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1e3a8a",
+                        "background-light": "#f8fafc",
+                        "background-dark": "#0f172a",
+                        "card-light": "#ffffff",
+                        "card-dark": "#1e293b",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem",
+                    },
+                },
+            },
+        };
+    </script>
+    <style type="text/tailwindcss">
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+        .activity-stream-border {
+            position: relative;
+        }
+        .activity-stream-border::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: #e2e8f0;
+            z-index: 0;
+        }
+        .dark .activity-stream-border::before {
+            background-color: #334155;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark min-h-screen text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <header class="bg-primary text-white p-4 sticky top-0 z-50 shadow-md">
+        <div class="max-w-[1600px] mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <h1 class="text-lg font-bold tracking-tight">Portal de Administración - Ticket #4</h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right hidden sm:block">
+                    <p class="text-xs font-semibold">Administrador</p>
+                    <p class="text-[10px] opacity-70">admin@system.com</p>
+                </div>
+                <div
+                    class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold text-sm ring-2 ring-white/20 shadow-inner">
+                    A</div>
+            </div>
+        </div>
+    </header>
+    <main class="max-w-[1600px] mx-auto p-4 lg:p-6 space-y-6">
+        <section
+            class="bg-card-light dark:bg-card-dark rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+            <div class="flex flex-col gap-6">
+                <div
+                    class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+                    <div class="flex items-center flex-wrap gap-3">
+                        <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight">Ticket
+                            #4</h2>
+                        <span
+                            class="px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase">En
+                            Revisión</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">UUID:</span>
+                            <span class="text-xs text-slate-500 font-mono">e9814293-b9e5-471d-84cb-25920bbbeb12</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <button
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">check_circle</span> Actualizar Estado
+                        </button>
+                        <button
+                            class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg text-xs font-bold shadow-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-sm">verified</span> Validar SAT
+                        </button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6">
+                    <div class="space-y-1">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Empresa Solicitante</p>
+                        <p class="font-bold text-slate-800 dark:text-slate-100 leading-tight">Grupo Motormexa</p>
+                        <p class="text-[10px] text-slate-500 font-mono">RFC: GMO940815S34</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Cliente / Receptor</p>
+                        <p class="font-bold text-slate-800 dark:text-slate-100 leading-tight">REGISCA</p>
+                        <p class="text-[10px] text-slate-500 font-mono uppercase">REG1512089H6</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tipo de Factura</p>
+                        <p class="font-bold text-slate-800 dark:text-slate-100 leading-tight">Autos Nuevos</p>
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                            <span class="text-[10px] text-slate-500 font-bold uppercase">Operación Comercial</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tipo de Cancelación</p>
+                        <p class="font-bold text-primary dark:text-blue-400 leading-tight uppercase">Refacturación</p>
+                        <p class="text-[10px] text-slate-500">Motivo: 01 - Comprobante con errores</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Monto Total del Ticket
+                        </p>
+                        <div class="flex items-baseline gap-2">
+                            <p class="font-black text-2xl text-slate-900 dark:text-white leading-tight">$1,695,000.00
+                            </p>
+                            <p class="text-[10px] text-slate-500 font-mono font-bold uppercase tracking-widest">MXN</p>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Solicitante Interno</p>
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold">
+                                FZ</div>
+                            <div>
+                                <p class="text-sm font-semibold">Federico Zepeda</p>
+                                <p class="text-[10px] text-slate-500">Ejecutivo de Cuenta</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 space-y-2">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Documentos Adjuntos</p>
+                        <div class="flex flex-wrap gap-2">
+                            <div
+                                class="flex items-center gap-1.5 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 rounded-lg border border-red-100 dark:border-red-900/30 cursor-pointer hover:bg-red-100 transition-colors">
+                                <span class="material-symbols-outlined text-red-500 text-[18px]">picture_as_pdf</span>
+                                <span
+                                    class="text-xs font-bold text-red-700 dark:text-red-400">autorización_v2.pdf</span>
+                            </div>
+                            <div
+                                class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-200 transition-colors">
+                                <span class="material-symbols-outlined text-slate-500 text-[18px]">description</span>
+                                <span class="text-xs font-bold text-slate-600 dark:text-slate-400">factura_AV.xml</span>
+                            </div>
+                            <div
+                                class="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg border border-blue-100 dark:border-blue-900/30 cursor-pointer hover:bg-blue-100 transition-colors">
+                                <span class="material-symbols-outlined text-blue-500 text-[18px]">add</span>
+                                <span class="text-xs font-bold text-blue-700 dark:text-blue-400">Subir más</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="flex flex-col lg:flex-row gap-6">
+            <div class="lg:w-[62%] flex flex-col gap-6">
+                <section
+                    class="bg-card-light dark:bg-card-dark rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary dark:text-blue-400">list_alt</span>
+                            <h3 class="font-bold text-slate-800 dark:text-white">Operaciones Relacionadas</h3>
+                        </div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Vista Detallada
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead
+                                class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                                <tr>
+                                    <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider">Factura</th>
+                                    <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider">Tipo</th>
+                                    <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-right">
+                                        Monto</th>
+                                    <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">
+                                        Requieres Canc.</th>
+                                    <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">
+                                        Solicitada Canc.</th>
+                                    <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">
+                                        Acciones</th>
+                                    <th class="px-6 py-4 font-bold uppercase text-[10px] tracking-wider text-center">
+                                        Validar SAT</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">CA-0004879</td>
+                                    <td class="px-6 py-4 text-slate-500">IAN</td>
+                                    <td class="px-6 py-4 text-right font-black">$258,000.00</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-bold">Sí</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-bold">Sí</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <span
+                                                class="material-symbols-outlined text-blue-500 text-lg cursor-pointer">assignment</span>
+                                            <span
+                                                class="material-symbols-outlined text-emerald-500 text-lg cursor-pointer">check</span>
+                                            <span
+                                                class="material-symbols-outlined text-purple-400 text-lg cursor-pointer">cloud</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="material-symbols-outlined text-orange-500">check_circle</span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">CA-0004883</td>
+                                    <td class="px-6 py-4 text-slate-500">IAN</td>
+                                    <td class="px-6 py-4 text-right font-black">$320,000.00</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-bold">Sí</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-bold">Sí</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <span
+                                                class="material-symbols-outlined text-blue-500 text-lg cursor-pointer">assignment</span>
+                                            <span
+                                                class="material-symbols-outlined text-emerald-500 text-lg cursor-pointer">check</span>
+                                            <span
+                                                class="material-symbols-outlined text-purple-400 text-lg cursor-pointer">cloud</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="material-symbols-outlined text-orange-500">check_circle</span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                    <td class="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">FA-0009529</td>
+                                    <td class="px-6 py-4 text-slate-500">IAN</td>
+                                    <td class="px-6 py-4 text-right font-black">$100,000.00</td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-bold">No</span>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span
+                                            class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-bold">No</span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center justify-center gap-2 opacity-50">
+                                            <span
+                                                class="material-symbols-outlined text-slate-400 text-lg">assignment</span>
+                                            <span class="material-symbols-outlined text-slate-400 text-lg">check</span>
+                                            <span class="material-symbols-outlined text-slate-400 text-lg">cloud</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <span class="material-symbols-outlined text-slate-300">check_circle</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div
+                        class="bg-card-light dark:bg-card-dark rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex items-center gap-4 hover:border-primary/30 transition-all cursor-pointer group">
+                        <div
+                            class="w-12 h-12 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600">
+                            <span class="material-symbols-outlined text-3xl">picture_as_pdf</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold truncate">Expediente_Fiscal.pdf</p>
+                            <p class="text-xs text-slate-500">1.2 MB • Hace 2 horas</p>
+                        </div>
+                        <span
+                            class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">download</span>
+                    </div>
+                    <div
+                        class="bg-card-light dark:bg-card-dark rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex items-center gap-4 hover:border-primary/30 transition-all cursor-pointer group">
+                        <div
+                            class="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
+                            <span class="material-symbols-outlined text-3xl">description</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold truncate">Anexo_Operacion_12.xml</p>
+                            <p class="text-xs text-slate-500">45 KB • Hace 1 día</p>
+                        </div>
+                        <span
+                            class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">download</span>
+                    </div>
+                </section>
+            </div>
+            <div class="lg:w-[38%] flex flex-col">
+                <section
+                    class="bg-slate-50 dark:bg-slate-900/50 rounded-xl shadow-lg border-2 border-slate-200 dark:border-slate-800 flex flex-col h-[calc(100vh-320px)] min-h-[600px] overflow-hidden sticky top-24">
+                    <div
+                        class="p-4 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary font-bold">forum</span>
+                            <h3 class="font-bold text-slate-800 dark:text-white">Activity &amp; Comments</h3>
+                        </div>
+                        <span
+                            class="bg-primary text-white px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-tighter">Unified
+                            Stream</span>
+                    </div>
+                    <div class="p-5 flex-1 overflow-y-auto custom-scrollbar activity-stream-border space-y-6">
+                        <div class="relative z-10 flex gap-4">
+                            <div
+                                class="w-8 h-8 rounded-full bg-emerald-500 flex-shrink-0 flex items-center justify-center text-white ring-4 ring-slate-50 dark:ring-slate-900">
+                                <span class="material-symbols-outlined text-sm">settings_suggest</span>
+                            </div>
+                            <div class="flex-1">
+                                <div
+                                    class="bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-xl border border-emerald-100 dark:border-emerald-800/30">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span
+                                            class="text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-400">System
+                                            Log</span>
+                                        <span class="text-[10px] text-slate-400 font-medium">11:57 AM</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-emerald-900 dark:text-emerald-200">Validación SAT
+                                        exitosa</p>
+                                    <p class="text-[11px] text-emerald-700/80 dark:text-emerald-400/80 mt-1">Estatus
+                                        verificado: <span class="underline font-bold">VIGENTE</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative z-10 flex gap-4">
+                            <div
+                                class="w-8 h-8 rounded-full bg-indigo-600 flex-shrink-0 flex items-center justify-center text-white font-bold text-xs ring-4 ring-slate-50 dark:ring-slate-900">
+                                ER</div>
+                            <div class="flex-1">
+                                <div
+                                    class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border-2 border-primary/10 dark:border-primary/20">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-black text-slate-800 dark:text-white">José Ernesto
+                                            Ruiz</span>
+                                        <span class="text-[10px] text-slate-400 font-medium">12:05 PM</span>
+                                    </div>
+                                    <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed italic">"He
+                                        revisado la factura y los montos coinciden. El proceso de cancelación por
+                                        refacturación puede proceder."</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative z-10 flex gap-4">
+                            <div
+                                class="w-8 h-8 rounded-full bg-blue-500 flex-shrink-0 flex items-center justify-center text-white ring-4 ring-slate-50 dark:ring-slate-900">
+                                <span class="material-symbols-outlined text-sm">history</span>
+                            </div>
+                            <div class="flex-1">
+                                <div
+                                    class="bg-blue-50/50 dark:bg-blue-900/10 p-3 rounded-xl border border-blue-100 dark:border-blue-900/20">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span
+                                            class="text-[10px] font-black uppercase text-blue-700 dark:text-blue-400">System
+                                            Activity</span>
+                                        <span class="text-[10px] text-slate-400 font-medium">10:30 AM</span>
+                                    </div>
+                                    <p class="text-xs text-slate-700 dark:text-slate-300">Cambio de bandera <code
+                                            class="bg-blue-100 dark:bg-blue-800 px-1 rounded text-[10px]">solicitada_cancelacion</code>
+                                        de <b>No</b> a <b>Sí</b></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="relative z-10 flex gap-4">
+                            <div
+                                class="w-8 h-8 rounded-full bg-slate-500 flex-shrink-0 flex items-center justify-center text-white font-bold text-xs ring-4 ring-slate-50 dark:ring-slate-900">
+                                FZ</div>
+                            <div class="flex-1">
+                                <div
+                                    class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border-2 border-primary/10 dark:border-primary/20">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-black text-slate-800 dark:text-white">Federico
+                                            Zepeda</span>
+                                        <span class="text-[10px] text-slate-400 font-medium">Ayer 15:20</span>
+                                    </div>
+                                    <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Adjunto el
+                                        correo de autorización del cliente para la refacturación. Revisar carpeta de
+                                        adjuntos.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-auto">
+                        <div class="relative">
+                            <textarea
+                                class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-primary focus:border-primary p-4 pb-12 transition-all placeholder:text-slate-400 resize-none"
+                                placeholder="Añadir un comentario o nota interna..." rows="3"></textarea>
+                            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <button class="text-slate-400 hover:text-primary transition-colors">
+                                        <span class="material-symbols-outlined text-xl">attach_file</span>
+                                    </button>
+                                    <button class="text-slate-400 hover:text-primary transition-colors">
+                                        <span class="material-symbols-outlined text-xl">alternate_email</span>
+                                    </button>
+                                </div>
+                                <button
+                                    class="bg-primary hover:bg-blue-800 text-white px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all shadow-md">
+                                    Enviar <span class="material-symbols-outlined text-sm">send</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+    <button
+        class="lg:hidden fixed bottom-6 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center z-50 hover:scale-105 active:scale-95 transition-transform">
+        <span class="material-symbols-outlined text-2xl">forum</span>
+    </button>
+
+</body>
+
+</html>

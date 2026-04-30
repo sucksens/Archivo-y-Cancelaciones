@@ -130,7 +130,15 @@
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="text-sm text-gray-700">
+                        <?php 
+                        $empresaColor = 'gray';
+                        if ($ticket['empresa_solicitante'] === 'grupo_motormexa') {
+                            $empresaColor = 'blue';
+                        } elseif ($ticket['empresa_solicitante'] === 'automotriz_motormexa') {
+                            $empresaColor = 'red';
+                        }
+                        ?>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold <?= $empresaColor === 'blue' ? 'bg-primary-100 text-primary-700' : ($empresaColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700') ?>">
                             <?= $empresas[$ticket['empresa_solicitante']] ?? $ticket['empresa_solicitante'] ?>
                         </span>
                     </td>
