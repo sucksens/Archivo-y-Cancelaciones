@@ -1,6 +1,34 @@
 <?php
 use App\Helpers\FileUploadHelper;
 use App\Helpers\PermissionHelper;
+
+/**
+ * Función helper para mostrar tiempo relativo
+ *
+ * @param string $datetime Fecha en formato de base de datos
+ * @return string
+ */
+function timeAgo($datetime) {
+    $time = strtotime($datetime);
+    $now = time();
+    $diff = $now - $time;
+
+    if ($diff < 60) {
+        return 'hace un momento';
+    } elseif ($diff < 3600) {
+        $minutes = floor($diff / 60);
+        return 'hace ' . $minutes . ' minuto' . ($minutes > 1 ? 's' : '');
+    } elseif ($diff < 86400) {
+        $hours = floor($diff / 3600);
+        return 'hace ' . $hours . ' hora' . ($hours > 1 ? 's' : '');
+    } elseif ($diff < 604800) {
+        $days = floor($diff / 86400);
+        return 'hace ' . $days . ' día' . ($days > 1 ? 's' : '');
+    } else {
+        return date('d/m/Y H:i', $time);
+    }
+}
+
 $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'color' => 'gray'];
 ?>
 
@@ -102,7 +130,140 @@ $estadoInfo = $estados[$ticket['estado']] ?? ['label' => $ticket['estado'], 'col
                 </div>
             </div>
         </div>
-        
+
+        <!-- SECCIÓN DE COMENTARIOS -->
+        <?php if (!empty($comentarios) || PermissionHelper::hasPermission('tickets.comments.add')): ?>
+        <div class="card mt-6" id="comentariosSection">
+            <div class="card-header flex items-center justify-between bg-gradient-to-r from-primary-500 to-primary-700">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white">💬 Comentarios</h3>
+                        <?php if (!empty($comentarios)): ?>
+                        <p class="text-primary-100 text-sm">
+                            <?= count($comentarios) ?> comentario(s)
+                        </p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Formulario para agregar comentario (solo Admin y Supervisor Cancelaciones) -->
+                <?php if (PermissionHelper::hasPermission('tickets.comments.add')): ?>
+                <form id="formComentario" class="mb-6">
+                    <?= \App\Helpers\AuthHelper::getCsrfField() ?>
+
+                    <div>
+                        <label for="comentario" class="form-label">
+                            Agregar un comentario
+                        </label>
+                        <textarea id="comentario"
+                                  name="comentario"
+                                  rows="3"
+                                  class="form-input"
+                                  placeholder="Escribe tu comentario aquí..."
+                                  required
+                                  minlength="5"
+                                  maxlength="1000"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Mínimo 5 caracteres. Máximo 1000.
+                        </p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mt-3">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                        Publicar Comentario
+                    </button>
+                </form>
+                <?php endif; ?>
+
+                <!-- Lista de comentarios -->
+                <?php if (!empty($comentarios)): ?>
+                <div id="listaComentarios" class="space-y-4">
+                    <?php foreach ($comentarios as $comentario): ?>
+                    <div class="border-l-4
+                        <?= $comentario['rol_nombre'] === 'Administrador'
+                           ? 'border-l-red-500 bg-red-50'
+                           : 'border-l-primary-500 bg-primary-50' ?>
+                        rounded-r-lg p-4"
+                         id="comentario-<?= $comentario['id'] ?>">
+                        <div class="flex items-start space-x-3">
+                            <!-- Avatar -->
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center
+                                     <?= $comentario['rol_nombre'] === 'Administrador'
+                                        ? 'bg-red-100 text-red-700'
+                                        : 'bg-primary-100 text-primary-700' ?>">
+                                    <span class="font-bold text-sm">
+                                        <?= strtoupper(substr($comentario['usuario_nombre'], 0, 1)) ?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Contenido -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-semibold text-gray-900">
+                                            <?= htmlspecialchars($comentario['usuario_nombre']) ?>
+                                        </span>
+                                        <span class="badge
+                                            <?= $comentario['rol_nombre'] === 'Administrador'
+                                               ? 'badge-red' : 'badge-blue' ?>">
+                                            <?= $comentario['rol_nombre'] ?>
+                                        </span>
+                                    </div>
+
+                                    <!-- Botón eliminar (solo Admin) -->
+                                    <?php if (PermissionHelper::isAdmin()): ?>
+                                    <button onclick="eliminarComentario(<?= $comentario['id'] ?>)"
+                                            class="text-red-500 hover:text-red-700 transition-colors"
+                                            title="Eliminar comentario">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                    </button>
+                                    <?php endif; ?>
+                                </div>
+
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <?= timeAgo($comentario['fecha_creacion']) ?>
+                                </p>
+
+                                <p class="text-gray-900 mt-2 whitespace-pre-line break-words">
+                                    <?= htmlspecialchars($comentario['comentario']) ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php else: ?>
+                <div class="text-center py-8 text-gray-500">
+                    <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    <p>Aún no hay comentarios en este ticket.</p>
+                    <?php if (PermissionHelper::hasPermission('tickets.comments.add')): ?>
+                    <p class="text-sm mt-1">Sé el primero en comentar.</p>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Operaciones Relacionadas -->
         <?php if (!empty($ticket['operaciones'])): ?>
         <div class="card">
@@ -652,7 +813,155 @@ document.addEventListener('DOMContentLoaded', function() {
                 showToast('Error de conexión con el servidor.', 'error');
                 this.disabled = false;
             }
+            });
         });
     });
+
+    // Formulario de agregar comentario
+    const formComentario = document.getElementById('formComentario');
+    if (formComentario) {
+        formComentario.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const btn = formComentario.querySelector('button[type="submit"]');
+            const btnOriginalContent = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `
+                <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                </svg>
+                Publicando...
+            `;
+
+            try {
+                const formData = new FormData(formComentario);
+                const response = await fetch(`<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/comentarios`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '<?= \App\Helpers\AuthHelper::generateCsrfToken() ?>'
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showToast('Comentario publicado correctamente', 'success');
+
+                    // Agregar comentario al DOM
+                    if (result.comentario) {
+                        addComentarioToUI(result.comentario);
+                    }
+
+                    // Limpiar formulario
+                    formComentario.reset();
+                    btn.innerHTML = btnOriginalContent;
+                    btn.disabled = false;
+                } else {
+                    showToast(result.error || 'Error al publicar comentario', 'error');
+                    btn.innerHTML = btnOriginalContent;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error de conexión con el servidor', 'error');
+                btn.innerHTML = btnOriginalContent;
+                btn.disabled = false;
+            }
+        });
+    }
+
+    // Función para agregar comentario al DOM
+    function addComentarioToUI(comentario) {
+        const lista = document.getElementById('listaComentarios');
+        const emptyState = lista.querySelector('.text-center');
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        const isAdmin = comentario.rol_nombre === 'Administrador';
+        const borderColor = isAdmin ? 'border-l-red-500 bg-red-50' : 'border-l-primary-500 bg-primary-50';
+        const badgeClass = isAdmin ? 'badge-red' : 'badge-blue';
+        const avatarClass = isAdmin ? 'bg-red-100 text-red-700' : 'bg-primary-100 text-primary-700';
+
+        const html = `
+            <div class="border-l-4 ${borderColor} rounded-r-lg p-4 animate-slide-in"
+                 id="comentario-${comentario.id}">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center ${avatarClass}">
+                            <span class="font-bold text-sm">
+                                ${comentario.usuario_nombre.charAt(0).toUpperCase()}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="font-semibold text-gray-900">
+                                    ${comentario.usuario_nombre}
+                                </span>
+                                <span class="badge ${badgeClass}">
+                                    ${comentario.rol_nombre}
+                                </span>
+                            </div>
+                            <?php if (PermissionHelper::isAdmin()): ?>
+                            <button onclick="eliminarComentario(${comentario.id})"
+                                    class="text-red-500 hover:text-red-700 transition-colors"
+                                    title="Eliminar comentario">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                            <?php endif; ?>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">hace un momento</p>
+                        <p class="text-gray-900 mt-2 whitespace-pre-line break-words">
+                            ${comentario.comentario}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        lista.insertAdjacentHTML('afterbegin', html);
+    }
+
+    // Función para eliminar comentario
+    async function eliminarComentario(comentarioId) {
+        if (!confirm('¿Estás seguro de eliminar este comentario? Esta acción no se puede deshacer.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`<?= BASE_URL ?>tickets/<?= $ticket['id'] ?>/comentarios/${comentarioId}/eliminar`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': '<?= \App\Helpers\AuthHelper::generateCsrfToken() ?>'
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                showToast('Comentario eliminado correctamente', 'success');
+
+                const comentarioElement = document.getElementById(`comentario-${comentarioId}`);
+                if (comentarioElement) {
+                    comentarioElement.classList.add('animate-fade-out');
+                    setTimeout(() => comentarioElement.remove(), 300);
+                }
+            } else {
+                showToast(result.error || 'Error al eliminar comentario', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Error de conexión con el servidor', 'error');
+        }
+    }
 });
 </script>

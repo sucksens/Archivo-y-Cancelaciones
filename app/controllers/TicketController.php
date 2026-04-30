@@ -12,6 +12,7 @@ namespace App\Controllers;
 use App\Core\BaseController;
 use App\Models\Ticket;
 use App\Models\FacturaOperacion;
+use App\Models\ComentarioTicket;
 use App\Helpers\ValidationHelper;
 use App\Helpers\FileUploadHelper;
 use App\Helpers\PermissionHelper;
@@ -21,6 +22,7 @@ class TicketController extends BaseController
 {
     private Ticket $ticketModel;
     private FacturaOperacion $operacionModel;
+    private ComentarioTicket $comentarioModel;
 
     public function __construct()
     {
@@ -28,6 +30,7 @@ class TicketController extends BaseController
         $this->requireAuth();
         $this->ticketModel = new Ticket();
         $this->operacionModel = new FacturaOperacion();
+        $this->comentarioModel = new ComentarioTicket();
     }
 
     /**
@@ -386,12 +389,15 @@ class TicketController extends BaseController
             exit;
         }
 
+        $comentarios = $this->comentarioModel->getByTicket($id);
+
         $this->view('tickets/detalle', [
             'title' => 'Ticket #' . $ticket['id'],
             'ticket' => $ticket,
             'estados' => TICKET_ESTADOS,
             'tipos_operacion' => TIPOS_OPERACION,
             'tipos_auto' => TIPOS_AUTO,
+            'comentarios' => $comentarios,
             'canEdit' => $this->hasPermission('tickets.edit'),
             'canChangeStatus' => $this->hasPermission('tickets.status'),
             'canProcess' => $this->hasPermission('tickets.process'),
@@ -929,6 +935,116 @@ class TicketController extends BaseController
 
         } catch (\Exception $e) {
             $this->json(['error' => 'Ocurrió un error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Obtener comentarios de un ticket (AJAX)
+     * 
+     * @param int $id ID del ticket
+     */
+    public function getComments(int $id): void
+    {
+        $ticket = $this->ticketModel->find($id);
+        if (!$ticket) {
+            $this->json(['error' => 'Ticket no encontrado'], 404);
+        }
+
+        try {
+            $comentarios = $this->comentarioModel->getByTicket($id);
+            $this->json(['success' => true, 'comentarios' => $comentarios]);
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Error al obtener comentarios: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Agregar comentario a un ticket
+     * 
+     * @param int $id ID del ticket
+     */
+    public function addComment(int $id): void
+    {
+        $this->requirePermission('tickets.comments.add');
+
+        try {
+            $this->validateCsrf();
+
+            $ticket = $this->ticketModel->find($id);
+            if (!$ticket) {
+                $this->json(['error' => 'Ticket no encontrado'], 404);
+            }
+
+            $comentario = trim($this->input('comentario'));
+            if (empty($comentario)) {
+                $this->json(['error' => 'El comentario no puede estar vacío'], 400);
+            }
+
+            if (strlen($comentario) < 5) {
+                $this->json(['error' => 'El comentario debe tener al menos 5 caracteres'], 400);
+            }
+
+            if (strlen($comentario) > 1000) {
+                $this->json(['error' => 'El comentario no puede exceder 1000 caracteres'], 400);
+            }
+
+            $comentarioId = $this->comentarioModel->create([
+                'ticket_id' => $id,
+                'usuario_id' => $this->userId(),
+                'comentario' => $comentario
+            ]);
+
+            if ($comentarioId) {
+                $nuevoComentario = $this->comentarioModel->find($comentarioId);
+                $this->json([
+                    'success' => true,
+                    'message' => 'Comentario agregado correctamente',
+                    'comentario' => $nuevoComentario
+                ]);
+            } else {
+                $this->json(['error' => 'Error al guardar el comentario'], 500);
+            }
+
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Error inesperado: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Eliminar comentario de un ticket
+     * 
+     * @param int $id ID del ticket
+     * @param int $comentarioId ID del comentario
+     */
+    public function deleteComment(int $id, int $comentarioId): void
+    {
+        try {
+            $this->validateCsrf();
+
+            $comentario = $this->comentarioModel->find($comentarioId);
+            if (!$comentario) {
+                $this->json(['error' => 'Comentario no encontrado'], 404);
+            }
+
+            if ($comentario['ticket_id'] !== $id) {
+                $this->json(['error' => 'El comentario no pertenece a este ticket'], 400);
+            }
+
+            if (!PermissionHelper::isAdmin()) {
+                $this->json(['error' => 'No tienes permisos para eliminar comentarios'], 403);
+            }
+
+            if ($this->comentarioModel->delete($comentarioId)) {
+                $this->json([
+                    'success' => true,
+                    'message' => 'Comentario eliminado correctamente'
+                ]);
+            } else {
+                $this->json(['error' => 'Error al eliminar el comentario'], 500);
+            }
+
+        } catch (\Exception $e) {
+            $this->json(['error' => 'Error inesperado: ' . $e->getMessage()], 500);
         }
     }
 }
