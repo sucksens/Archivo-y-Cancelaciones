@@ -126,12 +126,12 @@
     </div>
 </div>
 
-<!-- Modal para Nuevo/Editar Rol -->
-<div id="roleModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onclick="hideRoleModal()"></div>
-        
-        <div class="relative inline-block w-full max-w-lg p-6 overflow-hidden text-left bg-white rounded-xl shadow-xl">
+ <!-- Modal para Nuevo/Editar Rol -->
+ <div id="roleModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+         <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onclick="hideRoleModal()"></div>
+         
+         <div class="relative inline-block w-full max-w-2xl p-6 overflow-hidden text-left bg-white rounded-xl shadow-xl max-h-[90vh] overflow-y-auto">
             <form id="roleForm" method="POST">
                 <?= \App\Helpers\AuthHelper::getCsrfField() ?>
                 
@@ -155,6 +155,30 @@
                     </div>
                 </div>
                 
+                <!-- Sección de Permisos -->
+                <div class="border-t border-gray-200 pt-4 mt-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="text-sm font-medium text-gray-900">Permisos del Rol</h4>
+                        <div class="flex space-x-2">
+                            <button type="button" id="selectAllPerms" class="text-xs text-blue-600 hover:text-blue-800">Seleccionar Todo</button>
+                            <span class="text-gray-300">|</span>
+                            <button type="button" id="deselectAllPerms" class="text-xs text-gray-600 hover:text-gray-800">Deseleccionar</button>
+                        </div>
+                    </div>
+                    
+                    <div id="permissionsContainer" class="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
+                        <div class="flex items-center justify-center py-8">
+                            <svg class="animate-spin h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="ml-2 text-sm text-gray-500">Cargando permisos...</span>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="currentRole" id="currentRole">
+                </div>
+                
                 <div class="flex justify-end space-x-4 mt-6 pt-4 border-t border-gray-200">
                     <button type="button" class="btn btn-secondary" onclick="hideRoleModal()">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
@@ -169,28 +193,118 @@ const roleModal = document.getElementById('roleModal');
 const roleForm = document.getElementById('roleForm');
 const modalTitle = document.getElementById('roleModalTitle');
 
-document.getElementById('btnNewRole').addEventListener('click', () => {
-    roleForm.action = '<?= BASE_URL ?>admin/roles';
-    modalTitle.textContent = 'Nuevo Rol';
-    roleForm.reset();
-    roleModal.classList.remove('hidden');
-});
+ document.getElementById('btnNewRole').addEventListener('click', () => {
+     roleForm.action = '<?= BASE_URL ?>admin/roles';
+     modalTitle.textContent = 'Nuevo Rol';
+     roleForm.reset();
+     document.getElementById('currentRole').value = '';
+     loadPermissions(null);
+     roleModal.classList.remove('hidden');
+ });
+ 
+ document.querySelectorAll('.btn-edit-role').forEach(btn => {
+     btn.addEventListener('click', function() {
+         const id = this.dataset.id;
+         roleForm.action = '<?= BASE_URL ?>admin/roles/' + id;
+         modalTitle.textContent = 'Editar Rol';
+         document.getElementById('roleName').value = this.dataset.nombre;
+         document.getElementById('roleDesc').value = this.dataset.descripcion;
+         document.getElementById('roleNivel').value = this.dataset.nivel;
+         document.getElementById('currentRole').value = id;
+         loadPermissions(id);
+         roleModal.classList.remove('hidden');
+     });
+ });
 
-document.querySelectorAll('.btn-edit-role').forEach(btn => {
-    btn.addEventListener('click', function() {
-        const id = this.dataset.id;
-        roleForm.action = '<?= BASE_URL ?>admin/roles/' + id;
-        modalTitle.textContent = 'Editar Rol';
-        document.getElementById('roleName').value = this.dataset.nombre;
-        document.getElementById('roleDesc').value = this.dataset.descripcion;
-        document.getElementById('roleNivel').value = this.dataset.nivel;
-        roleModal.classList.remove('hidden');
-    });
-});
-
-function hideRoleModal() {
-    roleModal.classList.add('hidden');
-}
+ function hideRoleModal() {
+     roleModal.classList.add('hidden');
+ }
+ 
+ async function loadPermissions(roleId = null) {
+     const container = document.getElementById('permissionsContainer');
+     
+     try {
+         container.innerHTML = `
+             <div class="flex items-center justify-center py-8">
+                 <svg class="animate-spin h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24">
+                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                 </svg>
+                 <span class="ml-2 text-sm text-gray-500">Cargando permisos...</span>
+             </div>
+         `;
+         
+         const permissionsResponse = await fetch('<?= BASE_URL ?>admin/permisos', {
+             headers: {
+                 'X-Requested-With': 'XMLHttpRequest'
+             }
+         });
+         const permissionsData = await permissionsResponse.json();
+         
+         let rolePermissions = [];
+         if (roleId) {
+             const rolePermsResponse = await fetch(`<?= BASE_URL ?>admin/roles/${roleId}/permisos`, {
+                 headers: {
+                     'X-Requested-With': 'XMLHttpRequest'
+                 }
+             });
+             rolePermissions = await rolePermsResponse.json();
+         }
+         
+         renderPermissions(permissionsData, rolePermissions);
+         
+     } catch (error) {
+         container.innerHTML = `
+             <div class="flex items-center justify-center py-8 text-red-500">
+                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                 </svg>
+                 <span class="text-sm">Error al cargar permisos</span>
+             </div>
+         `;
+     }
+ }
+ 
+ function renderPermissions(permissionsData, rolePermissions = []) {
+     const container = document.getElementById('permissionsContainer');
+     
+     if (!permissionsData || Object.keys(permissionsData).length === 0) {
+         container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">No hay permisos disponibles</p>';
+         return;
+     }
+     
+     let html = '';
+     
+     for (const [module, permissions] of Object.entries(permissionsData)) {
+         html += `<div class="mb-4">`;
+         html += `<h5 class="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">${module}</h5>`;
+         html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-2">`;
+         
+         permissions.forEach(perm => {
+             const isChecked = rolePermissions.includes(perm.id) ? 'checked' : '';
+             html += `
+                 <label class="flex items-center p-2 rounded hover:bg-gray-100 cursor-pointer transition-colors">
+                     <input type="checkbox" name="permissions[]" value="${perm.id}" ${isChecked} 
+                            class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 permission-checkbox">
+                     <span class="ml-2 text-sm text-gray-700 flex-1">${perm.nombre}</span>
+                     ${perm.descripcion ? `<span class="text-xs text-gray-500 ml-2 hidden md:inline">${perm.descripcion}</span>` : ''}
+                 </label>
+             `;
+         });
+         
+         html += `</div></div>`;
+     }
+     
+     container.innerHTML = html;
+ }
+ 
+ document.getElementById('selectAllPerms').addEventListener('click', function() {
+     document.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = true);
+ });
+ 
+ document.getElementById('deselectAllPerms').addEventListener('click', function() {
+     document.querySelectorAll('.permission-checkbox').forEach(cb => cb.checked = false);
+ });
 
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') hideRoleModal();
