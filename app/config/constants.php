@@ -75,6 +75,12 @@ define('TIPOS_AUTO', [
     'seminuevos' => 'Seminuevos'
 ]);
 
+// Tipos de error de rechazo
+define('TIPOS_ERROR_RECHAZO', [
+    'tipo_cancelacion' => 'Tipo de Cancelación Incorrecto',
+    'archivo_no_coincide' => 'Archivo no coincide con factura subida'
+]);
+
 // Especialidades de usuario
 define('ESPECIALIDADES_USUARIO', [
     'ambos' => ['label' => 'Ambos', 'color' => 'gray', 'icon' => 'globe'],
