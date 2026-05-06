@@ -706,7 +706,7 @@ class TicketController extends BaseController
             if (!$operacion) {
                 $this->json(['error' => 'Operación no encontrada'], 404);
             }
-
+            $ticket = $this->ticketModel->find($operacion['ticket_id']);
             $flag = $this->input('flag');
             $allowedFlags = ['solicitada_cancelacion', 'cancelado_sistema', 'cancelado_sat'];
 
@@ -734,6 +734,7 @@ class TicketController extends BaseController
             }
 
             $this->operacionModel->update($id, $updateData);
+            $this->operacionModel->updateBbj($id, $ticket['empresa_solicitante'], $ticket['tipo_factura']);
 
             // Registrar auditoría en el ticket relacionado
             $this->ticketModel->audit(

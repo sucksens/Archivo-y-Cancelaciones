@@ -10,10 +10,12 @@
 namespace App\Models;
 
 use App\Core\Database;
+use App\Core\DatabaseBBj;
 
 class FacturaOperacion
 {
     private Database $db;
+    private DatabaseBBj $dbBbj;
     private string $table = 'factura_operaciones';
 
     public function __construct()
@@ -112,6 +114,37 @@ class FacturaOperacion
         $sql = "UPDATE {$this->table} SET " . implode(', ', $fields) . " WHERE id = ?";
         
         $this->db->query($sql, $values);
+        return true;
+    }
+
+    public function updateBbj(int $id, string $empresa, string $contexto ): bool
+    {
+        $sql = "SELECT serie, id_compago FROM {$this->table} WHERE id = ?";
+        $data = $this->db->fetchOne($sql, [$id]);
+
+        $dbMapping = [
+            'grupo_motormexa' => [
+                'autos_nuevos' => '01AN_AUTOSNUEVOS',
+                'seminuevos' => '01AU_SEMINUEVOS'
+            ],
+            'automotriz_motormexa' => [
+                'autos_nuevos' => '02AN_AUTOSNUEVOS',
+                'seminuevos' => '02AU_SEMINUEVOS'
+            ]
+        ];
+        $dbname = $dbMapping[$empresa][$contexto];
+        $dbBBj = DatabaseBbj::getInstance($dbname);
+        if((substr($data['serie'], 0, 2)) == "NF"){
+            $sql = "UPDATE NCANTICIPOS SET STATUS = CASE
+            WHEN STATUS = '0' THEN '1' ELSE '0' END
+            WHERE SERIENC = ? AND ID_NOTA = ?";
+        }elseif((substr($data['serie'], 0, 2)) == "NA"){
+            $sql = "UPDATE NCREDITO SET STATUS = CASE
+            WHEN STATUS = '0' THEN '1' ELSE '0' END
+            WHERE SERIENC = ? AND ID_NOTA = ?";
+        }
+        $dbBBj->query($sql, [$data['serie'], $data['id_compago']]);
+
         return true;
     }
 
