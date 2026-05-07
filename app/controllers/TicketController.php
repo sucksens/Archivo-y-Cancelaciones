@@ -706,16 +706,15 @@ class TicketController extends BaseController
             if (!$operacion) {
                 $this->json(['error' => 'Operación no encontrada'], 404);
             }
-            $ticket = $this->ticketModel->find($operacion['ticket_id']);
-            $flag = $this->input('flag');
-            $allowedFlags = ['solicitada_cancelacion', 'cancelado_sistema', 'cancelado_sat'];
 
-            if (!in_array($flag, $allowedFlags)) {
-                $this->json(['error' => 'Bandera no válida'], 400);
-            }
+            $flag = $this->input('flag');
 
             $nuevoValor = $operacion[$flag] ? 0 : 1;
             $updateData = [$flag => $nuevoValor];
+
+            if ($operacion[$flag]) {
+                $this->json(['error' => 'Operación ya fue enviada'], 400);
+            }
 
             // Si se marca como cancelado, guardamos la fecha (fecha_cancelacion se maneja via trigger)
             if ($nuevoValor === 1) {
@@ -724,17 +723,14 @@ class TicketController extends BaseController
                 } elseif ($flag === 'cancelado_sat') {
                     $updateData['fecha_cancelacion_sat'] = date('Y-m-d H:i:s');
                 }
-            } else {
-                // Si se desmarca, podríamos limpiar la fecha, pero mejor dejarla como histórico o limpiarla según regla de negocio
-                if ($flag === 'cancelado_sistema') {
-                    $updateData['fecha_cancelacion'] = null;
-                } elseif ($flag === 'cancelado_sat') {
-                    $updateData['fecha_cancelacion_sat'] = null;
-                }
-            }
-
+            } 
             $this->operacionModel->update($id, $updateData);
-            $this->operacionModel->updateBbj($id, $ticket['empresa_solicitante'], $ticket['tipo_factura']);
+            
+            // validacion de que bandera se esta marcando para poder cancelar en bbj
+            if($flag === 'cancelado_sistema'){
+                $ticket = $this->ticketModel->find($operacion['ticket_id']);
+                $this->operacionModel->CancelarBbj($id, $ticket['empresa_solicitante'], $ticket['tipo_factura']);
+            }
 
             // Registrar auditoría en el ticket relacionado
             $this->ticketModel->audit(
