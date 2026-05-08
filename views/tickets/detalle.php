@@ -768,11 +768,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const result = await response.json();
                 
                 if (result.success) {
-                    if (result.nuevo_valor) {
-                        badgeContainer.innerHTML = `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black uppercase tracking-tight shadow-sm">Sí</span>`;
-                    } else {
-                        badgeContainer.innerHTML = `<span class="px-2.5 py-1 rounded-full bg-slate-200 text-slate-600 text-xs font-bold uppercase tracking-tight">No</span>`;
-                    }
+                    setTimeout(() => window.location.reload(), 1000);
                 } else {
                     alert(result.error || 'Error al actualizar');
                 }
