@@ -247,6 +247,24 @@ class PermissionHelper
     }
 
     /**
+     * Obtener el vendedor asignado al usuario según su empresa
+     * 
+     * @return string|null Retorna 'CDIS' para grupo_motormexa, 'CDI1' para automotriz_motormexa, null para ambas o sin empresa
+     */
+    public static function getUserVendedor(): ?string
+    {
+        $empresa = self::getUserCompany();
+        
+        if ($empresa === 'grupo_motormexa') {
+            return 'CDIS';
+        } elseif ($empresa === 'automotriz_motormexa') {
+            return 'CDI1';
+        }
+        
+        return null; // Para empresa 'ambas' o null
+    }
+
+    /**
      * Verificar si el usuario de rol Consulta tiene especialidad específica
      * 
      * @return bool
