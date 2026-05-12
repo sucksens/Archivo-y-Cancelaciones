@@ -17,6 +17,8 @@ use App\Helpers\FileUploadHelper;
 use App\Helpers\PermissionHelper;
 use App\Helpers\AuthHelper;
 use App\BBj\FacturasBridge;
+use App\Models\EmailConfig;
+use App\Helpers\EmailService;
 
 class FacturaArchivoController extends BaseController
 {
@@ -339,9 +341,17 @@ class FacturaArchivoController extends BaseController
         $canDownloadVendedor = PermissionHelper::hasPermission('facturas.download.vendedor');
         $canDownload = $canDownloadAll || $canDownloadVendedor;
         $canDelete = PermissionHelper::isAdmin();
+        $canSendEmail = PermissionHelper::hasPermission('facturas.email.send');
 
         // Obtener el vendedor del usuario para validación en el cliente
         $userVendedor = PermissionHelper::getUserVendedor();
+
+        // Historial de envíos (visible para admin/supervisor)
+        $enviosEmail = [];
+        if (PermissionHelper::isAdmin() || PermissionHelper::hasPermission('facturas.view.all')) {
+            $emailConfigModel = new EmailConfig();
+            $enviosEmail = $emailConfigModel->getEnviosByFactura($id);
+        }
 
         // Registrar log de la acción
         $this->log(
@@ -352,15 +362,17 @@ class FacturaArchivoController extends BaseController
         );
 
         $this->view('facturas/detalle', [
-            'title' => 'Factura #' . $id,
-            'factura' => $factura,
-            'empresas' => EMPRESAS,
-            'tipos_auto' => TIPOS_AUTO,
-            'canDownload' => $canDownload,
-            'canDownloadAll' => $canDownloadAll,
-            'canDownloadVendedor' => $canDownloadVendedor,
-            'userVendedor' => $userVendedor,
-            'canDelete' => $canDelete
+            'title'              => 'Factura #' . $id,
+            'factura'            => $factura,
+            'empresas'           => EMPRESAS,
+            'tipos_auto'         => TIPOS_AUTO,
+            'canDownload'        => $canDownload,
+            'canDownloadAll'     => $canDownloadAll,
+            'canDownloadVendedor'=> $canDownloadVendedor,
+            'userVendedor'       => $userVendedor,
+            'canDelete'          => $canDelete,
+            'canSendEmail'       => $canSendEmail,
+            'enviosEmail'        => $enviosEmail,
         ]);
     }
 
@@ -592,5 +604,146 @@ class FacturaArchivoController extends BaseController
             error_log("Stack trace: " . $e->getTraceAsString());
             $this->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    /**
+     * Enviar factura por correo electrónico
+     *
+     * Valida whitelist/blacklist antes de llamar a la API de envío.
+     * Registra todos los intentos (enviado, bloqueado, error) en factura_envios_email.
+     *
+     * @param int $id ID de la factura
+     */
+    public function sendEmail(int $id): void
+    {
+        $this->requirePermission('facturas.email.send');
+
+        $factura = $this->facturaModel->find($id);
+        if (!$factura) {
+            $this->session->flash('error', 'Factura no encontrada.');
+            $this->redirect('/facturas');
+        }
+
+        // Verificar que el usuario puede ver esta factura
+        $userCompany = \App\Helpers\PermissionHelper::getUserCompany();
+        $canView = PermissionHelper::hasPermission('facturas.view.all')
+                || (PermissionHelper::hasPermission('facturas.view.own') && $factura['usuario_id'] === $this->userId())
+                || (PermissionHelper::hasPermission('facturas.view.empresa') &&
+                    ($factura['empresa'] === $userCompany || $userCompany === 'ambas'));
+
+        if (!$canView) {
+            http_response_code(403);
+            include VIEWS_PATH . '/errors/403.php';
+            exit;
+        }
+
+        try {
+            $this->validateCsrf();
+
+            $emailDestino = trim($this->input('email_destino') ?? '');
+            $asunto       = trim($this->input('asunto') ?? '');
+            $cuerpo       = trim($this->input('mensaje_cuerpo') ?? 'Se adjuntan los archivos de la factura.');
+
+            // Validaciones básicas
+            if (empty($emailDestino) || !filter_var($emailDestino, FILTER_VALIDATE_EMAIL)) {
+                throw new \Exception('Correo electrónico destino inválido.');
+            }
+            if (empty($asunto)) {
+                $asunto = 'Factura ' . ($factura['serie'] ?? '') . '-' . ($factura['folio'] ?? '');
+            }
+
+            // Validar whitelist / blacklist
+            $emailConfigModel = new EmailConfig();
+            $validation = $emailConfigModel->isEmailAllowed($emailDestino);
+
+            if (!$validation['allowed']) {
+                // Registrar intento bloqueado
+                $emailConfigModel->logEnvio([
+                    'factura_id'       => $id,
+                    'usuario_id'       => $this->userId(),
+                    'email_destino'    => $emailDestino,
+                    'asunto'           => $asunto,
+                    'resultado'        => 'bloqueado',
+                    'detalle'          => $validation['motivo'],
+                    'id_operacion_api' => null,
+                ]);
+
+                $this->log(
+                    'Envío de factura bloqueado',
+                    'facturas',
+                    "ID Factura: {$id}, Email: {$emailDestino}, Motivo: {$validation['motivo']}"
+                );
+
+                $this->session->flash('error', 'Envío bloqueado: ' . $validation['motivo']);
+                $this->redirect('/facturas/' . $id);
+            }
+
+            // Rutas de archivos
+            $xmlPath = UPLOADS_PATH . '/' . $factura['archivo_xml'];
+            $pdfPath = !empty($factura['archivo_pdf']) ? UPLOADS_PATH . '/' . $factura['archivo_pdf'] : '';
+
+            if (!file_exists($xmlPath)) {
+                throw new \Exception('El archivo XML de la factura no está disponible en el servidor.');
+            }
+
+            // Llamar a la API de envío
+            $emailService = new EmailService();
+            $resultado = $emailService->send($xmlPath, $pdfPath, $emailDestino, $asunto, $cuerpo);
+
+            $logResultado = $resultado['exito'] ? 'enviado' : 'error';
+            $logDetalle   = $resultado['exito']
+                ? ($resultado['mensaje'] ?? 'Enviado correctamente')
+                : ($resultado['error'] ?? 'Error desconocido en la API');
+
+            // Registrar en log de envíos
+            $emailConfigModel->logEnvio([
+                'factura_id'       => $id,
+                'usuario_id'       => $this->userId(),
+                'email_destino'    => $emailDestino,
+                'asunto'           => $asunto,
+                'resultado'        => $logResultado,
+                'detalle'          => $logDetalle,
+                'id_operacion_api' => $resultado['id_operacion'] ?? null,
+            ]);
+
+            // Registrar en logs_sistema
+            $this->log(
+                'Factura enviada por email',
+                'facturas',
+                "ID: {$id}, UUID: {$factura['uuid_factura']}, Email: {$emailDestino}, " .
+                "Resultado: {$logResultado}, ID Operación: " . ($resultado['id_operacion'] ?? 'N/A')
+            );
+
+            if ($resultado['exito']) {
+                $this->session->flash('success', "Factura enviada correctamente a {$emailDestino}.");
+            } else {
+                $this->session->flash('error', 'La API reportó error al enviar: ' . $logDetalle);
+            }
+
+        } catch (\Exception $e) {
+            // Registrar error en log de envíos si podemos obtener el email
+            try {
+                $emailDest = trim($this->input('email_destino') ?? '');
+                if (!empty($emailDest)) {
+                    $emailConfigModel = new EmailConfig();
+                    $emailConfigModel->logEnvio([
+                        'factura_id'       => $id,
+                        'usuario_id'       => $this->userId(),
+                        'email_destino'    => $emailDest,
+                        'asunto'           => trim($this->input('asunto') ?? '-'),
+                        'resultado'        => 'error',
+                        'detalle'          => $e->getMessage(),
+                        'id_operacion_api' => null,
+                    ]);
+                }
+            } catch (\Exception $logEx) {
+                error_log("Error al registrar log de email fallido: " . $logEx->getMessage());
+            }
+
+            $this->log('Error al enviar factura por email', 'facturas', "ID: {$id}, Error: " . $e->getMessage());
+            $this->session->flash('error', 'Error al enviar: ' . $e->getMessage());
+        }
+
+        $this->redirect('/facturas/' . $id);
     }
 }
