@@ -41,20 +41,20 @@ use App\Helpers\PermissionHelper;
             </div>
 
             <!-- Formulario agregar correo -->
-            <div class="px-6 py-4 border-b border-gray-100 bg-green-50">
-                <form action="<?= BASE_URL ?>admin/email-config/whitelist" method="POST" class="flex flex-col gap-2">
+            <div class="px-6 py-4 border-b border-gray-100 bg-white">
+                <form action="<?= BASE_URL ?>admin/email-config/whitelist" method="POST" class="flex flex-col gap-3">
                     <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
-                    <div class="flex gap-2">
+                    <div class="flex flex-col sm:flex-row gap-3">
                         <input type="email" name="email" required
                                placeholder="correo@dominio.com"
-                               class="flex-1 text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400">
+                               class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                         <button type="submit"
-                                class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors whitespace-nowrap">
+                                class="bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors whitespace-nowrap">
                             <i class="fas fa-plus mr-1"></i> Agregar
                         </button>
                     </div>
                     <input type="text" name="descripcion" placeholder="Descripción (opcional)"
-                           class="text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400">
+                           class="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                 </form>
             </div>
 
@@ -128,23 +128,23 @@ use App\Helpers\PermissionHelper;
             </div>
 
             <!-- Formulario agregar dominio -->
-            <div class="px-6 py-4 border-b border-gray-100 bg-red-50">
-                <form action="<?= BASE_URL ?>admin/email-config/blacklist" method="POST" class="flex flex-col gap-2">
+            <div class="px-6 py-4 border-b border-gray-100 bg-white">
+                <form action="<?= BASE_URL ?>admin/email-config/blacklist" method="POST" class="flex flex-col gap-3">
                     <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
-                    <div class="flex gap-2">
-                        <div class="flex flex-1 items-center border border-gray-300 rounded-md overflow-hidden focus-within:ring-2 focus-within:ring-red-400 bg-white">
-                            <span class="px-2 text-sm text-gray-400 select-none">@</span>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="flex flex-1 items-center border border-gray-300 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500 bg-white">
+                            <span class="px-3 py-2 text-sm text-gray-500 bg-gray-50 border-r border-gray-300 select-none">@</span>
                             <input type="text" name="dominio" required
                                    placeholder="ejemplo.com"
-                                   class="flex-1 text-sm px-2 py-2 focus:outline-none">
+                                   class="flex-1 text-sm px-3 py-2 focus:outline-none rounded-r-lg">
                         </div>
                         <button type="submit"
-                                class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors whitespace-nowrap">
-                            <i class="fas fa-plus mr-1"></i> Bloquear
+                                class="bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition-colors whitespace-nowrap">
+                            <i class="fas fa-ban mr-1"></i> Bloquear
                         </button>
                     </div>
                     <input type="text" name="motivo" placeholder="Motivo (opcional)"
-                           class="text-sm border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400">
+                           class="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
                 </form>
             </div>
 
@@ -186,10 +186,9 @@ use App\Helpers\PermissionHelper;
     </div>
 
     <!-- Nota informativa -->
-    <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
-        <i class="fas fa-info-circle mr-2"></i>
+    <div class="mt-4 p-4 bg-primary-50 border border-primary-200 rounded-lg text-sm text-primary-800">
+        <i class="fas fa-info-circle mr-2 text-primary-600"></i>
         <strong>Lógica de validación:</strong>
-        Si un correo está en la whitelist <strong>activa</strong>, puede recibir facturas aunque su dominio esté bloqueado.
-        Si no está en whitelist, se rechaza aunque el dominio no esté en blacklist (política restrictiva).
+        Todos los correos son permitidos por defecto. Si un dominio está bloqueado en la blacklist, solo se enviarán facturas a las cuentas de ese dominio que estén explícitamente en la whitelist activa.
     </div>
 </div>

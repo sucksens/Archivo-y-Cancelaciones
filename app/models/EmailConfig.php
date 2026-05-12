@@ -4,9 +4,9 @@
  * Sistema de Tickets de Cancelación
  *
  * Lógica de validación (en orden de prioridad):
- *  1. ¿Está en whitelist y activo?           → PERMITIDO (prioridad sobre blacklist)
+ *  1. ¿Está en whitelist y activo?           → PERMITIDO
  *  2. ¿Su dominio está en blacklist?          → BLOQUEADO
- *  3. ¿No está en whitelist?                  → BLOQUEADO (política restrictiva)
+ *  3. ¿No está en ninguna lista?              → PERMITIDO (antes bloqueado)
  *
  * @author José Ernesto Ruiz Valdivia
  * @version 1.0
@@ -62,8 +62,8 @@ class EmailConfig
             ];
         }
 
-        // 3. No está en whitelist → bloqueado (política restrictiva)
-        return ['allowed' => false, 'motivo' => 'Correo no autorizado en whitelist'];
+        // 3. Permitido por defecto
+        return ['allowed' => true, 'motivo' => 'Envío permitido según política general'];
     }
 
     // =========================================================

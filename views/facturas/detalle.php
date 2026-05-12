@@ -284,7 +284,7 @@ $enviosEmail = $enviosEmail ?? [];
             <button onclick="document.getElementById('modal-email').classList.add('hidden')" class="text-white hover:text-indigo-200 text-xl font-bold">&times;</button>
         </div>
         <form action="<?= BASE_URL ?>facturas/<?= $factura['id'] ?>/email" method="POST" class="px-6 py-5 space-y-4">
-            <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+            <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($_SESSION['_csrf_token'] ?? '') ?>">
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Correo destinatario <span class="text-red-500">*</span></label>
