@@ -265,6 +265,37 @@ class PermissionHelper
     }
 
     /**
+     * Obtener el RFC de la financiera NR (Mitsubishi)
+     * 
+     * @return string RFC de la financiera NR
+     */
+    public static function getRfcNR(): string
+    {
+        return 'NFM0307091L9';
+    }
+
+    /**
+     * Verificar si el usuario tiene permiso para descargar facturas de NR
+     * 
+     * @return bool
+     */
+    public static function canDownloadNR(): bool
+    {
+        return self::hasPermission('facturas.download.nr');
+    }
+
+    /**
+     * Verificar si una factura es de la financiera NR
+     * 
+     * @param array $factura Datos de la factura
+     * @return bool
+     */
+    public static function isFacturaNR(array $factura): bool
+    {
+        return isset($factura['rfc_receptor']) && $factura['rfc_receptor'] === self::getRfcNR();
+    }
+
+    /**
      * Verificar si el usuario de rol Consulta tiene especialidad específica
      * 
      * @return bool
