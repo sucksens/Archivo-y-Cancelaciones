@@ -87,6 +87,7 @@ class FacturaArchivoController extends BaseController
             'canDownloadAll' => PermissionHelper::hasPermission('facturas.download'),
             'canDownloadVendedor' => PermissionHelper::hasPermission('facturas.download.vendedor'),
             'canDownloadNR' => PermissionHelper::canDownloadNR(),
+            'canDownloadPdfOnly' => PermissionHelper::hasPermission('facturas.download.pdf_only'),
             'userVendedor' => PermissionHelper::getUserVendedor()
         ]);
     }
@@ -344,7 +345,8 @@ class FacturaArchivoController extends BaseController
         $canDownloadAll = PermissionHelper::hasPermission('facturas.download');
         $canDownloadVendedor = PermissionHelper::hasPermission('facturas.download.vendedor');
         $canDownloadNR = PermissionHelper::canDownloadNR();
-        $canDownload = $canDownloadAll || $canDownloadVendedor || $canDownloadNR;
+        $canDownloadPdfOnly = PermissionHelper::hasPermission('facturas.download.pdf_only');
+        $canDownload = $canDownloadAll || $canDownloadVendedor || $canDownloadNR || $canDownloadPdfOnly;
         $canDelete = PermissionHelper::isAdmin();
         $canSendEmail = PermissionHelper::hasPermission('facturas.email.send');
 
@@ -378,6 +380,7 @@ class FacturaArchivoController extends BaseController
             'canDownloadAll'     => $canDownloadAll,
             'canDownloadVendedor'=> $canDownloadVendedor,
             'canDownloadNR'      => $canDownloadNR,
+            'canDownloadPdfOnly' => $canDownloadPdfOnly,
             'userVendedor'       => $userVendedor,
             'rfcNR'              => $rfcNR,
             'canDelete'          => $canDelete,
@@ -404,55 +407,38 @@ class FacturaArchivoController extends BaseController
         $canDownloadAll = PermissionHelper::hasPermission('facturas.download');
         $canDownloadVendedor = PermissionHelper::hasPermission('facturas.download.vendedor');
         $canDownloadNR = PermissionHelper::canDownloadNR();
+        $canDownloadPdfOnly = PermissionHelper::hasPermission('facturas.download.pdf_only');
 
-        if (!$canDownloadAll && !$canDownloadVendedor && !$canDownloadNR) {
+        if (!$canDownloadAll && !$canDownloadVendedor && !$canDownloadNR && !$canDownloadPdfOnly) {
             http_response_code(403);
             exit('Acceso denegado');
         }
 
-        // Si solo tiene permiso de vendedor, verificar que el id_vendedor coincida
-        if (!$canDownloadAll && $canDownloadVendedor && !$canDownloadNR) {
-            $userVendedor = PermissionHelper::getUserVendedor();
-            
-            if (!$userVendedor) {
-                http_response_code(403);
-                exit('No tienes un vendedor asignado');
-            }
-            
-            if ($factura['id_vendedor'] !== $userVendedor) {
-                http_response_code(403);
-                exit('No tienes permiso para descargar facturas de este vendedor');
-            }
-        }
-
-        // Si solo tiene permiso de NR, verificar que el RFC receptor sea NFM0307091L9
-        if (!$canDownloadAll && !$canDownloadVendedor && $canDownloadNR) {
-            $rfcNR = PermissionHelper::getRfcNR();
-            
-            if ($factura['rfc_receptor'] !== $rfcNR) {
-                http_response_code(403);
-                exit('No tienes permiso para descargar facturas de este RFC receptor');
-            }
-        }
-
-        // Si tiene permiso de vendedor y NR, verificar que cumpla con al menos uno
-        if (!$canDownloadAll && $canDownloadVendedor && $canDownloadNR) {
+        // Si no tiene permiso global, verificar permisos específicos
+        if (!$canDownloadAll) {
             $hasAccess = false;
-            
+
+            // Verificar permiso de pdf only
+            if ($tipo === 'pdf' && $canDownloadPdfOnly) {
+                $hasAccess = true;
+            }
+
             // Verificar permiso de vendedor
-            $userVendedor = PermissionHelper::getUserVendedor();
-            if ($userVendedor && $factura['id_vendedor'] === $userVendedor) {
-                $hasAccess = true;
+            if ($canDownloadVendedor) {
+                $userVendedor = PermissionHelper::getUserVendedor();
+                if ($userVendedor && $factura['id_vendedor'] === $userVendedor) {
+                    $hasAccess = true;
+                }
             }
-            
+
             // Verificar permiso de NR
-            if (PermissionHelper::isFacturaNR($factura)) {
+            if ($canDownloadNR && PermissionHelper::isFacturaNR($factura)) {
                 $hasAccess = true;
             }
-            
+
             if (!$hasAccess) {
                 http_response_code(403);
-                exit('No tienes permiso para descargar esta factura');
+                exit('No tienes permiso para descargar este archivo');
             }
         }
 

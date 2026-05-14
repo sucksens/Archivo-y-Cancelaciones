@@ -64,4 +64,49 @@ class FacturasBridge{
             $sql = "SELECT * FROM NCANTICIPOS WHERE ID_VENDEDOR = ? AND ID_PEDIDO = ? AND STATUS = '0' ";
             return $this->db->fetchAll($sql, [$vendedor, $pedido]);
       }
+
+      /**
+      * Obtiene datos del inventario del vehículo
+      * 
+      * @param string $inventario
+      * @return array|null
+      */
+      public function getDatosInventario(string $inventario): ?array
+      {
+            $sql = "SELECT * FROM INV_VENDIDOS WHERE INVENTARIO = ?";
+            return $this->db->fetchOne($sql, [$inventario]);
+      }
+
+      /**
+      * Obtiene datos del cliente del pedido
+      * 
+      * @param string $idPedido
+      * @param string $idVendedor
+      * @return array|null
+      */
+      public function getDatosCliente(string $idPedido, string $idVendedor): ?array
+      {
+            $sql = "SELECT * FROM PEDFACTURA WHERE ID_PEDIDO = ? AND ID_VENDEDOR = ?";
+            return $this->db->fetchOne($sql, [$idPedido, $idVendedor]);
+      }
+
+      /**
+      * Obtiene datos de la operación (prioriza FACOPERACION, fallback a PEDOPERACION)
+      * 
+      * @param string $idPedido
+      * @param string $idVendedor
+      * @return array|null
+      */
+      public function getDatosOperacion(string $idPedido, string $idVendedor): ?array
+      {
+            $sql = "SELECT * FROM FACOPERACION WHERE ID_PEDIDO = ? AND ID_VENDEDOR = ?";
+            $result = $this->db->fetchOne($sql, [$idPedido, $idVendedor]);
+            
+            if (!$result) {
+                  $sql = "SELECT * FROM PEDOPERACION WHERE ID_PEDIDO = ? AND ID_VENDEDOR = ?";
+                  $result = $this->db->fetchOne($sql, [$idPedido, $idVendedor]);
+            }
+            
+            return $result;
+      }
 }
