@@ -97,7 +97,35 @@ class PadronController extends BaseController
                 $operacionBbj = $facturaBridge->getDatosOperacion($facturaBbj['ID_PEDIDO'], $facturaBbj['ID_VENDEDOR']) ?? [];
             }
 
-            $formData = PadronMapper::mapToPdfForm($facturaBbj, $inventarioBbj, $clienteBbj, $operacionBbj);
+            // Obtener el número de motor según empresa y tipo de factura
+            $motor = "";
+            if ($factura['empresa'] == 'automotriz_motormexa') {
+                // Mitsubishi
+                if ($factura['tipo_factura'] == 'seminuevos') {
+                    $motor = $inventarioBbj['MOTOR'] ?? '';
+                } else {
+                    // nuevos
+                    $motor = $inventarioBbj['NOMOTOR'] ?? '';
+                }
+            } else {
+                // Grupo
+                if ($factura['tipo_factura'] == 'seminuevos') {
+                    $motor = $inventarioBbj['MOTOR'] ?? '';
+                } else {
+                    // nuevos grupo - consultar MODELOGRAL para obtener texto de procedencia
+                    if (!empty($inventarioBbj['ID_MODELO'])) {
+                        $motor = $facturaBridge->getMotorGrupo($inventarioBbj['ID_MODELO']);
+                    }
+                }
+            }
+
+            $marca = "";
+            if (!empty($inventarioBbj['ID_MODELO'])) {
+                $marca = $facturaBridge->getMarca($inventarioBbj['ID_MODELO']);
+            }
+
+
+            $formData = PadronMapper::mapToPdfForm($facturaBbj, $inventarioBbj, $clienteBbj, $operacionBbj, $factura['empresa'], $factura['tipo_factura'], $motor, $marca);
 
             $apiUrl = 'http://200.1.1.245:5000/llenar_padron/';
             
@@ -131,7 +159,24 @@ class PadronController extends BaseController
                 if ($response) {
                     $decoded = json_decode($response, true);
                     if ($decoded && isset($decoded['detail'])) {
-                        $errorMsg .= ': ' . $decoded['detail'];
+                        // Manejar errores de validación422 donde detail puede ser array
+                        if (is_array($decoded['detail'])) {
+                            // Formato FastAPI: array de objetos con "msg", "loc", "type"
+                            $messages = [];
+                            foreach ($decoded['detail'] as $error) {
+                                if (isset($error['msg'])) {
+                                    $field = isset($error['loc']) && is_array($error['loc'])
+                                        ? implode('.', array_slice($error['loc'], 1))
+                                        : '';
+                                    $messages[] = $field ? "{$field}: {$error['msg']}" : $error['msg'];
+                                } else {
+                                    $messages[] = json_encode($error, JSON_UNESCAPED_UNICODE);
+                                }
+                            }
+                            $errorMsg .= ': ' . implode('; ', $messages);
+                        } else {
+                            $errorMsg .= ': ' . $decoded['detail'];
+                        }
                     } else {
                         $errorMsg .= ': ' . substr($response, 0, 200);
                     }

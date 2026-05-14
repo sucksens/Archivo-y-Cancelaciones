@@ -109,4 +109,73 @@ class FacturasBridge{
             
             return $result;
       }
+
+      /**
+       * Mapeo de códigos de procedencia a texto descriptivo
+       */
+      private const PROCEDENCIAS = [
+            'ARG' => 'HECHO EN ARGENTINA',
+            'BRA' => 'HECHO EN BRASIL',
+            'CAN' => 'HECHO EN CANADA',
+            'CHN' => 'HECHO EN CHINA',
+            'CRA' => 'HECHO EN COREA',
+            'ESP' => 'HECHO EN ESPAÑA',
+            'EUM' => 'HECHO EN MEXICO',
+            'FRA' => 'HECHO EN FRANCIA',
+            'GMA' => 'HECHO EN ALEMANIA',
+            'HLD' => 'HECHO EN HOLANDA',
+            'IDA' => 'HECHO EN INDIA',
+            'IND' => 'HECHO EN INDONESIA',
+            'ITA' => 'HECHO EN ITALIA',
+            'JPN' => 'HECHO EN JAPON',
+            'MAL' => 'HECHO EN MALASIA',
+            'NID' => 'HECHO EN NO IDENTIFICADO',
+            'TAI' => 'HECHO EN TAILANDIA',
+            'TUR' => 'HECHO EN TURQUIA',
+            'USA' => 'HECHO EN U.S.A.',
+      ];
+
+      private const MARCAS = [
+            'CRS' => 'CHRYSLER',
+            'DDG' => 'DODGE',
+            'FIA' => 'FIAT',
+            'FIC' => 'FIAT',
+            'JEP' => 'JEEP',
+            'MIT' => 'MITSUBISHI',
+            'PEC' => 'PEUGEOT',
+            'PEU' => 'PEUGEOT',
+            'RAM' => 'RAM',
+            'USA' => 'SEMINUEVOS',
+      ];
+      /**
+       * Obtiene el modelo del vehículo
+       *
+       * @param string $idmodelo
+       * @return string
+       */
+      public function getMarca(string $idmodelo): string
+      {
+            $sql = "SELECT ID_MARCA FROM MODELOGRAL WHERE ID_MODELO = ?";
+            $datos = $this->db->fetchOne($sql, [$idmodelo]);
+            return self::MARCAS[$datos['ID_MARCA']] ?? '';
+      }
+
+
+      /**
+       * Obtiene datos del motor del vehículo (texto de procedencia)
+       *
+       * @param string $idmodelo
+       * @return string
+       */
+      public function getMotorGrupo(string $idmodelo): string
+      {
+            $sql = "SELECT ID_PROCEDENCIA FROM MODELOGRAL WHERE ID_MODELO = ?";
+            $datos = $this->db->fetchOne($sql, [$idmodelo]);
+            
+            if (empty($datos) || empty($datos['ID_PROCEDENCIA'])) {
+                  return '';
+            }
+            
+            return self::PROCEDENCIAS[$datos['ID_PROCEDENCIA']] ?? '';
+      }
 }
